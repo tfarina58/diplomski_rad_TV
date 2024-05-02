@@ -78,7 +78,7 @@
         app:layout_constraintStart_toStartOf="@+id/editTextTextPassword" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/loginButton"
         android:layout_width="400dp"
         android:layout_height="50dp"
         android:background="@drawable/button_design"

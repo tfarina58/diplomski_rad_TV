@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:focusable="false"
     android:background="#181818"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -14,7 +15,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:adjustViewBounds="true"
-        android:background="@drawable/highlighted_header_button"
+        android:background="@drawable/header_button"
         android:gravity="center"
         android:scaleType="fitCenter"
         android:text="English"
@@ -22,6 +23,9 @@
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textSize="14sp"
+        android:focusable="true"
+        android:nextFocusRight="@+id/themeButton"
+        android:nextFocusDown="@+id/imageButton1"
         app:layout_constraintEnd_toStartOf="@+id/themeButton"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -31,6 +35,7 @@
         android:layout_height="22dp"
         android:background="@drawable/united_kingdom"
         android:translationZ="2dp"
+        android:focusable="false"
         app:layout_constraintBottom_toBottomOf="@+id/languageButton"
         app:layout_constraintEnd_toEndOf="@+id/languageButton"
         app:layout_constraintHorizontal_bias="0.109"
@@ -52,6 +57,10 @@
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textSize="14sp"
+        android:focusable="true"
+        android:nextFocusLeft="@+id/languageButton"
+        android:nextFocusRight="@+id/gridButton"
+        android:nextFocusDown="@+id/imageButton1"
         app:layout_constraintEnd_toStartOf="@+id/gridButton"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -61,6 +70,7 @@
         android:layout_height="22dp"
         android:background="@drawable/moon"
         android:translationZ="2dp"
+        android:focusable="false"
         app:layout_constraintBottom_toBottomOf="@+id/themeButton"
         app:layout_constraintEnd_toEndOf="@+id/themeButton"
         app:layout_constraintHorizontal_bias="0.184"
@@ -82,6 +92,10 @@
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textSize="14sp"
+        android:focusable="true"
+        android:nextFocusLeft="@+id/themeButton"
+        android:nextFocusRight="@+id/textClock"
+        android:nextFocusDown="@+id/imageButton1"
         app:layout_constraintEnd_toStartOf="@+id/textClock"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -91,6 +105,7 @@
         android:layout_height="20dp"
         android:src="@drawable/grid"
         android:translationZ="2dp"
+        android:focusable="false"
         app:layout_constraintBottom_toBottomOf="@+id/gridButton"
         app:layout_constraintEnd_toEndOf="@+id/gridButton"
         app:layout_constraintHorizontal_bias="0.225"
@@ -109,6 +124,9 @@
         android:background="@drawable/header_button"
         android:textAlignment="center"
         android:textSize="14sp"
+        android:focusable="true"
+        android:nextFocusLeft="@+id/gridButton"
+        android:nextFocusDown="@+id/imageButton1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -121,6 +139,9 @@
         android:iconifiedByDefault="false"
         android:background="@drawable/header_button"
         android:queryHint="Search..."
+        android:focusable="true"
+        android:nextFocusUp="@+id/imageButton1"
+        android:nextFocusRight="@+id/pageIndex"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -137,12 +158,20 @@
         android:textColor="#ffffff"
         android:background="@drawable/header_button"
         android:text="7/12"
+        android:focusable="true"
+        android:nextFocusUp="@+id/imageButton1"
+        android:nextFocusLeft="@+id/searchView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <androidx.viewpager2.widget.ViewPager2
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </androidx.viewpager2.widget.ViewPager2>
 
     <TextView
-        android:id="@+id/title4"
+        android:id="@+id/title1"
         android:layout_width="272dp"
         android:layout_height="20dp"
         android:layout_marginEnd="14dp"
@@ -152,11 +181,12 @@
         android:textColor="#ffffff"
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/imageButton4"
-        app:layout_constraintEnd_toStartOf="@+id/title5" />
+        android:focusable="false"
+        app:layout_constraintBottom_toTopOf="@+id/imageButton1"
+        app:layout_constraintEnd_toStartOf="@+id/title2" />
 
     <TextView
-        android:id="@+id/title5"
+        android:id="@+id/title2"
         android:layout_width="272dp"
         android:layout_height="20dp"
         android:layout_marginBottom="4dp"
@@ -165,12 +195,13 @@
         android:textColor="#ffffff"
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/imageButton5"
+        android:focusable="false"
+        app:layout_constraintBottom_toTopOf="@+id/imageButton2x"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/title6"
+        android:id="@+id/title3"
         android:layout_width="272dp"
         android:layout_height="20dp"
         android:layout_marginStart="14dp"
@@ -180,30 +211,43 @@
         android:textColor="#ffffff"
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/imageButton6"
-        app:layout_constraintStart_toEndOf="@+id/title5" />
+        android:focusable="false"
+        app:layout_constraintBottom_toTopOf="@+id/imageButton3"
+        app:layout_constraintStart_toEndOf="@+id/title2" />
 
     <ImageButton
-        android:id="@+id/imageButton4"
+        android:id="@+id/imageButton1"
         android:layout_width="272dp"
         android:layout_height="153dp"
         android:background="#181818"
         android:scaleType="centerCrop"
         android:src="@drawable/vietnam"
+        android:focusable="true"
+        android:nextFocusRight="@+id/imageButton2"
+        android:nextFocusUp="@+id/languageButton"
+        android:nextFocusDown="@+id/searchView"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton5"
+        app:layout_constraintEnd_toStartOf="@+id/imageButton2x"
         app:layout_constraintHorizontal_bias="0.805"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.501" />
+        app:layout_constraintVertical_bias="0.501">
+
+        <requestFocus />
+    </ImageButton>
 
     <ImageButton
-        android:id="@+id/imageButton5"
+        android:id="@+id/imageButton2x"
         android:layout_width="272dp"
         android:layout_height="153dp"
         android:background="#181818"
         android:scaleType="centerCrop"
         android:src="@drawable/vietnam"
+        android:focusable="true"
+        android:nextFocusLeft="@+id/imageButton1"
+        android:nextFocusRight="@+id/imageButton3"
+        android:nextFocusUp="@+id/languageButton"
+        android:nextFocusDown="@+id/searchView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -211,16 +255,20 @@
         app:layout_constraintVertical_bias="0.501" />
 
     <ImageButton
-        android:id="@+id/imageButton6"
+        android:id="@+id/imageButton3"
         android:layout_width="272dp"
         android:layout_height="153dp"
         android:background="#181818"
         android:scaleType="centerCrop"
         android:src="@drawable/vietnam"
+        android:focusable="true"
+        android:nextFocusLeft="@+id/imageButton2"
+        android:nextFocusUp="@+id/languageButton"
+        android:nextFocusDown="@+id/searchView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.194"
-        app:layout_constraintStart_toEndOf="@+id/imageButton5"
+        app:layout_constraintStart_toEndOf="@+id/imageButton2x"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.501" />
 

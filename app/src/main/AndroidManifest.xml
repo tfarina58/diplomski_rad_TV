@@ -10,7 +10,9 @@
 
         <activity
             android:name=".EstateListActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -19,7 +21,28 @@
 
         <activity
             android:name=".LoginActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing" />
+
+        <activity
+            android:name=".CategoryListActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing" />
+
+        <activity
+            android:name=".ElementListActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing" />
+
+        <activity
+            android:name=".DescriptionActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing" />
+
+        <activity
+            android:name=".RatingActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing" />
 
     </application>
 

@@ -1,7 +1,11 @@
 package com.example.diplomski_rad_tv;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.FocusFinder;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -19,7 +23,7 @@ public class EstateListActivity extends Activity {
     Estate estate;
     Language language = Language.germany;
     Theme theme = Theme.light;
-    Grid grid = Grid.one;
+    Grid grid = Grid.three;
     Clock format = Clock.h12;
     BasicPageButton focusedButton;
     String searchbarText = "";
@@ -32,6 +36,12 @@ public class EstateListActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setNewContentView(savedInstanceState);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // Toast.makeText(EstateListActivity.this, Integer.toString(keyCode), Toast.LENGTH_SHORT).show();
+        return keyCode != 4;
     }
 
     void setNewContentView(Bundle savedInstanceState) {
@@ -82,9 +92,15 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(EstateListActivity.this, "Navigate to next page", Toast.LENGTH_SHORT).show();
+
+                    Intent i = new Intent(getApplicationContext(), CategoryListActivity.class);
+                    startActivity(i);
                 }
             });
         }
+
+        TextView buttonTitle = findViewById(R.id.title1);
+        buttonTitle.setText("Real estate name");
     }
     void setupLanguageButton(Bundle savedInstanceState) {
         Button languageButton = findViewById(R.id.languageButton);
@@ -278,7 +294,12 @@ public class EstateListActivity extends Activity {
             paginationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: open pagination modal or something
+                    /*FragmentManager fragmentManager = getFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    SelectPageFragment fragment = new SelectPageFragment();
+                    fragmentTransaction.add(R.id.fragmentContainerView, fragment);
+                    fragmentTransaction.commit();*/
+
                     focusedButton = BasicPageButton.pagination;
                     setNewContentView(savedInstanceState);
                 }

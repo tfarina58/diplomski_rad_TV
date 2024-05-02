@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:focusable="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#181820"
+        android:focusable="true"
+        android:nextFocusRight="@+id/imageButton2"
+        android:nextFocusUp="@+id/languageButton"
+        android:nextFocusDown="@+id/searchView"
+        android:scaleType="centerCrop"
+        android:src="@drawable/vietnam"
+        android:translationZ="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.501" />
+
+    <TextView
+        android:id="@+id/title1"
+        android:layout_width="300dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="14dp"
+        android:text="Real estate name"
+        android:textAlignment="textStart"
+        android:textColor="#ffffff"
+        android:textFontWeight="@android:integer/config_longAnimTime"
+        android:textSize="14sp"
+        android:focusable="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/languageButton"
+        android:layout_width="118dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/header_button"
+        android:gravity="center"
+        android:scaleType="fitCenter"
+        android:text="English"
+        android:paddingLeft="26dp"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        android:focusable="true"
+        app:layout_constraintEnd_toStartOf="@+id/themeButton"
+        app:layout_constraintTop_toTopOf="parent">
+    </Button>
+
+    <ImageView
+        android:id="@+id/languageIcon"
+        android:layout_width="24dp"
+        android:layout_height="22dp"
+        android:translationZ="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/languageButton"
+        app:layout_constraintEnd_toEndOf="@+id/languageButton"
+        app:layout_constraintHorizontal_bias="0.109"
+        app:layout_constraintStart_toStartOf="@+id/languageButton"
+        app:layout_constraintTop_toTopOf="@+id/languageButton" />
+
+    <Button
+        android:id="@+id/themeButton"
+        android:layout_width="118dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/header_button"
+        android:gravity="center"
+        android:scaleType="fitCenter"
+        android:text="Dark"
+        android:paddingLeft="26dp"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/gridButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/themeIcon"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:translationZ="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/themeButton"
+        app:layout_constraintEnd_toEndOf="@+id/themeButton"
+        app:layout_constraintHorizontal_bias="0.184"
+        app:layout_constraintStart_toStartOf="@+id/themeButton"
+        app:layout_constraintTop_toTopOf="@+id/themeButton" />
+
+    <Button
+        android:id="@+id/gridButton"
+        android:layout_width="118dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/header_button"
+        android:gravity="center"
+        android:scaleType="fitCenter"
+        android:text="List"
+        android:paddingLeft="26dp"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/textClock"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/grid"
+        android:translationZ="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/gridButton"
+        app:layout_constraintEnd_toEndOf="@+id/gridButton"
+        app:layout_constraintHorizontal_bias="0.225"
+        app:layout_constraintStart_toStartOf="@+id/gridButton"
+        app:layout_constraintTop_toTopOf="@+id/gridButton" />
+
+    <TextClock
+        android:id="@+id/textClock"
+        android:layout_width="128dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        android:text="12:45:00 AM"
+        android:textFontWeight="@android:integer/config_longAnimTime"
+        android:background="@drawable/header_button"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="300dp"
+        android:layout_height="40dp"
+        android:queryBackground="@android:color/transparent"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:iconifiedByDefault="false"
+        android:background="@drawable/header_button"
+        android:queryHint="Search..."
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/pageIndex"
+        android:layout_width="88dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textFontWeight="@android:integer/config_longAnimTime"
+        android:textSize="14sp"
+        android:textColor="#ffffff"
+        android:background="@drawable/header_button"
+        android:text="7/12"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
