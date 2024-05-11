@@ -1,2 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <color name="dark_theme">#181820</color>
+    <color name="light_theme">#c8d9ed</color>
+
+    <color name="dark_button_background">#003333</color>
+    <color name="light_button_background">#4663ac</color>
+</resources>

@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.diplomski_rad_tv"
-        minSdk = 24
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -32,8 +32,7 @@ android {
 
 dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.core:core:1.12.0")
+    implementation("androidx.core:core:1.13.1")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
-
 }

@@ -9,7 +9,7 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="#181818"
+        android:background="#181820"
         android:orientation="vertical"
         android:focusable="true"
         android:id="@+id/main"
