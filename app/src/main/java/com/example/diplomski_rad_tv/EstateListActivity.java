@@ -1,12 +1,15 @@
 package com.example.diplomski_rad_tv;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SearchView;
@@ -15,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
+import android.app.Fragment;
 
 
 public class EstateListActivity extends Activity {
@@ -29,10 +33,12 @@ public class EstateListActivity extends Activity {
     int currentIndex = 0;
     int currentPage = 0;
     int totalPages;
+    Bundle savedInstanceState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.savedInstanceState = savedInstanceState;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         this.estates = new Estate[5];
@@ -87,6 +93,8 @@ public class EstateListActivity extends Activity {
                         this.overallIndex += 3;
                         this.currentIndex += 3;
                     } else newFocusedViewId = R.id.searchView;
+                } else if (Grid.isSecondRow(oldFocusedViewId)) {
+                    newFocusedViewId = R.id.searchView;
                 } else newFocusedViewId = 0;
 
             }
@@ -195,7 +203,15 @@ public class EstateListActivity extends Activity {
             } else if (oldFocusedViewId == R.id.pageIndex) {
                 focusedView = findViewById(R.id.pageIndex);
 
-                // FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                /*if (savedInstanceState == null) {
+                    Fragment newFragment = new Fragment();
+                    FragmentManager fm = getFragmentManager();
+                    FragmentTransaction ft = fm.beginTransaction();
+
+                    ft.replace(R.id.frame_layout, new SelectPageFragment());
+                    ft.commit();
+                }*/
+
 
                 // setNewContentView();
             } else if (oldFocusedViewId == R.id.main) {
@@ -295,6 +311,9 @@ public class EstateListActivity extends Activity {
             focusedView = main;
         }
 
+        if (theme == Theme.light) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
+        else if (theme == Theme.dark) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
+
         if (this.overallIndex < estates.length && this.estates[this.overallIndex].image != null && this.estates[this.overallIndex].image.length() > 0) {
             try {
                 ImageLoader imageLoader = new ImageLoader(main);
@@ -302,9 +321,6 @@ public class EstateListActivity extends Activity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            if (theme == Theme.light) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
-            else if (theme == Theme.dark) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
         }
 
 

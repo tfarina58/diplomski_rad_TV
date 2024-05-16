@@ -15,7 +15,7 @@ public enum Grid {
         {0,                   R.id.main,       R.id.gridButton,     0},                // textClock
         {R.id.main,           0,               0,                   R.id.pageIndex},   // searchView
         {R.id.main,           0,               R.id.searchView,     0},                // pageIndex
-        {R.id.languageButton, R.id.searchView, 0,                   0}                 // main
+        {R.id.languageButton, R.id.searchView, R.id.main,           R.id.main}                 // main
     };
     private static int[][] navigationBasic3 = {
         {0,                   R.id.imageButton1, 0,                   R.id.themeButton},  // languageButton

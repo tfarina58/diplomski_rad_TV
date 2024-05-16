@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -29,6 +30,7 @@ public class ImageLoader extends AsyncTask<String, Void, Bitmap> {
             URL imageUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
             connection.setDoInput(true);
+            connection.setDoOutput(true);
             connection.connect();
             InputStream inputStream = connection.getInputStream();
             bitmap = BitmapFactory.decodeStream(inputStream);
