@@ -1,15 +1,14 @@
 package com.example.diplomski_rad_tv;
 
 import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SearchView;
@@ -17,11 +16,23 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import android.app.Fragment;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
 
 public class EstateListActivity extends Activity {
+    String userId = "TUXPrSDT4VHw1hfYUn5z";
+    FirebaseFirestore firestore;
     Estate[] estates;
     Language language = Language.germany;
     Theme theme = Theme.light;
@@ -33,35 +44,55 @@ public class EstateListActivity extends Activity {
     int currentIndex = 0;
     int currentPage = 0;
     int totalPages;
-    Bundle savedInstanceState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.savedInstanceState = savedInstanceState;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        this.estates = new Estate[5];
-        this.estates[0] = new Estate(1);
-        this.estates[1] = new Estate(2);
-        this.estates[2] = new Estate(1);
-        this.estates[3] = new Estate(1);
-        this.estates[4] = new Estate(2);
-        // this.estates[5] = new Estate(1);
-        // this.estates[6] = new Estate(2);
+        this.firestore = FirebaseFirestore.getInstance();
+        Query query = firestore.collection("estates").whereEqualTo("ownerId", userId);
 
+        query.get()
+            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    int i = 0;
+                    estates = new Estate[queryDocumentSnapshots.size()];
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        String estateId = document.getId();
+                        String name = document.getString("name");
+                        String image = document.getString("image");
+                        GeoPoint coordinates = document.getGeoPoint("coordinates");
+                        HashMap<String, Object> variables = (HashMap<String, Object>) document.get("variables");
+                        estates[i] = new Estate(estateId, image, coordinates.getLatitude(), coordinates.getLongitude(), name, userId, variables);
+                        i++;
+                    }
+                    setNewContentView();
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    estates = new Estate[0];
+                    setNewContentView();
+                }
+            });
+
+        this.estates = new Estate[0];
         setNewContentView();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // super.onKeyDown(keyCode, event);
         int oldFocusedViewId = focusedView.getId();
 
         int gridType = Grid.getGridTypeAsInt(this.grid);
 
         // Up, down, left, right navigation button
         if (keyCode >= 19 && keyCode <= 22) {
-            int newFocusedViewId = Grid.navigateOverActivity(grid, focusedView.getId(), keyCode - 19);
+            int newFocusedViewId = Grid.navigateOverActivity(this.grid, focusedView.getId(), keyCode - 19);
 
             if (newFocusedViewId == 0) return false;
 
@@ -89,7 +120,7 @@ public class EstateListActivity extends Activity {
                         newFocusedViewId = R.id.searchView;
                     }
                 } else if (oldFocusedViewId == R.id.main || Grid.isFirstRow(oldFocusedViewId)) {
-                    if (grid == Grid.six && this.overallIndex + 3 < estates.length) {
+                    if (this.grid == Grid.six && this.overallIndex + 3 < this.estates.length) {
                         this.overallIndex += 3;
                         this.currentIndex += 3;
                     } else newFocusedViewId = R.id.searchView;
@@ -102,7 +133,7 @@ public class EstateListActivity extends Activity {
             if (keyCode == 21) {
                 if (Grid.isUpperButtons(oldFocusedViewId) || Grid.isLowerButtons(oldFocusedViewId)) {
                     // Do nothing
-                } else if (oldFocusedViewId == R.id.main || (grid == Grid.three && Grid.isFirstRow(oldFocusedViewId))) {
+                } else if (oldFocusedViewId == R.id.main || (this.grid == Grid.three && Grid.isFirstRow(oldFocusedViewId))) {
                     if (this.overallIndex - 1 >= 0) {
                         this.overallIndex--;
                         this.currentIndex = this.overallIndex % gridType;
@@ -111,7 +142,7 @@ public class EstateListActivity extends Activity {
                         this.currentPage = this.overallIndex / gridType;
                         if (oldPage != this.currentPage) setNewContentView();
                     } else newFocusedViewId = 0; // TODO: return false;
-                } else if (grid == Grid.six) {
+                } else if (this.grid == Grid.six) {
                     if (Grid.isLeftColumn(oldFocusedViewId)) {
                         if (this.overallIndex - 4 >= 0) {
                             this.overallIndex -= 4;
@@ -130,7 +161,7 @@ public class EstateListActivity extends Activity {
             else if (keyCode == 22) {
                 if (Grid.isUpperButtons(oldFocusedViewId) || Grid.isLowerButtons(oldFocusedViewId)) {
                     // Do nothing
-                } else if (oldFocusedViewId == R.id.main || (grid == Grid.three && Grid.isFirstRow(oldFocusedViewId))) {
+                } else if (oldFocusedViewId == R.id.main || (this.grid == Grid.three && Grid.isFirstRow(oldFocusedViewId))) {
                     if (this.overallIndex + 1 < estates.length) {
                         this.overallIndex++;
                         this.currentIndex = this.overallIndex % gridType;
@@ -139,7 +170,7 @@ public class EstateListActivity extends Activity {
                         this.currentPage = this.overallIndex / gridType;
                         if (oldPage != this.currentPage) setNewContentView();
                     } else newFocusedViewId = 0; // TODO: return false;
-                } else if (grid == Grid.six) {
+                } else if (this.grid == Grid.six) {
                     if (Grid.isRightColumn(oldFocusedViewId)) {
                         if (this.overallIndex + 4 < estates.length) {
                             this.overallIndex += 4;
@@ -180,7 +211,7 @@ public class EstateListActivity extends Activity {
                 focusedView = findViewById(R.id.themeButton);
                 setNewContentView();
             } else if (oldFocusedViewId == R.id.gridButton) {
-                grid = grid.next();
+                this.grid = this.grid.next();
                 focusedView = findViewById(R.id.gridButton);
                 setNewContentView();
             } else if (oldFocusedViewId == R.id.textClock) {
@@ -199,19 +230,51 @@ public class EstateListActivity extends Activity {
 
                 // TODO: calculate all variables and content to show
 
+
                 // setNewContentView();
             } else if (oldFocusedViewId == R.id.pageIndex) {
                 focusedView = findViewById(R.id.pageIndex);
 
-                /*if (savedInstanceState == null) {
-                    Fragment newFragment = new Fragment();
-                    FragmentManager fm = getFragmentManager();
-                    FragmentTransaction ft = fm.beginTransaction();
+                Button pageIndex = findViewById(R.id.pageIndex);
+                EditText pageIndexIndex = findViewById(R.id.pageIndexIndex);
+                pageIndexIndex.requestFocus();
 
-                    ft.replace(R.id.frame_layout, new SelectPageFragment());
-                    ft.commit();
-                }*/
-
+                pageIndexIndex.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            try {
+                                String input = pageIndexIndex.getText().toString();
+                                int pageIndexNumber = Integer.parseInt(input) - 1;
+                                if (pageIndexNumber < 0 || pageIndexNumber >= totalPages) throw new Exception();
+                                if (pageIndexNumber != currentPage) {
+                                    currentPage = pageIndexNumber;
+                                    overallIndex = Grid.getGridTypeAsInt(grid) * currentPage;
+                                    currentIndex = 0;
+                                }
+                            } catch (Exception ex) {
+                                switch (language) {
+                                    case united_kingdom:
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_page_number_en) + " " + totalPages + ".", Toast.LENGTH_LONG).show();
+                                        break;
+                                    case germany:
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_page_number_de) + " " + totalPages + ".", Toast.LENGTH_LONG).show();
+                                        break;
+                                    case croatia:
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_page_number_hr) + " " + totalPages + ".", Toast.LENGTH_LONG).show();
+                                        break;
+                                }
+                                pageIndexIndex.clearFocus();
+                                return false;
+                            }
+                            pageIndexIndex.clearFocus();
+                            setNewContentView();
+                            return true; // Return true to indicate that the event has been handled
+                        }
+                        pageIndexIndex.clearFocus();
+                        return false; // Return false to indicate that the event has not been handled
+                    }
+                });
 
                 // setNewContentView();
             } else if (oldFocusedViewId == R.id.main) {
@@ -267,8 +330,8 @@ public class EstateListActivity extends Activity {
         this.currentIndex = this.overallIndex % gridType;
         this.totalPages = (this.estates.length - 1) / gridType + 1;
 
-        if (grid == Grid.one) setupMain();
-        else if (grid == Grid.three) {
+        if (this.grid == Grid.one) setupMain();
+        else if (this.grid == Grid.three) {
             setupImageButton(1);
             setupImageButton(2);
             setupImageButton(3);
@@ -290,7 +353,7 @@ public class EstateListActivity extends Activity {
     }
 
     void pickContentView() {
-        switch (grid) {
+        switch (this.grid) {
             case one:
                 setContentView(R.layout.activity_basic_grid_1);
                 break;
@@ -304,33 +367,86 @@ public class EstateListActivity extends Activity {
     }
 
     void setupMain() {
-        ImageButton main = findViewById(R.id.main);
+        ImageView main = findViewById(R.id.main);
 
         if (main == null) return;
-        if (focusedView == null) {
-            focusedView = main;
+        if (this.focusedView == null) {
+            this.focusedView = main;
         }
 
-        if (theme == Theme.light) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
-        else if (theme == Theme.dark) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
+        if (this.theme == Theme.light) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
+        else if (this.theme == Theme.dark) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
 
-        if (this.overallIndex < estates.length && this.estates[this.overallIndex].image != null && this.estates[this.overallIndex].image.length() > 0) {
-            try {
-                ImageLoader imageLoader = new ImageLoader(main);
-                imageLoader.execute(this.estates[this.overallIndex].image);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (this.estates.length == 0) {
+            TextView centerText = findViewById(R.id.centerText);
+            TextView titleText = findViewById(R.id.title1);
+
+            switch (this.language) {
+                case united_kingdom:
+                    titleText.setText(R.string.real_estate_name_en);
+                    centerText.setText(R.string.no_estates_en);
+                    if (this.theme == Theme.dark) {
+                        titleText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
+                        centerText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
+                    } else if (this.theme == Theme.light) {
+                        titleText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+                        centerText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+                    }
+                    break;
+                case germany:
+                    titleText.setText(R.string.real_estate_name_de);
+                    centerText.setText(R.string.no_estates_de);
+                    if (this.theme == Theme.dark) {
+                        titleText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
+                        centerText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
+                    } else if (this.theme == Theme.light) {
+                        titleText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+                        centerText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+                    }
+                    break;
+                case croatia:
+                    titleText.setText(R.string.real_estate_name_hr);
+                    centerText.setText(R.string.no_estates_hr);
+                    if (this.theme == Theme.dark) {
+                        titleText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
+                        centerText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
+                    } else if (this.theme == Theme.light) {
+                        titleText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+                        centerText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+                    }
+                    break;
+            }
+            return;
+
+        } else if (this.overallIndex < this.estates.length) {
+            TextView centerText = findViewById(R.id.centerText);
+            TextView titleText = findViewById(R.id.title1);
+
+            centerText.setText("");
+            centerText.setVisibility(View.INVISIBLE);
+            if (this.theme == Theme.dark) titleText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
+            else if (this.theme == Theme.light) titleText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+
+            if (this.estates[this.overallIndex].image != null && !this.estates[this.overallIndex].image.isEmpty()) {
+                try {
+                    Picasso.get()
+                            .load(this.estates[this.overallIndex].image)
+                            .fit()
+                            .into(main);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
 
-        if (focusedView.getId() == R.id.main) {
+        if (this.focusedView.getId() == R.id.main) {
             // Add shadow on borders and image
         }
 
         // Setting estate's name as title
         TextView buttonTitle = findViewById(R.id.title1);
-        buttonTitle.setText(estates[overallIndex].name);
+        buttonTitle.setText(this.estates[this.overallIndex].name);
     }
 
     void setupImageButton(int index) {
@@ -339,12 +455,12 @@ public class EstateListActivity extends Activity {
         ImageButton background = findViewById(R.id.background);
         int viewIndex = 0;
 
-        if (focusedView == null) {
-            focusedView = findViewById(R.id.imageButton1);
+        if (this.focusedView == null) {
+            this.focusedView = findViewById(R.id.imageButton1);
         }
 
-        if (theme == Theme.light) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
-        else if (theme == Theme.dark) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
+        if (this.theme == Theme.light) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
+        else if (this.theme == Theme.dark) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
 
         int gridType = Grid.getGridTypeAsInt(this.grid);
 
@@ -353,7 +469,7 @@ public class EstateListActivity extends Activity {
             imageBackground = findViewById(R.id.imageButtonBackground1);
             viewIndex = this.currentPage * gridType; // currentIndex?
 
-            if (viewIndex < estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
                     imageLoader.execute(this.estates[viewIndex].image);
@@ -362,19 +478,24 @@ public class EstateListActivity extends Activity {
                 }
             }
 
-            if (focusedView.getId() == R.id.imageButton1) {
-                if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
+            if (this.focusedView.getId() == R.id.imageButton1) {
+                if (this.theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
+                else if (this.theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title1 = findViewById(R.id.title1);
-            if (viewIndex < estates.length) title1.setText(estates[viewIndex].name); // This if statement has to always be true!
+            if (viewIndex < this.estates.length) title1.setText(this.estates[viewIndex].name); // This if statement has to always be true!
+
+            if (viewIndex >= this.estates.length) {
+                imageButton.setVisibility(View.INVISIBLE);
+                title1.setVisibility(View.INVISIBLE);
+            }
         } else if (index == 2) {
             imageButton = findViewById(R.id.imageButton2);
             imageBackground = findViewById(R.id.imageButtonBackground2);
             viewIndex = this.currentPage * gridType + 1;
 
-            if (viewIndex < estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
                     imageLoader.execute(this.estates[viewIndex].image);
@@ -383,20 +504,25 @@ public class EstateListActivity extends Activity {
                 }
             }
 
-            if (focusedView.getId() == R.id.imageButton2) {
-                if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
+            if (this.focusedView.getId() == R.id.imageButton2) {
+                if (this.theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
+                else if (this.theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title2 = findViewById(R.id.title2);
-            if (viewIndex < estates.length) title2.setText(estates[viewIndex].name);
+            if (viewIndex < this.estates.length) title2.setText(this.estates[viewIndex].name);
+
+            if (viewIndex >= this.estates.length) {
+                imageButton.setVisibility(View.INVISIBLE);
+                title2.setVisibility(View.INVISIBLE);
+            }
         }
         else if (index == 3) {
             imageButton = findViewById(R.id.imageButton3);
             imageBackground = findViewById(R.id.imageButtonBackground3);
             viewIndex = this.currentPage * gridType + 2;
 
-            if (viewIndex < estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
                     imageLoader.execute(this.estates[viewIndex].image);
@@ -405,20 +531,26 @@ public class EstateListActivity extends Activity {
                 }
             }
 
-            if (focusedView.getId() == R.id.imageButton3) {
+            if (this.focusedView.getId() == R.id.imageButton3) {
                 if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
                 else if (theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title3 = findViewById(R.id.title3);
-            if (viewIndex < estates.length) title3.setText(estates[viewIndex].name);
+            if (viewIndex < this.estates.length) title3.setText(this.estates[viewIndex].name);
+
+
+            if (viewIndex >= this.estates.length) {
+                imageButton.setVisibility(View.INVISIBLE);
+                title3.setVisibility(View.INVISIBLE);
+            }
         }
         else if (index == 4) {
             imageButton = findViewById(R.id.imageButton4);
             imageBackground = findViewById(R.id.imageButtonBackground4);
             viewIndex = this.currentPage * gridType + 3;
 
-            if (viewIndex < estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
                     imageLoader.execute(this.estates[viewIndex].image);
@@ -427,20 +559,26 @@ public class EstateListActivity extends Activity {
                 }
             }
 
-            if (focusedView.getId() == R.id.imageButton4) {
-                if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
+            if (this.focusedView.getId() == R.id.imageButton4) {
+                if (this.theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
+                else if (this.theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title4 = findViewById(R.id.title4);
-            if (viewIndex < estates.length) title4.setText(estates[viewIndex].name);
+            if (viewIndex < this.estates.length) title4.setText(this.estates[viewIndex].name);
+
+
+            if (viewIndex >= this.estates.length) {
+                imageButton.setVisibility(View.INVISIBLE);
+                title4.setVisibility(View.INVISIBLE);
+            }
         }
         else if (index == 5) {
             imageButton = findViewById(R.id.imageButton5);
             imageBackground = findViewById(R.id.imageButtonBackground5);
             viewIndex = this.currentPage * gridType + 4;
 
-            if (viewIndex < estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
                     imageLoader.execute(this.estates[viewIndex].image);
@@ -449,20 +587,26 @@ public class EstateListActivity extends Activity {
                 }
             }
 
-            if (focusedView.getId() == R.id.imageButton5) {
-                if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
+            if (this.focusedView.getId() == R.id.imageButton5) {
+                if (this.theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
+                else if (this.theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title5 = findViewById(R.id.title5);
-            if (viewIndex < estates.length) title5.setText(estates[viewIndex].name);
+            if (viewIndex < this.estates.length) title5.setText(this.estates[viewIndex].name);
+
+
+            if (viewIndex >= this.estates.length) {
+                imageButton.setVisibility(View.INVISIBLE);
+                title5.setVisibility(View.INVISIBLE);
+            }
         }
         else if (index == 6) {
             imageButton = findViewById(R.id.imageButton6);
             imageBackground = findViewById(R.id.imageButtonBackground6);
             viewIndex = this.currentPage * gridType + 5;
 
-            if (viewIndex < estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
                     imageLoader.execute(this.estates[viewIndex].image);
@@ -471,13 +615,18 @@ public class EstateListActivity extends Activity {
                 }
             }
 
-            if (focusedView.getId() == R.id.imageButton6) {
-                if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
+            if (this.focusedView.getId() == R.id.imageButton6) {
+                if (this.theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
+                else if (this.theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title6 = findViewById(R.id.title6);
-            if (viewIndex < estates.length) title6.setText(estates[viewIndex].name);
+            if (viewIndex < this.estates.length) title6.setText(this.estates[viewIndex].name);
+
+            if (viewIndex >= this.estates.length) {
+                imageButton.setVisibility(View.INVISIBLE);
+                title6.setVisibility(View.INVISIBLE);
+            }
         }
     }
     void setupLanguageButton() {
@@ -532,11 +681,14 @@ public class EstateListActivity extends Activity {
 
     void setupGridButton() {
         Button gridButton = findViewById(R.id.gridButton);
+        ImageView gridIcon = findViewById(R.id.gridIcon);
 
         if (gridButton == null) return;
         if (this.language == Language.united_kingdom) gridButton.setText(R.string.grid_en);
         else if (this.language == Language.germany) gridButton.setText(R.string.grid_de);
         else if (this.language == Language.croatia) gridButton.setText(R.string.grid_hr);
+
+        gridIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.grid));
 
         if (focusedView.getId() == R.id.gridButton) gridButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
         else gridButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
@@ -573,9 +725,13 @@ public class EstateListActivity extends Activity {
 
     void setupPaginationButton() {
         Button paginationButton = findViewById(R.id.pageIndex);
+        EditText paginationCurrentPage = findViewById(R.id.pageIndexIndex);
+        TextView paginationTotalPages = findViewById(R.id.pageIndexTotal);
 
-        if (paginationButton == null) return;
-        paginationButton.setText((this.currentPage + 1) + "/" + this.totalPages);
+        if (paginationButton == null || paginationCurrentPage == null || paginationTotalPages == null) return;
+        if (this.estates.length != 0) paginationCurrentPage.setText(Integer.toString(this.currentPage + 1));
+        else paginationCurrentPage.setText("0");
+        paginationTotalPages.setText(Integer.toString(this.totalPages));
 
         if (focusedView.getId() == R.id.pageIndex) paginationButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
         else paginationButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
@@ -588,8 +744,8 @@ public class EstateListActivity extends Activity {
         else if (row == 3) setupTextClock();
         else if (row == 4) setupSearchBarButton();
         else if (row == 5) setupPaginationButton();
-        else if (row == 6 && grid == Grid.one) setupMain();
-        else if (row == 6 && (grid == Grid.three || grid == Grid.six)) setupImageButton(1);
+        else if (row == 6 && this.grid == Grid.one) setupMain();
+        else if (row == 6 && (this.grid == Grid.three || this.grid == Grid.six)) setupImageButton(1);
         else if (row == 7) setupImageButton(2);
         else if (row == 8) setupImageButton(3);
         else if (row == 9) setupImageButton(4);

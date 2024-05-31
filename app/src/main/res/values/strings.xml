@@ -17,6 +17,18 @@
     <string name="grid_en">Appearance</string>
     <string name="grid_de">Aussehen</string>
     <string name="grid_hr">Izgled</string>
+
+    <string name="no_estates_en">There are no estates to display!</string>
+    <string name="no_estates_de">Es sind keine Immobilien zum Anzeigen vorhanden!</string>
+    <string name="no_estates_hr">Nema nekretnina za prikaz!</string>
+    
+    <string name="real_estate_name_en">Real estate name</string>
+    <string name="real_estate_name_de">Immobilienname</string>
+    <string name="real_estate_name_hr">Naziv nekretnine</string>
+
+    <string name="invalid_page_number_en">Invalid input. Please enter a number between 1 and</string>
+    <string name="invalid_page_number_de">Ungültige Eingabe. Bitte geben Sie eine Zahl zwischen 1 und</string>
+    <string name="invalid_page_number_hr">Pogrešan unos. Unesite broj između 1 i</string>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

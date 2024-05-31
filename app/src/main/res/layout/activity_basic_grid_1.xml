@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageButton
+    <ImageView
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -31,9 +31,9 @@
         android:layout_height="35dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="14dp"
-        android:text="Real estate name"
+        android:text="@string/real_estate_name_en"
         android:textAlignment="textStart"
-        android:textColor="#ffffff"
+        android:textColor="@color/text_color_dark_mode"
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
         android:focusable="false"
@@ -119,10 +119,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/gridIcon"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@drawable/grid"
+        app:srcCompat="@drawable/grid"
         android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="@+id/gridButton"
         app:layout_constraintEnd_toEndOf="@+id/gridButton"
@@ -162,7 +162,7 @@
     <Button
         android:id="@+id/pageIndex"
         android:layout_width="88dp"
-        android:layout_height="32dp"
+        android:layout_height="40dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:gravity="center"
@@ -171,17 +171,68 @@
         android:textSize="14sp"
         android:textColor="#ffffff"
         android:background="@drawable/header_button"
-        android:text="7/12"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <FrameLayout
-        android:id="@+id/frame_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/main"
-        app:layout_constraintEnd_toEndOf="@+id/main"
-        app:layout_constraintStart_toStartOf="@+id/main"
-        app:layout_constraintTop_toTopOf="@+id/main" />
+    <EditText
+        android:id="@+id/pageIndexIndex"
+        android:layout_width="36dp"
+        android:layout_height="32dp"
+        android:background="@null"
+        android:inputType="number"
+        android:text="7"
+        android:textAlignment="textEnd"
+        android:textFontWeight="@android:integer/config_longAnimTime"
+        android:textSize="22sp"
+        android:translationZ="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/pageIndex"
+        app:layout_constraintStart_toStartOf="@+id/pageIndex"
+        app:layout_constraintTop_toTopOf="@+id/pageIndex" />
+
+    <TextView
+        android:id="@+id/pageIndexSlash"
+        android:layout_width="10dp"
+        android:layout_height="32dp"
+        android:gravity="center"
+        android:text="/"
+        android:textAlignment="center"
+        android:textFontWeight="@android:integer/config_longAnimTime"
+        android:textSize="22sp"
+        android:translationZ="2dp"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/pageIndex"
+        app:layout_constraintEnd_toEndOf="@+id/pageIndex"
+        app:layout_constraintStart_toStartOf="@+id/pageIndex"
+        app:layout_constraintTop_toTopOf="@+id/pageIndex" />
+
+    <TextView
+        android:id="@+id/pageIndexTotal"
+        android:layout_width="36dp"
+        android:layout_height="32dp"
+        android:text="12"
+        android:textAlignment="textStart"
+        android:textFontWeight="@android:integer/config_longAnimTime"
+        android:textSize="22sp"
+        android:translationZ="2dp"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/pageIndex"
+        app:layout_constraintEnd_toEndOf="@+id/pageIndex"
+        app:layout_constraintTop_toTopOf="@+id/pageIndex"
+        app:layout_constraintVertical_bias="0.75" />
+
+    <TextView
+        android:id="@+id/centerText"
+        android:layout_width="329dp"
+        android:layout_height="97dp"
+        android:text="@string/no_estates_en"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:textFontWeight="@android:integer/config_longAnimTime"
+        android:textSize="22sp"
+        android:textColor="@color/text_color_dark_mode"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

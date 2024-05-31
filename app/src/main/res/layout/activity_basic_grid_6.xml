@@ -103,10 +103,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/gridIcon"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@drawable/grid"
+        app:srcCompat="@drawable/grid"
         android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="@+id/gridButton"
         app:layout_constraintEnd_toEndOf="@+id/gridButton"

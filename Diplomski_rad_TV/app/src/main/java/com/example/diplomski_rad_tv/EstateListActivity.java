@@ -1,9 +1,6 @@
 package com.example.diplomski_rad_tv;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -11,16 +8,12 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
-
-import java.io.InputStream;
-import java.net.URL;
 
 public class EstateListActivity extends Activity {
     Estate[] estates;

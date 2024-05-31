@@ -5,4 +5,7 @@
 
     <color name="dark_button_background">#003333</color>
     <color name="light_button_background">#4663ac</color>
+
+    <color name="text_color_dark_mode">#b3cccc</color>
+    <color name="text_color_light_mode">#343343</color>
 </resources>
