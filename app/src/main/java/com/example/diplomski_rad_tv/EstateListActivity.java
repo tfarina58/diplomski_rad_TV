@@ -1,12 +1,15 @@
 package com.example.diplomski_rad_tv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -17,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -28,18 +32,24 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class EstateListActivity extends Activity {
     String userId = "TUXPrSDT4VHw1hfYUn5z";
     FirebaseFirestore firestore;
     Estate[] estates;
+    ArrayList<Integer> estatesToShow;
     Language language = Language.germany;
     Theme theme = Theme.light;
     Grid grid = Grid.one;
     Clock format = Clock.h12;
     View focusedView;
-    String searchbarText = "";
+    String searchbarText = "e";
     int overallIndex = 0;
     int currentIndex = 0;
     int currentPage = 0;
@@ -52,6 +62,8 @@ public class EstateListActivity extends Activity {
 
         this.firestore = FirebaseFirestore.getInstance();
         Query query = firestore.collection("estates").whereEqualTo("ownerId", userId);
+
+        estatesToShow = new ArrayList<>();
 
         query.get()
             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -68,6 +80,7 @@ public class EstateListActivity extends Activity {
                         estates[i] = new Estate(estateId, image, coordinates.getLatitude(), coordinates.getLongitude(), name, userId, variables);
                         i++;
                     }
+                    setupEstatesToShow();
                     setNewContentView();
                 }
             })
@@ -75,11 +88,13 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     estates = new Estate[0];
+                    setupEstatesToShow();
                     setNewContentView();
                 }
             });
 
         this.estates = new Estate[0];
+        setupEstatesToShow();
         setNewContentView();
     }
 
@@ -106,7 +121,7 @@ public class EstateListActivity extends Activity {
                 } else if (Grid.isLowerButtons(oldFocusedViewId)) {
                     this.currentIndex = 0;
                     this.overallIndex = this.currentPage * gridType;
-                    if (this.estates.length == 0) {
+                    if (this.estatesToShow.size() == 0) {
                         newFocusedViewId = R.id.languageButton;
                     }
                 } else newFocusedViewId = 0;
@@ -116,11 +131,11 @@ public class EstateListActivity extends Activity {
                 if (Grid.isUpperButtons(oldFocusedViewId)) {
                     this.currentIndex = 0;
                     this.overallIndex = this.currentPage * gridType;
-                    if (this.estates.length == 0) {
+                    if (this.estatesToShow.size() == 0) {
                         newFocusedViewId = R.id.searchView;
                     }
                 } else if (oldFocusedViewId == R.id.main || Grid.isFirstRow(oldFocusedViewId)) {
-                    if (this.grid == Grid.six && this.overallIndex + 3 < this.estates.length) {
+                    if (this.grid == Grid.six && this.overallIndex + 3 < this.estatesToShow.size()) {
                         this.overallIndex += 3;
                         this.currentIndex += 3;
                     } else newFocusedViewId = R.id.searchView;
@@ -162,7 +177,7 @@ public class EstateListActivity extends Activity {
                 if (Grid.isUpperButtons(oldFocusedViewId) || Grid.isLowerButtons(oldFocusedViewId)) {
                     // Do nothing
                 } else if (oldFocusedViewId == R.id.main || (this.grid == Grid.three && Grid.isFirstRow(oldFocusedViewId))) {
-                    if (this.overallIndex + 1 < estates.length) {
+                    if (this.overallIndex + 1 < estatesToShow.size()) {
                         this.overallIndex++;
                         this.currentIndex = this.overallIndex % gridType;
 
@@ -172,14 +187,14 @@ public class EstateListActivity extends Activity {
                     } else newFocusedViewId = 0; // TODO: return false;
                 } else if (this.grid == Grid.six) {
                     if (Grid.isRightColumn(oldFocusedViewId)) {
-                        if (this.overallIndex + 4 < estates.length) {
+                        if (this.overallIndex + 4 < estatesToShow.size()) {
                             this.overallIndex += 4;
                             this.currentPage = this.overallIndex / gridType;
                             this.currentIndex = this.overallIndex % gridType;
                             setNewContentView();
                         } else newFocusedViewId = 0; // TODO: return false;
                     } else if (Grid.isLeftColumn(oldFocusedViewId) || Grid.isMiddleColumn(oldFocusedViewId)) {
-                        if (this.overallIndex + 1 < estates.length) {
+                        if (this.overallIndex + 1 < estatesToShow.size()) {
                             this.overallIndex++;
                             this.currentPage = this.overallIndex / gridType;
                             this.currentIndex = this.overallIndex % gridType;
@@ -229,13 +244,32 @@ public class EstateListActivity extends Activity {
                 focusedView = findViewById(R.id.searchView);
 
                 // TODO: calculate all variables and content to show
+                ((SearchView)focusedView).requestFocus();
 
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.showSoftInput(((SearchView)focusedView), InputMethodManager.SHOW_IMPLICIT);
+                }
+
+                ((SearchView)focusedView).setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        searchbarText = query;
+                        setupEstatesToShow();
+                        setNewContentView();
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        return true;
+                    }
+                });
 
                 // setNewContentView();
             } else if (oldFocusedViewId == R.id.pageIndex) {
                 focusedView = findViewById(R.id.pageIndex);
 
-                Button pageIndex = findViewById(R.id.pageIndex);
                 EditText pageIndexIndex = findViewById(R.id.pageIndexIndex);
                 pageIndexIndex.requestFocus();
 
@@ -328,7 +362,7 @@ public class EstateListActivity extends Activity {
 
         this.currentPage = this.overallIndex / gridType;
         this.currentIndex = this.overallIndex % gridType;
-        this.totalPages = (this.estates.length - 1) / gridType + 1;
+        this.totalPages = (this.estatesToShow.size() - 1) / gridType + 1;
 
         if (this.grid == Grid.one) setupMain();
         else if (this.grid == Grid.three) {
@@ -377,7 +411,7 @@ public class EstateListActivity extends Activity {
         if (this.theme == Theme.light) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
         else if (this.theme == Theme.dark) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
 
-        if (this.estates.length == 0) {
+        if (this.estatesToShow.size() == 0) {
             TextView centerText = findViewById(R.id.centerText);
             TextView titleText = findViewById(R.id.title1);
 
@@ -418,7 +452,7 @@ public class EstateListActivity extends Activity {
             }
             return;
 
-        } else if (this.overallIndex < this.estates.length) {
+        } else if (this.overallIndex < this.estatesToShow.size()) {
             TextView centerText = findViewById(R.id.centerText);
             TextView titleText = findViewById(R.id.title1);
 
@@ -427,10 +461,10 @@ public class EstateListActivity extends Activity {
             if (this.theme == Theme.dark) titleText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
             else if (this.theme == Theme.light) titleText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
 
-            if (this.estates[this.overallIndex].image != null && !this.estates[this.overallIndex].image.isEmpty()) {
+            if (this.estates[this.estatesToShow.get(this.overallIndex)].image != null && !this.estates[this.estatesToShow.get(this.overallIndex)].image.isEmpty()) {
                 try {
                     Picasso.get()
-                            .load(this.estates[this.overallIndex].image)
+                            .load(this.estates[this.estatesToShow.get(this.overallIndex)].image)
                             .fit()
                             .into(main);
                 } catch (Exception e) {
@@ -446,7 +480,7 @@ public class EstateListActivity extends Activity {
 
         // Setting estate's name as title
         TextView buttonTitle = findViewById(R.id.title1);
-        buttonTitle.setText(this.estates[this.overallIndex].name);
+        buttonTitle.setText(this.estates[this.estatesToShow.get(this.overallIndex)].name);
     }
 
     void setupImageButton(int index) {
@@ -469,10 +503,10 @@ public class EstateListActivity extends Activity {
             imageBackground = findViewById(R.id.imageButtonBackground1);
             viewIndex = this.currentPage * gridType; // currentIndex?
 
-            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[viewIndex].image);
+                    imageLoader.execute(this.estates[this.estatesToShow.get(viewIndex)].image);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -484,9 +518,9 @@ public class EstateListActivity extends Activity {
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title1 = findViewById(R.id.title1);
-            if (viewIndex < this.estates.length) title1.setText(this.estates[viewIndex].name); // This if statement has to always be true!
+            if (viewIndex < this.estatesToShow.size()) title1.setText(this.estates[this.estatesToShow.get(viewIndex)].name); // This if statement has to always be true!
 
-            if (viewIndex >= this.estates.length) {
+            if (viewIndex >= this.estatesToShow.size()) {
                 imageButton.setVisibility(View.INVISIBLE);
                 title1.setVisibility(View.INVISIBLE);
             }
@@ -495,10 +529,10 @@ public class EstateListActivity extends Activity {
             imageBackground = findViewById(R.id.imageButtonBackground2);
             viewIndex = this.currentPage * gridType + 1;
 
-            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[viewIndex].image);
+                    imageLoader.execute(this.estates[this.estatesToShow.get(viewIndex)].image);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -510,9 +544,9 @@ public class EstateListActivity extends Activity {
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title2 = findViewById(R.id.title2);
-            if (viewIndex < this.estates.length) title2.setText(this.estates[viewIndex].name);
+            if (viewIndex < this.estatesToShow.size()) title2.setText(this.estates[this.estatesToShow.get(viewIndex)].name);
 
-            if (viewIndex >= this.estates.length) {
+            if (viewIndex >= this.estatesToShow.size()) {
                 imageButton.setVisibility(View.INVISIBLE);
                 title2.setVisibility(View.INVISIBLE);
             }
@@ -522,10 +556,10 @@ public class EstateListActivity extends Activity {
             imageBackground = findViewById(R.id.imageButtonBackground3);
             viewIndex = this.currentPage * gridType + 2;
 
-            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[viewIndex].image);
+                    imageLoader.execute(this.estates[this.estatesToShow.get(viewIndex)].image);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -537,10 +571,10 @@ public class EstateListActivity extends Activity {
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title3 = findViewById(R.id.title3);
-            if (viewIndex < this.estates.length) title3.setText(this.estates[viewIndex].name);
+            if (viewIndex < this.estatesToShow.size()) title3.setText(this.estates[this.estatesToShow.get(viewIndex)].name);
 
 
-            if (viewIndex >= this.estates.length) {
+            if (viewIndex >= this.estatesToShow.size()) {
                 imageButton.setVisibility(View.INVISIBLE);
                 title3.setVisibility(View.INVISIBLE);
             }
@@ -550,7 +584,7 @@ public class EstateListActivity extends Activity {
             imageBackground = findViewById(R.id.imageButtonBackground4);
             viewIndex = this.currentPage * gridType + 3;
 
-            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
                     imageLoader.execute(this.estates[viewIndex].image);
@@ -565,10 +599,10 @@ public class EstateListActivity extends Activity {
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title4 = findViewById(R.id.title4);
-            if (viewIndex < this.estates.length) title4.setText(this.estates[viewIndex].name);
+            if (viewIndex < this.estatesToShow.size()) title4.setText(this.estates[this.estatesToShow.get(viewIndex)].name);
 
 
-            if (viewIndex >= this.estates.length) {
+            if (viewIndex >= this.estatesToShow.size()) {
                 imageButton.setVisibility(View.INVISIBLE);
                 title4.setVisibility(View.INVISIBLE);
             }
@@ -578,10 +612,10 @@ public class EstateListActivity extends Activity {
             imageBackground = findViewById(R.id.imageButtonBackground5);
             viewIndex = this.currentPage * gridType + 4;
 
-            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[viewIndex].image);
+                    imageLoader.execute(this.estates[this.estatesToShow.get(viewIndex)].image);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -593,10 +627,10 @@ public class EstateListActivity extends Activity {
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title5 = findViewById(R.id.title5);
-            if (viewIndex < this.estates.length) title5.setText(this.estates[viewIndex].name);
+            if (viewIndex < this.estatesToShow.size()) title5.setText(this.estates[this.estatesToShow.get(viewIndex)].name);
 
 
-            if (viewIndex >= this.estates.length) {
+            if (viewIndex >= this.estatesToShow.size()) {
                 imageButton.setVisibility(View.INVISIBLE);
                 title5.setVisibility(View.INVISIBLE);
             }
@@ -606,10 +640,10 @@ public class EstateListActivity extends Activity {
             imageBackground = findViewById(R.id.imageButtonBackground6);
             viewIndex = this.currentPage * gridType + 5;
 
-            if (viewIndex < this.estates.length && this.estates[viewIndex].image != null && this.estates[viewIndex].image.length() > 0) {
+            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
                 try {
                     ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[viewIndex].image);
+                    imageLoader.execute(this.estates[this.estatesToShow.get(viewIndex)].image);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -621,9 +655,9 @@ public class EstateListActivity extends Activity {
             } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
 
             TextView title6 = findViewById(R.id.title6);
-            if (viewIndex < this.estates.length) title6.setText(this.estates[viewIndex].name);
+            if (viewIndex < this.estatesToShow.size()) title6.setText(this.estates[this.estatesToShow.get(viewIndex)].name);
 
-            if (viewIndex >= this.estates.length) {
+            if (viewIndex >= this.estatesToShow.size()) {
                 imageButton.setVisibility(View.INVISIBLE);
                 title6.setVisibility(View.INVISIBLE);
             }
@@ -718,6 +752,7 @@ public class EstateListActivity extends Activity {
 
         if (searchbarButton == null) return;
         searchbarButton.setQuery(searchbarText, false);
+        // searchbarButton.setIconified(false);
 
         if (focusedView.getId() == R.id.searchView) searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
         else searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
@@ -729,7 +764,7 @@ public class EstateListActivity extends Activity {
         TextView paginationTotalPages = findViewById(R.id.pageIndexTotal);
 
         if (paginationButton == null || paginationCurrentPage == null || paginationTotalPages == null) return;
-        if (this.estates.length != 0) paginationCurrentPage.setText(Integer.toString(this.currentPage + 1));
+        if (this.estatesToShow.size() != 0) paginationCurrentPage.setText(Integer.toString(this.currentPage + 1));
         else paginationCurrentPage.setText("0");
         paginationTotalPages.setText(Integer.toString(this.totalPages));
 
@@ -751,5 +786,12 @@ public class EstateListActivity extends Activity {
         else if (row == 9) setupImageButton(4);
         else if (row == 10) setupImageButton(5);
         else if (row == 11) setupImageButton(6);
+    }
+
+    void setupEstatesToShow() {
+        this.estatesToShow.clear();
+        for (int i = 0; i < estates.length; ++i) {
+            if (estates[i].name.contains(this.searchbarText)) this.estatesToShow.add(i);
+        }
     }
 }
