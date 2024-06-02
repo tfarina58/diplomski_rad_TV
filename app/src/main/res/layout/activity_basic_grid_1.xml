@@ -11,7 +11,7 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/dark_theme"
+        android:background="@drawable/main_border_dark"
         android:focusable="true"
         android:nextFocusRight="@+id/imageButton2"
         android:nextFocusUp="@+id/languageButton"
@@ -230,6 +230,18 @@
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="22sp"
         android:textColor="@color/text_color_dark_mode"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/loader_color_dark_mode"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

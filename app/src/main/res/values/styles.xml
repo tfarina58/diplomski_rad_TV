@@ -8,4 +8,9 @@
 
     <color name="text_color_dark_mode">#b3cccc</color>
     <color name="text_color_light_mode">#343343</color>
+
+    <color name="loader_color_dark_mode">#ff9933</color>
+    <color name="loader_color_light_mode">#4d4dff</color>
+
+    <color name="transparent">#00ffffff</color>
 </resources>

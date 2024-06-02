@@ -3,8 +3,8 @@ package com.example.diplomski_rad_tv;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -14,13 +14,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,27 +33,24 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 public class EstateListActivity extends Activity {
     String userId = "TUXPrSDT4VHw1hfYUn5z";
     FirebaseFirestore firestore;
     Estate[] estates;
     ArrayList<Integer> estatesToShow;
-    Language language = Language.germany;
-    Theme theme = Theme.light;
+    Language language = Language.croatia;
+    Theme theme = Theme.dark;
     Grid grid = Grid.one;
     Clock format = Clock.h12;
     View focusedView;
-    String searchbarText = "e";
+    String searchbarText = "";
     int overallIndex = 0;
     int currentIndex = 0;
     int currentPage = 0;
     int totalPages;
+    boolean loadingInProgress = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +77,7 @@ public class EstateListActivity extends Activity {
                         estates[i] = new Estate(estateId, image, coordinates.getLatitude(), coordinates.getLongitude(), name, userId, variables);
                         i++;
                     }
+                    loadingInProgress = false;
                     setupEstatesToShow();
                     setNewContentView();
                 }
@@ -93,9 +91,11 @@ public class EstateListActivity extends Activity {
                 }
             });
 
+
         this.estates = new Estate[0];
         setupEstatesToShow();
         setNewContentView();
+        this.setProgressBar();
     }
 
     @Override
@@ -351,12 +351,11 @@ public class EstateListActivity extends Activity {
         // else return keyCode != 4;
 
         Toast.makeText(getApplicationContext(), Integer.toString(overallIndex) + ", " + Integer.toString(currentIndex) + ", " + Integer.toString(currentPage) + ", " + Integer.toString(totalPages), Toast.LENGTH_SHORT).show();
-
         return true;
     }
 
     void setNewContentView() {
-        pickContentView();
+        setContentView();
 
         int gridType = Grid.getGridTypeAsInt(this.grid);
 
@@ -386,7 +385,7 @@ public class EstateListActivity extends Activity {
         setupPaginationButton();
     }
 
-    void pickContentView() {
+    void setContentView() {
         switch (this.grid) {
             case one:
                 setContentView(R.layout.activity_basic_grid_1);
@@ -408,259 +407,110 @@ public class EstateListActivity extends Activity {
             this.focusedView = main;
         }
 
-        if (this.theme == Theme.light) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
-        else if (this.theme == Theme.dark) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
+        if (this.focusedView.getId() == R.id.main) {
+            if (this.theme == Theme.dark) main.setBackground(getResources().getDrawable(R.drawable.main_border_dark));
+            else if (this.theme == Theme.light) main.setBackground(getResources().getDrawable(R.drawable.main_border_light));
+        } else {
+            if (this.theme == Theme.light) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
+            else if (this.theme == Theme.dark) main.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
+        }
 
-        if (this.estatesToShow.size() == 0) {
-            TextView centerText = findViewById(R.id.centerText);
-            TextView titleText = findViewById(R.id.title1);
+
+        if (this.loadingInProgress) {
+            this.setTitleText(View.VISIBLE, R.string.real_estate_name_en, R.color.text_color_dark_mode);
+            this.setCenterText(View.INVISIBLE, R.string.empty_string, R.color.transparent);
+        } else if (this.estatesToShow.size() == 0 /*&& !this.loadingInProgress*/) {
+            this.hideProgressBar();
 
             switch (this.language) {
                 case united_kingdom:
-                    titleText.setText(R.string.real_estate_name_en);
-                    centerText.setText(R.string.no_estates_en);
                     if (this.theme == Theme.dark) {
-                        titleText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
-                        centerText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
+                        this.setTitleText(View.VISIBLE, R.string.real_estate_name_en, R.color.text_color_dark_mode);
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_en, R.color.text_color_dark_mode);
                     } else if (this.theme == Theme.light) {
-                        titleText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
-                        centerText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+                        this.setTitleText(View.VISIBLE, R.string.real_estate_name_en, R.color.text_color_light_mode);
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_en, R.color.text_color_light_mode);
                     }
                     break;
                 case germany:
-                    titleText.setText(R.string.real_estate_name_de);
-                    centerText.setText(R.string.no_estates_de);
                     if (this.theme == Theme.dark) {
-                        titleText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
-                        centerText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
+                        this.setTitleText(View.VISIBLE, R.string.real_estate_name_de, R.color.text_color_dark_mode);
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_de, R.color.text_color_dark_mode);
                     } else if (this.theme == Theme.light) {
-                        titleText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
-                        centerText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+                        this.setTitleText(View.VISIBLE, R.string.real_estate_name_de, R.color.text_color_light_mode);
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_de, R.color.text_color_light_mode);
                     }
                     break;
                 case croatia:
-                    titleText.setText(R.string.real_estate_name_hr);
-                    centerText.setText(R.string.no_estates_hr);
                     if (this.theme == Theme.dark) {
-                        titleText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
-                        centerText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
+                        this.setTitleText(View.VISIBLE, R.string.real_estate_name_hr, R.color.text_color_dark_mode);
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_hr, R.color.text_color_dark_mode);
                     } else if (this.theme == Theme.light) {
-                        titleText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
-                        centerText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+                        this.setTitleText(View.VISIBLE, R.string.real_estate_name_hr, R.color.text_color_light_mode);
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_hr, R.color.text_color_light_mode);
                     }
                     break;
             }
+
             return;
 
         } else if (this.overallIndex < this.estatesToShow.size()) {
-            TextView centerText = findViewById(R.id.centerText);
-            TextView titleText = findViewById(R.id.title1);
+            this.hideProgressBar();
 
-            centerText.setText("");
-            centerText.setVisibility(View.INVISIBLE);
-            if (this.theme == Theme.dark) titleText.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
-            else if (this.theme == Theme.light) titleText.setTextColor(getResources().getColor(R.color.text_color_light_mode));
+            this.setCenterText(View.INVISIBLE, R.string.empty_string, R.color.transparent);
+            if (this.theme == Theme.dark) this.setTitleText(View.VISIBLE, this.estates[this.estatesToShow.get(this.overallIndex)].name, R.color.text_color_dark_mode);
+            else if (this.theme == Theme.light) this.setTitleText(View.VISIBLE, this.estates[this.estatesToShow.get(this.overallIndex)].name, R.color.text_color_light_mode);
 
-            if (this.estates[this.estatesToShow.get(this.overallIndex)].image != null && !this.estates[this.estatesToShow.get(this.overallIndex)].image.isEmpty()) {
-                try {
-                    Picasso.get()
-                            .load(this.estates[this.estatesToShow.get(this.overallIndex)].image)
-                            .fit()
-                            .into(main);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            this.setGridButtonImage(main);
         }
-
-
-        if (this.focusedView.getId() == R.id.main) {
-            // Add shadow on borders and image
-        }
-
-        // Setting estate's name as title
-        TextView buttonTitle = findViewById(R.id.title1);
-        buttonTitle.setText(this.estates[this.estatesToShow.get(this.overallIndex)].name);
     }
 
     void setupImageButton(int index) {
-        Button imageBackground = null;
-        ImageButton imageButton = null;
         ImageButton background = findViewById(R.id.background);
-        int viewIndex = 0;
+        if (this.theme == Theme.light) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
+        else if (this.theme == Theme.dark) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
+
+        int gridType = Grid.getGridTypeAsInt(this.grid);
+        int viewIndex = this.currentPage * gridType + index - 1;
 
         if (this.focusedView == null) {
             this.focusedView = findViewById(R.id.imageButton1);
         }
 
-        if (this.theme == Theme.light) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
-        else if (this.theme == Theme.dark) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
-
-        int gridType = Grid.getGridTypeAsInt(this.grid);
-
-        if (index == 1) {
-            imageButton = findViewById(R.id.imageButton1);
-            imageBackground = findViewById(R.id.imageButtonBackground1);
-            viewIndex = this.currentPage * gridType; // currentIndex?
-
-            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
-                try {
-                    ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[this.estatesToShow.get(viewIndex)].image);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        if (this.estatesToShow.size() == 0) {
+            switch (this.language) {
+                case united_kingdom:
+                    if (this.theme == Theme.dark) {
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_en, R.color.text_color_dark_mode);
+                    } else if (this.theme == Theme.light) {
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_en, R.color.text_color_light_mode);
+                    }
+                    break;
+                case germany:
+                    if (this.theme == Theme.dark) {
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_de, R.color.text_color_dark_mode);
+                    } else if (this.theme == Theme.light) {
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_de, R.color.text_color_light_mode);
+                    }
+                    break;
+                case croatia:
+                    if (this.theme == Theme.dark) {
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_hr, R.color.text_color_dark_mode);
+                    } else if (this.theme == Theme.light) {
+                        this.setCenterText(View.VISIBLE, R.string.no_estates_hr, R.color.text_color_light_mode);
+                    }
+                    break;
             }
+            this.setGridButton(getViewsByIndex(index), R.drawable.image_button, viewIndex);
+        } else {
+            this.setCenterText(View.INVISIBLE, R.string.empty_string, R.color.transparent);
 
-            if (this.focusedView.getId() == R.id.imageButton1) {
-                if (this.theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (this.theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
-            } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
+            View[] views = getViewsByIndex(index); // ImageButton, Button, TextView
+            if (this.focusedView.getId() != views[0].getId()) this.setGridButton(views, R.drawable.image_button, viewIndex);
+            else if (this.theme == Theme.dark) this.setGridButton(views, R.drawable.highlighted_image_button_dark, viewIndex);
+            else if (this.theme == Theme.light) this.setGridButton(views, R.drawable.highlighted_image_button_light, viewIndex);
 
-            TextView title1 = findViewById(R.id.title1);
-            if (viewIndex < this.estatesToShow.size()) title1.setText(this.estates[this.estatesToShow.get(viewIndex)].name); // This if statement has to always be true!
-
-            if (viewIndex >= this.estatesToShow.size()) {
-                imageButton.setVisibility(View.INVISIBLE);
-                title1.setVisibility(View.INVISIBLE);
-            }
-        } else if (index == 2) {
-            imageButton = findViewById(R.id.imageButton2);
-            imageBackground = findViewById(R.id.imageButtonBackground2);
-            viewIndex = this.currentPage * gridType + 1;
-
-            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
-                try {
-                    ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[this.estatesToShow.get(viewIndex)].image);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (this.focusedView.getId() == R.id.imageButton2) {
-                if (this.theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (this.theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
-            } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
-
-            TextView title2 = findViewById(R.id.title2);
-            if (viewIndex < this.estatesToShow.size()) title2.setText(this.estates[this.estatesToShow.get(viewIndex)].name);
-
-            if (viewIndex >= this.estatesToShow.size()) {
-                imageButton.setVisibility(View.INVISIBLE);
-                title2.setVisibility(View.INVISIBLE);
-            }
-        }
-        else if (index == 3) {
-            imageButton = findViewById(R.id.imageButton3);
-            imageBackground = findViewById(R.id.imageButtonBackground3);
-            viewIndex = this.currentPage * gridType + 2;
-
-            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
-                try {
-                    ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[this.estatesToShow.get(viewIndex)].image);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (this.focusedView.getId() == R.id.imageButton3) {
-                if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
-            } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
-
-            TextView title3 = findViewById(R.id.title3);
-            if (viewIndex < this.estatesToShow.size()) title3.setText(this.estates[this.estatesToShow.get(viewIndex)].name);
-
-
-            if (viewIndex >= this.estatesToShow.size()) {
-                imageButton.setVisibility(View.INVISIBLE);
-                title3.setVisibility(View.INVISIBLE);
-            }
-        }
-        else if (index == 4) {
-            imageButton = findViewById(R.id.imageButton4);
-            imageBackground = findViewById(R.id.imageButtonBackground4);
-            viewIndex = this.currentPage * gridType + 3;
-
-            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
-                try {
-                    ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[viewIndex].image);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (this.focusedView.getId() == R.id.imageButton4) {
-                if (this.theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (this.theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
-            } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
-
-            TextView title4 = findViewById(R.id.title4);
-            if (viewIndex < this.estatesToShow.size()) title4.setText(this.estates[this.estatesToShow.get(viewIndex)].name);
-
-
-            if (viewIndex >= this.estatesToShow.size()) {
-                imageButton.setVisibility(View.INVISIBLE);
-                title4.setVisibility(View.INVISIBLE);
-            }
-        }
-        else if (index == 5) {
-            imageButton = findViewById(R.id.imageButton5);
-            imageBackground = findViewById(R.id.imageButtonBackground5);
-            viewIndex = this.currentPage * gridType + 4;
-
-            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
-                try {
-                    ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[this.estatesToShow.get(viewIndex)].image);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (this.focusedView.getId() == R.id.imageButton5) {
-                if (this.theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (this.theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
-            } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
-
-            TextView title5 = findViewById(R.id.title5);
-            if (viewIndex < this.estatesToShow.size()) title5.setText(this.estates[this.estatesToShow.get(viewIndex)].name);
-
-
-            if (viewIndex >= this.estatesToShow.size()) {
-                imageButton.setVisibility(View.INVISIBLE);
-                title5.setVisibility(View.INVISIBLE);
-            }
-        }
-        else if (index == 6) {
-            imageButton = findViewById(R.id.imageButton6);
-            imageBackground = findViewById(R.id.imageButtonBackground6);
-            viewIndex = this.currentPage * gridType + 5;
-
-            if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && this.estates[this.estatesToShow.get(viewIndex)].image.length() > 0) {
-                try {
-                    ImageLoader imageLoader = new ImageLoader(imageButton);
-                    imageLoader.execute(this.estates[this.estatesToShow.get(viewIndex)].image);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (this.focusedView.getId() == R.id.imageButton6) {
-                if (this.theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_light));
-                else if (this.theme == Theme.dark) imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_image_button_dark));
-            } else imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.image_button));
-
-            TextView title6 = findViewById(R.id.title6);
-            if (viewIndex < this.estatesToShow.size()) title6.setText(this.estates[this.estatesToShow.get(viewIndex)].name);
-
-            if (viewIndex >= this.estatesToShow.size()) {
-                imageButton.setVisibility(View.INVISIBLE);
-                title6.setVisibility(View.INVISIBLE);
-            }
+            this.setGridButtonImage(((ImageButton)views[0]), viewIndex);
         }
     }
     void setupLanguageButton() {
@@ -752,7 +602,6 @@ public class EstateListActivity extends Activity {
 
         if (searchbarButton == null) return;
         searchbarButton.setQuery(searchbarText, false);
-        // searchbarButton.setIconified(false);
 
         if (focusedView.getId() == R.id.searchView) searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
         else searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
@@ -791,7 +640,128 @@ public class EstateListActivity extends Activity {
     void setupEstatesToShow() {
         this.estatesToShow.clear();
         for (int i = 0; i < estates.length; ++i) {
-            if (estates[i].name.contains(this.searchbarText)) this.estatesToShow.add(i);
+            if ((estates[i].name.toLowerCase()).contains(this.searchbarText.toLowerCase())) this.estatesToShow.add(i);
+        }
+    }
+
+    void setCenterText(int visibility, int textId, int colorId) {
+        TextView centerText = findViewById(R.id.centerText);
+
+        centerText.setVisibility(visibility);
+        centerText.setText(getResources().getString(textId));
+        centerText.setTextColor(getResources().getColor(colorId));
+    }
+
+    void setTitleText(int visibility, int textId, int colorId) {
+        TextView titleText = findViewById(R.id.title1);
+
+        titleText.setVisibility(visibility);
+        titleText.setText(getResources().getString(textId));
+        titleText.setTextColor(getResources().getColor(colorId));
+    }
+
+    void setTitleText(int visibility, String text, int colorId) {
+        TextView titleText = findViewById(R.id.title1);
+
+        titleText.setVisibility(visibility);
+        titleText.setText(text);
+        titleText.setTextColor(getResources().getColor(colorId));
+    }
+
+    void setGridButton(View[] views, int drawableId, int viewIndex) {
+        ImageButton imageButton = ((ImageButton)views[0]);
+        Button imageBackground = ((Button) views[1]);
+        TextView title = ((TextView) views[2]);
+
+        int visibility = viewIndex >= this.estatesToShow.size() ? View.INVISIBLE: View.VISIBLE;
+        String titleText = viewIndex < this.estatesToShow.size() ? this.estates[this.estatesToShow.get(viewIndex)].name : "";
+
+        imageBackground.setBackground(ContextCompat.getDrawable(getApplicationContext(), drawableId));
+        title.setText(titleText);
+
+        imageButton.setVisibility(visibility);
+        title.setVisibility(visibility);
+    }
+    View[] getViewsByIndex(int index) {
+        View[] views = new View[3];
+        switch (index) {
+            case 1:
+                views[0] = findViewById(R.id.imageButton1);
+                views[1] = findViewById(R.id.imageButtonBackground1);
+                views[2] = findViewById(R.id.title1);
+                break;
+            case 2:
+                views[0] = findViewById(R.id.imageButton2);
+                views[1] = findViewById(R.id.imageButtonBackground2);
+                views[2] = findViewById(R.id.title2);
+                break;
+            case 3:
+                views[0] = findViewById(R.id.imageButton3);
+                views[1] = findViewById(R.id.imageButtonBackground3);
+                views[2] = findViewById(R.id.title3);
+                break;
+            case 4:
+                views[0] = findViewById(R.id.imageButton4);
+                views[1] = findViewById(R.id.imageButtonBackground4);
+                views[2] = findViewById(R.id.title4);
+                break;
+            case 5:
+                views[0] = findViewById(R.id.imageButton5);
+                views[1] = findViewById(R.id.imageButtonBackground5);
+                views[2] = findViewById(R.id.title5);
+                break;
+            case 6:
+                views[0] = findViewById(R.id.imageButton6);
+                views[1] = findViewById(R.id.imageButtonBackground6);
+                views[2] = findViewById(R.id.title6);
+                break;
+        }
+        return views;
+    }
+
+    void setGridButtonImage(ImageButton imageButton, int viewIndex) {
+        if (viewIndex < this.estatesToShow.size() && this.estates[this.estatesToShow.get(viewIndex)].image != null && !this.estates[this.estatesToShow.get(viewIndex)].image.isEmpty()) {
+            try {
+                Picasso.get()
+                        .load(this.estates[this.estatesToShow.get(viewIndex)].image)
+                        .fit()
+                        .into(imageButton);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    void setGridButtonImage(ImageView imageButton) {
+        if (this.estates[this.estatesToShow.get(this.overallIndex)].image != null && !this.estates[this.estatesToShow.get(this.overallIndex)].image.isEmpty()) {
+            try {
+                Picasso.get()
+                        .load(this.estates[this.estatesToShow.get(this.overallIndex)].image)
+                        .fit()
+                        .into(imageButton);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    void hideProgressBar() {
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
+    }
+
+    void setProgressBar() {
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        if (progressBar == null) return;
+
+        if (this.theme == Theme.dark) {
+            int color = ContextCompat.getColor(this, R.color.loader_color_dark_mode);
+            progressBar.setProgressTintList(ColorStateList.valueOf(color));
+            progressBar.setIndeterminateTintList(ColorStateList.valueOf(color));
+        } else if (this.theme == Theme.light) {
+            int color = ContextCompat.getColor(this, R.color.loader_color_light_mode);
+            progressBar.setProgressTintList(ColorStateList.valueOf(color));
+            progressBar.setIndeterminateTintList(ColorStateList.valueOf(color));
         }
     }
 }
