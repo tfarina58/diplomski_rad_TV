@@ -3,6 +3,7 @@ package com.example.diplomski_rad_tv;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -36,13 +37,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class EstateListActivity extends Activity {
-    String userId = "TUXPrSDT4VHw1hfYUn5z";
+    String userId;
     FirebaseFirestore firestore;
     Estate[] estates;
     ArrayList<Integer> estatesToShow;
     Language language = Language.croatia;
     Theme theme = Theme.dark;
-    Grid grid = Grid.one;
+    BasicGridNavigation grid = BasicGridNavigation.one;
     Clock format = Clock.h12;
     View focusedView;
     String searchbarText = "";
@@ -57,10 +58,14 @@ public class EstateListActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", MODE_PRIVATE);
+        String userId = sharedPreferences.getString("userId", "");
+        this.userId = userId;
+
+        this.estatesToShow = new ArrayList<>();
+
         this.firestore = FirebaseFirestore.getInstance();
         Query query = firestore.collection("estates").whereEqualTo("ownerId", userId);
-
-        estatesToShow = new ArrayList<>();
 
         query.get()
             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -103,22 +108,22 @@ public class EstateListActivity extends Activity {
         // super.onKeyDown(keyCode, event);
         int oldFocusedViewId = focusedView.getId();
 
-        int gridType = Grid.getGridTypeAsInt(this.grid);
+        int gridType = BasicGridNavigation.getGridTypeAsInt(this.grid);
 
         // Up, down, left, right navigation button
         if (keyCode >= 19 && keyCode <= 22) {
-            int newFocusedViewId = Grid.navigateOverActivity(this.grid, focusedView.getId(), keyCode - 19);
+            int newFocusedViewId = BasicGridNavigation.navigateOverActivity(this.grid, focusedView.getId(), keyCode - 19);
 
             if (newFocusedViewId == 0) return false;
 
             // Pressed up
             if (keyCode == 19) {
-                if (Grid.isUpperButtons(oldFocusedViewId) || Grid.isFirstRow(oldFocusedViewId) || oldFocusedViewId == R.id.main) {
+                if (BasicGridNavigation.isUpperButtons(oldFocusedViewId) || BasicGridNavigation.isFirstRow(oldFocusedViewId) || oldFocusedViewId == R.id.main) {
                     // Do nothing
-                } else if (Grid.isSecondRow(oldFocusedViewId)) {
+                } else if (BasicGridNavigation.isSecondRow(oldFocusedViewId)) {
                     this.overallIndex -= 3;
                     this.currentIndex -= 3;
-                } else if (Grid.isLowerButtons(oldFocusedViewId)) {
+                } else if (BasicGridNavigation.isLowerButtons(oldFocusedViewId)) {
                     this.currentIndex = 0;
                     this.overallIndex = this.currentPage * gridType;
                     if (this.estatesToShow.size() == 0) {
@@ -128,27 +133,27 @@ public class EstateListActivity extends Activity {
             }
             // Pressed down
             else if (keyCode == 20) {
-                if (Grid.isUpperButtons(oldFocusedViewId)) {
+                if (BasicGridNavigation.isUpperButtons(oldFocusedViewId)) {
                     this.currentIndex = 0;
                     this.overallIndex = this.currentPage * gridType;
                     if (this.estatesToShow.size() == 0) {
                         newFocusedViewId = R.id.searchView;
                     }
-                } else if (oldFocusedViewId == R.id.main || Grid.isFirstRow(oldFocusedViewId)) {
-                    if (this.grid == Grid.six && this.overallIndex + 3 < this.estatesToShow.size()) {
+                } else if (oldFocusedViewId == R.id.main || BasicGridNavigation.isFirstRow(oldFocusedViewId)) {
+                    if (this.grid == BasicGridNavigation.six && this.overallIndex + 3 < this.estatesToShow.size()) {
                         this.overallIndex += 3;
                         this.currentIndex += 3;
                     } else newFocusedViewId = R.id.searchView;
-                } else if (Grid.isSecondRow(oldFocusedViewId)) {
+                } else if (BasicGridNavigation.isSecondRow(oldFocusedViewId)) {
                     newFocusedViewId = R.id.searchView;
                 } else newFocusedViewId = 0;
 
             }
             // Pressed left
             if (keyCode == 21) {
-                if (Grid.isUpperButtons(oldFocusedViewId) || Grid.isLowerButtons(oldFocusedViewId)) {
+                if (BasicGridNavigation.isUpperButtons(oldFocusedViewId) || BasicGridNavigation.isLowerButtons(oldFocusedViewId)) {
                     // Do nothing
-                } else if (oldFocusedViewId == R.id.main || (this.grid == Grid.three && Grid.isFirstRow(oldFocusedViewId))) {
+                } else if (oldFocusedViewId == R.id.main || (this.grid == BasicGridNavigation.three && BasicGridNavigation.isFirstRow(oldFocusedViewId))) {
                     if (this.overallIndex - 1 >= 0) {
                         this.overallIndex--;
                         this.currentIndex = this.overallIndex % gridType;
@@ -157,15 +162,15 @@ public class EstateListActivity extends Activity {
                         this.currentPage = this.overallIndex / gridType;
                         if (oldPage != this.currentPage) setNewContentView();
                     } else newFocusedViewId = 0; // TODO: return false;
-                } else if (this.grid == Grid.six) {
-                    if (Grid.isLeftColumn(oldFocusedViewId)) {
+                } else if (this.grid == BasicGridNavigation.six) {
+                    if (BasicGridNavigation.isLeftColumn(oldFocusedViewId)) {
                         if (this.overallIndex - 4 >= 0) {
                             this.overallIndex -= 4;
                             this.currentPage = this.overallIndex / gridType;
                             this.currentIndex = this.overallIndex % gridType;
                             setNewContentView();
                         } else newFocusedViewId = 0; // TODO: return false;
-                    } else if (Grid.isMiddleColumn(oldFocusedViewId) || Grid.isRightColumn(oldFocusedViewId)) {
+                    } else if (BasicGridNavigation.isMiddleColumn(oldFocusedViewId) || BasicGridNavigation.isRightColumn(oldFocusedViewId)) {
                         this.overallIndex--;
                         this.currentPage = this.overallIndex / gridType;
                         this.currentIndex = this.overallIndex % gridType;
@@ -174,9 +179,9 @@ public class EstateListActivity extends Activity {
             }
             // Pressed right
             else if (keyCode == 22) {
-                if (Grid.isUpperButtons(oldFocusedViewId) || Grid.isLowerButtons(oldFocusedViewId)) {
+                if (BasicGridNavigation.isUpperButtons(oldFocusedViewId) || BasicGridNavigation.isLowerButtons(oldFocusedViewId)) {
                     // Do nothing
-                } else if (oldFocusedViewId == R.id.main || (this.grid == Grid.three && Grid.isFirstRow(oldFocusedViewId))) {
+                } else if (oldFocusedViewId == R.id.main || (this.grid == BasicGridNavigation.three && BasicGridNavigation.isFirstRow(oldFocusedViewId))) {
                     if (this.overallIndex + 1 < estatesToShow.size()) {
                         this.overallIndex++;
                         this.currentIndex = this.overallIndex % gridType;
@@ -185,15 +190,15 @@ public class EstateListActivity extends Activity {
                         this.currentPage = this.overallIndex / gridType;
                         if (oldPage != this.currentPage) setNewContentView();
                     } else newFocusedViewId = 0; // TODO: return false;
-                } else if (this.grid == Grid.six) {
-                    if (Grid.isRightColumn(oldFocusedViewId)) {
+                } else if (this.grid == BasicGridNavigation.six) {
+                    if (BasicGridNavigation.isRightColumn(oldFocusedViewId)) {
                         if (this.overallIndex + 4 < estatesToShow.size()) {
                             this.overallIndex += 4;
                             this.currentPage = this.overallIndex / gridType;
                             this.currentIndex = this.overallIndex % gridType;
                             setNewContentView();
                         } else newFocusedViewId = 0; // TODO: return false;
-                    } else if (Grid.isLeftColumn(oldFocusedViewId) || Grid.isMiddleColumn(oldFocusedViewId)) {
+                    } else if (BasicGridNavigation.isLeftColumn(oldFocusedViewId) || BasicGridNavigation.isMiddleColumn(oldFocusedViewId)) {
                         if (this.overallIndex + 1 < estatesToShow.size()) {
                             this.overallIndex++;
                             this.currentPage = this.overallIndex / gridType;
@@ -207,11 +212,11 @@ public class EstateListActivity extends Activity {
                 focusedView = findViewById(newFocusedViewId);
 
                 // Remove focus from old View
-                int row = Grid.getRowWithId(oldFocusedViewId);
+                int row = BasicGridNavigation.getRowWithId(oldFocusedViewId);
                 updateView(row);
 
                 // Add focus to new View
-                row = Grid.getRowWithId(newFocusedViewId);
+                row = BasicGridNavigation.getRowWithId(newFocusedViewId);
                 updateView(row);
             }
         }
@@ -283,7 +288,7 @@ public class EstateListActivity extends Activity {
                                 if (pageIndexNumber < 0 || pageIndexNumber >= totalPages) throw new Exception();
                                 if (pageIndexNumber != currentPage) {
                                     currentPage = pageIndexNumber;
-                                    overallIndex = Grid.getGridTypeAsInt(grid) * currentPage;
+                                    overallIndex = BasicGridNavigation.getGridTypeAsInt(grid) * currentPage;
                                     currentIndex = 0;
                                 }
                             } catch (Exception ex) {
@@ -357,14 +362,14 @@ public class EstateListActivity extends Activity {
     void setNewContentView() {
         setContentView();
 
-        int gridType = Grid.getGridTypeAsInt(this.grid);
+        int gridType = BasicGridNavigation.getGridTypeAsInt(this.grid);
 
         this.currentPage = this.overallIndex / gridType;
         this.currentIndex = this.overallIndex % gridType;
         this.totalPages = (this.estatesToShow.size() - 1) / gridType + 1;
 
-        if (this.grid == Grid.one) setupMain();
-        else if (this.grid == Grid.three) {
+        if (this.grid == BasicGridNavigation.one) setupMain();
+        else if (this.grid == BasicGridNavigation.three) {
             setupImageButton(1);
             setupImageButton(2);
             setupImageButton(3);
@@ -470,7 +475,7 @@ public class EstateListActivity extends Activity {
         if (this.theme == Theme.light) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
         else if (this.theme == Theme.dark) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
 
-        int gridType = Grid.getGridTypeAsInt(this.grid);
+        int gridType = BasicGridNavigation.getGridTypeAsInt(this.grid);
         int viewIndex = this.currentPage * gridType + index - 1;
 
         if (this.focusedView == null) {
@@ -628,8 +633,8 @@ public class EstateListActivity extends Activity {
         else if (row == 3) setupTextClock();
         else if (row == 4) setupSearchBarButton();
         else if (row == 5) setupPaginationButton();
-        else if (row == 6 && this.grid == Grid.one) setupMain();
-        else if (row == 6 && (this.grid == Grid.three || this.grid == Grid.six)) setupImageButton(1);
+        else if (row == 6 && this.grid == BasicGridNavigation.one) setupMain();
+        else if (row == 6 && (this.grid == BasicGridNavigation.three || this.grid == BasicGridNavigation.six)) setupImageButton(1);
         else if (row == 7) setupImageButton(2);
         else if (row == 8) setupImageButton(3);
         else if (row == 9) setupImageButton(4);

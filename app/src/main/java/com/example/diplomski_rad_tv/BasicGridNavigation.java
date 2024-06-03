@@ -1,23 +1,20 @@
 package com.example.diplomski_rad_tv;
-
-import android.view.View;
-
-public enum Grid {
+public enum BasicGridNavigation {
     one, three, six;
-    private static final Grid[] values = values();
-    public Grid next() {
+    private static final BasicGridNavigation[] values = values();
+    public BasicGridNavigation next() {
         return values[(this.ordinal() + 1) % values.length];
     }
-    private static int[][] navigationBasic1 = {
+    private static int[][] navigationBasicGrid1 = {
         {0,                   R.id.main,       0,                   R.id.themeButton}, // languageButton
         {0,                   R.id.main,       R.id.languageButton, R.id.gridButton},  // themeButton
         {0,                   R.id.main,       R.id.themeButton,    R.id.textClock},   // gridButton
         {0,                   R.id.main,       R.id.gridButton,     0},                // textClock
         {R.id.main,           0,               0,                   R.id.pageIndex},   // searchView
         {R.id.main,           0,               R.id.searchView,     0},                // pageIndex
-        {R.id.languageButton, R.id.searchView, 0,                   0}                 // main
+        {R.id.languageButton, R.id.searchView, R.id.main,           R.id.main}         // main
     };
-    private static int[][] navigationBasic3 = {
+    private static int[][] navigationBasicGrid3 = {
         {0,                   R.id.imageButton1, 0,                   R.id.themeButton},  // languageButton
         {0,                   R.id.imageButton1, R.id.languageButton, R.id.gridButton},   // themeButton
         {0,                   R.id.imageButton1, R.id.themeButton,    R.id.textClock},    // gridButton
@@ -28,7 +25,7 @@ public enum Grid {
         {R.id.languageButton, R.id.searchView,   R.id.imageButton1,   R.id.imageButton3}, // imageButton2
         {R.id.languageButton, R.id.searchView,   R.id.imageButton2,   R.id.imageButton1}  // imageButton3
     };
-    private static int[][] navigationBasic6 = {
+    private static int[][] navigationBasicGrid6 = {
         {0,                   R.id.imageButton1, 0,                   R.id.themeButton},  // languageButton
         {0,                   R.id.imageButton1, R.id.languageButton, R.id.gridButton},   // themeButton
         {0,                   R.id.imageButton1, R.id.themeButton,    R.id.textClock},    // gridButton
@@ -42,13 +39,19 @@ public enum Grid {
         {R.id.imageButton2,   R.id.searchView,   R.id.imageButton4,   R.id.imageButton6}, // imageButton5
         {R.id.imageButton3,   R.id.searchView,   R.id.imageButton5,   R.id.imageButton4}  // imageButton6
     };
-    public static int navigateOverActivity(Grid currentGrid, int currentViewId, int direction) {
+
+    private static int[][] navigationLogin = {
+            {0,                R.id.password,    0, 0},  // emailAddress
+            {R.id.password,    R.id.loginButton, 0, 0},  // password
+            {R.id.loginButton, 0,                0, 0},  // loginButton
+    };
+    public static int navigateOverActivity(BasicGridNavigation currentGrid, int currentViewId, int direction) {
         if (currentGrid == BasicGridNavigation.one) {
-            return navigationBasic1[getRowWithId(currentViewId)][direction];
+            return navigationBasicGrid1[getRowWithId(currentViewId)][direction];
         } else if (currentGrid == BasicGridNavigation.three) {
-            return navigationBasic3[getRowWithId(currentViewId)][direction];
+            return navigationBasicGrid3[getRowWithId(currentViewId)][direction];
         } else if (currentGrid == BasicGridNavigation.six) {
-            return navigationBasic6[getRowWithId(currentViewId)][direction];
+            return navigationBasicGrid6[getRowWithId(currentViewId)][direction];
         }
         return 0;
     }
@@ -84,7 +87,19 @@ public enum Grid {
         return viewId == R.id.imageButton4 || viewId == R.id.imageButton5 || viewId == R.id.imageButton6;
     }
 
-    public static int getGridTypeAsInt(Grid grid) {
+    public static boolean isLeftColumn(int viewId) {
+        return viewId == R.id.imageButton1 || viewId == R.id.imageButton4;
+    }
+
+    public static boolean isMiddleColumn(int viewId) {
+        return viewId == R.id.imageButton2 || viewId == R.id.imageButton5;
+    }
+
+    public static boolean isRightColumn(int viewId) {
+        return viewId == R.id.imageButton3 || viewId == R.id.imageButton6;
+    }
+
+    public static int getGridTypeAsInt(BasicGridNavigation grid) {
         if (grid == BasicGridNavigation.one) return 1;
         else if (grid == BasicGridNavigation.three) return 3;
         else return 6;

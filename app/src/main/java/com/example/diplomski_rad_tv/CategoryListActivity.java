@@ -20,7 +20,7 @@ public class CategoryListActivity extends Activity {
     Category[] categories;
     Language language = Language.germany;
     Theme theme = Theme.light;
-    Grid grid = Grid.one;
+    BasicGridNavigation grid = BasicGridNavigation.one;
     Clock format = Clock.h12;
     View focusedView;
     String searchbarText = "";

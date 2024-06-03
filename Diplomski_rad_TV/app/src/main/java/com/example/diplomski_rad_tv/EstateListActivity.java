@@ -19,7 +19,7 @@ public class EstateListActivity extends Activity {
     Estate[] estates;
     Language language = Language.germany;
     Theme theme = Theme.light;
-    Grid grid = Grid.one;
+    Grid grid = BasicGridNavigation.one;
     Clock format = Clock.h12;
     View focusedView;
     String searchbarText = "";
@@ -49,11 +49,11 @@ public class EstateListActivity extends Activity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         int oldFocusedViewId = focusedView.getId();
 
-        int gridType = Grid.getGridTypeAsInt(this.grid);
+        int gridType = BasicGridNavigation.getGridTypeAsInt(this.grid);
 
         // Up, down, left, right navigation button
         if (keyCode >= 19 && keyCode <= 22) {
-            int newFocusedViewId = Grid.navigateOverActivity(grid, focusedView.getId(), keyCode - 19);
+            int newFocusedViewId = BasicGridNavigation.navigateOverActivity(grid, focusedView.getId(), keyCode - 19);
 
             // Pressed up
             if (keyCode == 19) {
@@ -67,10 +67,10 @@ public class EstateListActivity extends Activity {
             }
             // Pressed down
             else if (keyCode == 20) {
-                if ((oldFocusedViewId == R.id.imageButton1 || oldFocusedViewId == R.id.imageButton2 || oldFocusedViewId == R.id.imageButton3) && grid == Grid.six && this.overallIndex + 3 < estates.length) {
+                if ((oldFocusedViewId == R.id.imageButton1 || oldFocusedViewId == R.id.imageButton2 || oldFocusedViewId == R.id.imageButton3) && grid == BasicGridNavigation.six && this.overallIndex + 3 < estates.length) {
                     this.overallIndex += 3;
                     this.currentIndex += 3;
-                } else if (Grid.isUpperButtons(oldFocusedViewId)) {
+                } else if (BasicGridNavigation.isUpperButtons(oldFocusedViewId)) {
                     this.currentIndex = 0;
                     this.overallIndex = this.currentPage * gridType;
                 }
@@ -78,7 +78,7 @@ public class EstateListActivity extends Activity {
             }
             // Pressed left
             if (keyCode == 21) {
-                if (oldFocusedViewId == R.id.main || (grid == Grid.three && Grid.isFirstRow(oldFocusedViewId))) {
+                if (oldFocusedViewId == R.id.main || (grid == BasicGridNavigation.three && BasicGridNavigation.isFirstRow(oldFocusedViewId))) {
                     if (this.overallIndex - 1 >= 0) {
                         this.overallIndex--;
                         this.currentIndex = this.overallIndex % gridType;
@@ -87,7 +87,7 @@ public class EstateListActivity extends Activity {
                         this.currentPage = this.overallIndex / gridType;
                         if (oldPage != this.currentPage) setNewContentView();
                     } else newFocusedViewId = 0; // TODO: return false;
-                } else if (grid == Grid.six) {
+                } else if (grid == BasicGridNavigation.six) {
                     if (oldFocusedViewId == R.id.imageButton1 || oldFocusedViewId == R.id.imageButton4) {
                         if (this.overallIndex - 4 >= 0) {
                             this.overallIndex -= 4;
@@ -104,7 +104,7 @@ public class EstateListActivity extends Activity {
             }
             // Pressed right
             else if (keyCode == 22) {
-                if (oldFocusedViewId == R.id.main || (grid == Grid.three && Grid.isFirstRow(oldFocusedViewId))) {
+                if (oldFocusedViewId == R.id.main || (grid == BasicGridNavigation.three && BasicGridNavigation.isFirstRow(oldFocusedViewId))) {
                     if (this.overallIndex + 1 < estates.length) {
                         this.overallIndex++;
                         this.currentIndex = this.overallIndex % gridType;
@@ -113,7 +113,7 @@ public class EstateListActivity extends Activity {
                         this.currentPage = this.overallIndex / gridType;
                         if (oldPage != this.currentPage) setNewContentView();
                     } else newFocusedViewId = 0; // TODO: return false;
-                } else if (grid == Grid.six) {
+                } else if (grid == BasicGridNavigation.six) {
                     if (oldFocusedViewId == R.id.imageButton3 || oldFocusedViewId == R.id.imageButton6) {
                         if (this.overallIndex + 4 < estates.length) {
                             this.overallIndex += 4;
@@ -133,11 +133,11 @@ public class EstateListActivity extends Activity {
                 focusedView = findViewById(newFocusedViewId);
 
                 // Remove focus from old View
-                int row = Grid.getRowWithId(oldFocusedViewId);
+                int row = BasicGridNavigation.getRowWithId(oldFocusedViewId);
                 updateView(row);
 
                 // Add focus to new View
-                row = Grid.getRowWithId(newFocusedViewId);
+                row = BasicGridNavigation.getRowWithId(newFocusedViewId);
                 updateView(row);
             }
         }
@@ -229,14 +229,14 @@ public class EstateListActivity extends Activity {
     void setNewContentView() {
         pickContentView();
 
-        int gridType = Grid.getGridTypeAsInt(this.grid);
+        int gridType = BasicGridNavigation.getGridTypeAsInt(this.grid);
 
         this.currentPage = this.overallIndex / gridType;
         this.currentIndex = this.overallIndex % gridType;
         this.totalPages = (this.estates.length - 1) / gridType + 1;
 
-        if (grid == Grid.one) setupMain();
-        else if (grid == Grid.three) {
+        if (grid == BasicGridNavigation.one) setupMain();
+        else if (grid == BasicGridNavigation.three) {
             setupImageButton(1);
             setupImageButton(2);
             setupImageButton(3);
@@ -306,7 +306,7 @@ public class EstateListActivity extends Activity {
             focusedView = findViewById(R.id.imageButton1);
         }
 
-        int gridType = Grid.getGridTypeAsInt(this.grid);
+        int gridType = BasicGridNavigation.getGridTypeAsInt(this.grid);
 
         if (index == 1) {
             imageButton = findViewById(R.id.imageButton1);
@@ -526,8 +526,8 @@ public class EstateListActivity extends Activity {
         else if (row == 3) setupTextClock();
         else if (row == 4) setupSearchBarButton();
         else if (row == 5) setupPaginationButton();
-        else if (row == 6 && grid == Grid.one) setupMain();
-        else if (row == 6 && (grid == Grid.three || grid == Grid.six)) setupImageButton(1);
+        else if (row == 6 && grid == BasicGridNavigation.one) setupMain();
+        else if (row == 6 && (grid == BasicGridNavigation.three || grid == BasicGridNavigation.six)) setupImageButton(1);
         else if (row == 7) setupImageButton(2);
         else if (row == 8) setupImageButton(3);
         else if (row == 9) setupImageButton(4);

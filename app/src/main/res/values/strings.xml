@@ -30,5 +30,35 @@
     <string name="invalid_page_number_de">Ungültige Eingabe. Bitte geben Sie eine Zahl zwischen 1 und</string>
     <string name="invalid_page_number_hr">Pogrešan unos. Unesite broj između 1 i</string>
 
+    <string name="email_empty_en">Email field cannot be empty.</string>
+    <string name="email_empty_de">Das E-Mail-Feld darf nicht leer sein.</string>
+    <string name="email_empty_hr">Polje e-maila ne može biti prazno.</string>
+
+
+    <string name="password_empty_en">Password field cannot be empty.</string>
+    <string name="password_empty_de">Das Passwortfeld darf nicht leer sein.</string>
+    <string name="password_empty_hr">Polje za lozinku ne može biti prazno.</string>
+
+    <string name="email_or_password_incorrect_en">Email or password is incorrect.</string>
+    <string name="email_or_password_incorrect_de">Email oder Passwort ist falsch.</string>
+    <string name="email_or_password_incorrect_hr">E-mail ili lozinka su netočni.</string>
+
+    <string name="firebase_error_en">An error occured while attempting to retrieve your data from the server.</string>
+    <string name="firebase_error_de">Beim Versuch, Ihre Daten vom Server abzurufen, ist ein Fehler aufgetreten.</string>
+    <string name="firebase_error_hr">Došlo je do pogreške prilikom pokušaja dohvaćanja vaših podataka s poslužitelja.</string>
+
+
+    <string name="email_en">Email</string>
+    <string name="email_de">Email</string>
+    <string name="email_hr">E-mail</string>
+
+    <string name="password_en">Password</string>
+    <string name="password_de">Passwort</string>
+    <string name="password_hr">Lozinka</string>
+
+    <string name="login_en">Sign in</string>
+    <string name="login_de">Anmelden</string>
+    <string name="login_hr">Prijaviti se</string>
+
     <string name="empty_string"> </string>
 </resources>
