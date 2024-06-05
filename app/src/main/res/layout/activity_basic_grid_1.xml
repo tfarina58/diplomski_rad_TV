@@ -222,8 +222,8 @@
 
     <TextView
         android:id="@+id/centerText"
-        android:layout_width="329dp"
-        android:layout_height="97dp"
+        android:layout_width="330dp"
+        android:layout_height="100dp"
         android:text="@string/no_estates_en"
         android:textAlignment="center"
         android:gravity="center"

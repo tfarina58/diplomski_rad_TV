@@ -316,41 +316,8 @@ public class EstateListActivity extends Activity {
                 });
 
                 // setNewContentView();
-            } else if (oldFocusedViewId == R.id.main) {
-                Toast.makeText(EstateListActivity.this, "Navigate to next page", Toast.LENGTH_SHORT).show();
-
-                Intent i = new Intent(getApplicationContext(), CategoryListActivity.class);
-                startActivity(i);
-            } else if (oldFocusedViewId == R.id.imageButton1) {
-                Toast.makeText(EstateListActivity.this, "Navigate to next page", Toast.LENGTH_SHORT).show();
-
-                Intent i = new Intent(getApplicationContext(), CategoryListActivity.class);
-                startActivity(i);
-            } else if (oldFocusedViewId == R.id.imageButton2) {
-                Toast.makeText(EstateListActivity.this, "Navigate to next page", Toast.LENGTH_SHORT).show();
-
-                Intent i = new Intent(getApplicationContext(), CategoryListActivity.class);
-                startActivity(i);
-            } else if (oldFocusedViewId == R.id.imageButton3) {
-                Toast.makeText(EstateListActivity.this, "Navigate to next page", Toast.LENGTH_SHORT).show();
-
-                Intent i = new Intent(getApplicationContext(), CategoryListActivity.class);
-                startActivity(i);
-            } else if (oldFocusedViewId == R.id.imageButton4) {
-                Toast.makeText(EstateListActivity.this, "Navigate to next page", Toast.LENGTH_SHORT).show();
-
-                Intent i = new Intent(getApplicationContext(), CategoryListActivity.class);
-                startActivity(i);
-            } else if (oldFocusedViewId == R.id.imageButton5) {
-                Toast.makeText(EstateListActivity.this, "Navigate to next page", Toast.LENGTH_SHORT).show();
-
-                Intent i = new Intent(getApplicationContext(), CategoryListActivity.class);
-                startActivity(i);
-            } else if (oldFocusedViewId == R.id.imageButton6) {
-                Toast.makeText(EstateListActivity.this, "Navigate to next page", Toast.LENGTH_SHORT).show();
-
-                Intent i = new Intent(getApplicationContext(), CategoryListActivity.class);
-                startActivity(i);
+            } else if (oldFocusedViewId == R.id.main || BasicGridNavigation.isFirstRow(oldFocusedViewId) || BasicGridNavigation.isSecondRow(oldFocusedViewId)) {
+                this.navigateToCategoryListActivity();
             }
         }
         // else return keyCode != 4;
@@ -768,5 +735,20 @@ public class EstateListActivity extends Activity {
             progressBar.setProgressTintList(ColorStateList.valueOf(color));
             progressBar.setIndeterminateTintList(ColorStateList.valueOf(color));
         }
+    }
+
+    void navigateToCategoryListActivity() {
+        String estateId = this.estates[this.estatesToShow.get(this.overallIndex)].id;
+        if (estateId == null || estateId.isEmpty()) return;
+
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("estateId", estateId);
+        editor.apply();
+
+        Toast.makeText(EstateListActivity.this, "Navigate to next page", Toast.LENGTH_SHORT).show();
+
+        Intent i = new Intent(getApplicationContext(), CategoryListActivity.class);
+        startActivity(i);
     }
 }

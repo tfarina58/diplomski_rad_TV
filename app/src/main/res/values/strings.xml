@@ -21,7 +21,7 @@
     <string name="no_estates_en">There are no estates to display!</string>
     <string name="no_estates_de">Es sind keine Immobilien zum Anzeigen vorhanden!</string>
     <string name="no_estates_hr">Nema nekretnina za prikaz!</string>
-    
+
     <string name="real_estate_name_en">Real estate name</string>
     <string name="real_estate_name_de">Immobilienname</string>
     <string name="real_estate_name_hr">Naziv nekretnine</string>
@@ -58,7 +58,11 @@
 
     <string name="login_en">Sign in</string>
     <string name="login_de">Anmelden</string>
-    <string name="login_hr">Prijaviti se</string>
+    <string name="login_hr">Prijavite se</string>
+
+    <string name="welcome_en">Welcome</string>
+    <string name="welcome_de">Willkommen</string>
+    <string name="welcome_hr">Dobrodošli</string>
 
     <string name="empty_string"> </string>
 </resources>

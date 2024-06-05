@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextClock;
@@ -39,10 +40,22 @@ public class LoginActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", MODE_PRIVATE);
+
+        String userId = sharedPreferences.getString("userId", "");
+        String estateId = sharedPreferences.getString("estateId", "");
+        /*if (!userId.isEmpty() && !estateId.isEmpty()) {
+            Intent i = new Intent(getApplicationContext(), Welcome.class);
+            startActivity(i);
+            return;
+        }*/ // TODO: remove comment
+
         this.firestore = FirebaseFirestore.getInstance();
         Button loginButton = findViewById(R.id.loginButton);
 
-        String languageCode = Locale.getDefault().getLanguage();
+        String languageCode = sharedPreferences.getString("language", "");
+        if (languageCode.isEmpty())  languageCode = Locale.getDefault().getLanguage();
+
         switch (languageCode) {
             case "en":
                 this.language = Language.united_kingdom;
@@ -107,7 +120,16 @@ public class LoginActivity extends Activity {
         int oldFocusedViewId = focusedView.getId();
 
         // Up, down, left, right navigation button
-        if (keyCode >= 19 && keyCode <= 22) {
+        if (keyCode == 4) {
+            this.focusedView.clearFocus();
+            this.focusedView.setFocusable(false);
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(this.focusedView.getWindowToken(), 0);
+            }
+            // TODO
+
+        } else if (keyCode >= 19 && keyCode <= 22) {
             int newFocusedViewId = LoginNavigation.navigateOverActivity(focusedView.getId(), keyCode - 19);
             if (newFocusedViewId == 0) return false;
 
@@ -142,8 +164,24 @@ public class LoginActivity extends Activity {
                         ((TextClock)focusedView).setFormat12Hour("hh:mm:ss a");
                         break;
                 }
+            } else if (oldFocusedViewId == R.id.emailAddress) {
+                EditText email = findViewById(R.id.emailAddress);
+                email.setFocusable(true);
+                email.requestFocus();
+                // TODO
+
+            } else if (oldFocusedViewId == R.id.password) {
+                EditText email = findViewById(R.id.emailAddress);
+                email.setFocusable(true);
+                email.requestFocus();
+                // TODO
+
             } else if (oldFocusedViewId == R.id.loginButton) {
-                Toast.makeText(getApplicationContext(), "Setting of wrong trigger function!", Toast.LENGTH_SHORT).show();
+                EditText email = findViewById(R.id.emailAddress);
+                email.setFocusable(true);
+                email.requestFocus();
+                // TODO
+
             }
         }
         return true;
