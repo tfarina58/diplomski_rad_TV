@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#181820"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#181820">
 
     <TextView
         android:id="@+id/title"
@@ -12,12 +13,12 @@
         android:layout_height="35dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="14dp"
+        android:focusable="false"
         android:text="Real estate name"
         android:textAlignment="textStart"
         android:textColor="#ffffff"
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
-        android:focusable="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -30,9 +31,9 @@
         android:adjustViewBounds="true"
         android:background="@drawable/header_button"
         android:gravity="center"
+        android:paddingLeft="26dp"
         android:scaleType="fitCenter"
         android:text="English"
-        android:paddingLeft="26dp"
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textSize="14sp"
@@ -60,9 +61,9 @@
         android:adjustViewBounds="true"
         android:background="@drawable/header_button"
         android:gravity="center"
+        android:paddingLeft="26dp"
         android:scaleType="fitCenter"
         android:text="Dark"
-        android:paddingLeft="26dp"
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textSize="14sp"
@@ -90,9 +91,9 @@
         android:adjustViewBounds="true"
         android:background="@drawable/header_button"
         android:gravity="center"
+        android:paddingLeft="26dp"
         android:scaleType="fitCenter"
         android:text="List"
-        android:paddingLeft="26dp"
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textSize="14sp"
@@ -103,13 +104,13 @@
         android:id="@+id/imageView3"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        app:srcCompat="@drawable/grid"
         android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="@+id/gridButton"
         app:layout_constraintEnd_toEndOf="@+id/gridButton"
         app:layout_constraintHorizontal_bias="0.225"
         app:layout_constraintStart_toStartOf="@+id/gridButton"
-        app:layout_constraintTop_toTopOf="@+id/gridButton" />
+        app:layout_constraintTop_toTopOf="@+id/gridButton"
+        app:srcCompat="@drawable/grid" />
 
     <TextClock
         android:id="@+id/textClock"
@@ -117,11 +118,11 @@
         android:layout_height="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:background="@drawable/header_button"
         android:gravity="center"
         android:text="12:45:00 AM"
-        android:textFontWeight="@android:integer/config_longAnimTime"
-        android:background="@drawable/header_button"
         android:textAlignment="center"
+        android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -131,18 +132,19 @@
         android:layout_width="240dp"
         android:layout_height="50dp"
         android:layout_marginStart="148dp"
-        android:stepSize="1"
         android:layout_marginBottom="56dp"
+        android:stepSize="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/editTextText"
+        android:id="@+id/ratingContent"
         android:layout_width="665dp"
         android:layout_height="203dp"
         android:ems="10"
         android:gravity="start"
-        android:hint="Please write down any praise and remarks that you want other people to see"
+        android:hint="@string/rating_content_en"
+        android:padding="8dp"
         android:textAlignment="textStart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -152,12 +154,12 @@
 
     <Button
         android:id="@+id/ratingButton"
-        android:background="@drawable/button_design"
         android:layout_width="240dp"
         android:layout_height="50dp"
         android:layout_marginEnd="144dp"
         android:layout_marginBottom="56dp"
-        android:text="Button"
+        android:background="@drawable/button_design"
+        android:text="@string/send_rating_en"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

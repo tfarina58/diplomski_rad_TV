@@ -41,7 +41,7 @@ public class EstateListActivity extends Activity {
     FirebaseFirestore firestore;
     Estate[] estates;
     ArrayList<Integer> estatesToShow;
-    Language language = Language.croatia;
+    Language language = Language.united_kingdom;
     Theme theme = Theme.dark;
     BasicGridNavigation grid = BasicGridNavigation.one;
     Clock format = Clock.h12;
@@ -75,11 +75,12 @@ public class EstateListActivity extends Activity {
                     estates = new Estate[queryDocumentSnapshots.size()];
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         String estateId = document.getId();
+                        String ownerId = document.getString("ownerId");
                         String name = document.getString("name");
                         String image = document.getString("image");
                         GeoPoint coordinates = document.getGeoPoint("coordinates");
                         HashMap<String, Object> variables = (HashMap<String, Object>) document.get("variables");
-                        estates[i] = new Estate(estateId, image, coordinates.getLatitude(), coordinates.getLongitude(), name, userId, variables);
+                        estates[i] = new Estate(estateId, ownerId, image, coordinates.getLatitude(), coordinates.getLongitude(), name, variables);
                         i++;
                     }
                     loadingInProgress = false;

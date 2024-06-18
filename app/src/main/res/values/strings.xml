@@ -22,9 +22,25 @@
     <string name="no_estates_de">Es sind keine Immobilien zum Anzeigen vorhanden!</string>
     <string name="no_estates_hr">Nema nekretnina za prikaz!</string>
 
+    <string name="no_categories_en">There are no categories to display!</string>
+    <string name="no_categories_de">Es sind keine Kategorien zum Anzeigen vorhanden!</string>
+    <string name="no_categories_hr">Nema kategorija za prikaz!</string>
+
+    <string name="no_elements_en">There are no elements to display!</string>
+    <string name="no_elements_de">Es sind keine Elemente zum Anzeigen vorhanden!</string>
+    <string name="no_elements_hr">Nema elemenata za prikaz!</string>
+
     <string name="real_estate_name_en">Real estate name</string>
     <string name="real_estate_name_de">Immobilienname</string>
     <string name="real_estate_name_hr">Naziv nekretnine</string>
+
+    <string name="category_name_en">Category name</string>
+    <string name="category_name_de">Kategoriename</string>
+    <string name="category_name_hr">Ime kategorije</string>
+
+    <string name="element_name_en">Element name</string>
+    <string name="element_name_de">Elementname</string>
+    <string name="element_name_hr">Naziv elementa</string>
 
     <string name="invalid_page_number_en">Invalid input. Please enter a number between 1 and</string>
     <string name="invalid_page_number_de">Ungültige Eingabe. Bitte geben Sie eine Zahl zwischen 1 und</string>
@@ -63,6 +79,14 @@
     <string name="welcome_en">Welcome</string>
     <string name="welcome_de">Willkommen</string>
     <string name="welcome_hr">Dobrodošli</string>
+
+    <string name="send_rating_en">Send rating</string>
+    <string name="send_rating_de">Bewertung senden</string>
+    <string name="send_rating_hr">Pošalji ocjenu</string>
+
+    <string name="rating_content_en">Please write down any praise and remarks </string>
+    <string name="rating_content_de">Bitte schreiben Sie Lob und Bemerkungen auf</string>
+    <string name="rating_content_hr">Zapišite sve pohvale i primjedbe</string>
 
     <string name="empty_string"> </string>
 </resources>

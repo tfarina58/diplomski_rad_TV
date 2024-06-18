@@ -45,7 +45,7 @@ public class LoginActivity extends Activity {
         String userId = sharedPreferences.getString("userId", "");
         String estateId = sharedPreferences.getString("estateId", "");
         /*if (!userId.isEmpty() && !estateId.isEmpty()) {
-            Intent i = new Intent(getApplicationContext(), Welcome.class);
+            Intent i = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivity(i);
             return;
         }*/ // TODO: remove comment
@@ -111,7 +111,6 @@ public class LoginActivity extends Activity {
                     });
             }
         });
-
     }
 
     @Override
