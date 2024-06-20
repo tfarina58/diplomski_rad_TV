@@ -41,9 +41,9 @@ public class EstateListActivity extends Activity {
     FirebaseFirestore firestore;
     Estate[] estates;
     ArrayList<Integer> estatesToShow;
-    Language language = Language.united_kingdom;
+    Language language = Language.english;
     Theme theme = Theme.dark;
-    BasicGridNavigation grid = BasicGridNavigation.one;
+    GridNavigation grid = GridNavigation.one;
     Clock format = Clock.h12;
     View focusedView;
     String searchbarText = "";
@@ -109,22 +109,22 @@ public class EstateListActivity extends Activity {
         // super.onKeyDown(keyCode, event);
         int oldFocusedViewId = focusedView.getId();
 
-        int gridType = BasicGridNavigation.getGridTypeAsInt(this.grid);
+        int gridType = GridNavigation.getGridTypeAsInt(this.grid);
 
         // Up, down, left, right navigation button
         if (keyCode >= 19 && keyCode <= 22) {
-            int newFocusedViewId = BasicGridNavigation.navigateOverActivity(this.grid, focusedView.getId(), keyCode - 19);
+            int newFocusedViewId = GridNavigation.navigateOverActivity(this.grid, focusedView.getId(), keyCode - 19);
 
             if (newFocusedViewId == 0) return false;
 
             // Pressed up
             if (keyCode == 19) {
-                if (BasicGridNavigation.isUpperButtons(oldFocusedViewId) || BasicGridNavigation.isFirstRow(oldFocusedViewId) || oldFocusedViewId == R.id.main) {
+                if (GridNavigation.isUpperButtons(oldFocusedViewId) || GridNavigation.isFirstRow(oldFocusedViewId) || oldFocusedViewId == R.id.main) {
                     // Do nothing
-                } else if (BasicGridNavigation.isSecondRow(oldFocusedViewId)) {
+                } else if (GridNavigation.isSecondRow(oldFocusedViewId)) {
                     this.overallIndex -= 3;
                     this.currentIndex -= 3;
-                } else if (BasicGridNavigation.isLowerButtons(oldFocusedViewId)) {
+                } else if (GridNavigation.isLowerButtons(oldFocusedViewId)) {
                     this.currentIndex = 0;
                     this.overallIndex = this.currentPage * gridType;
                     if (this.estatesToShow.size() == 0) {
@@ -134,27 +134,27 @@ public class EstateListActivity extends Activity {
             }
             // Pressed down
             else if (keyCode == 20) {
-                if (BasicGridNavigation.isUpperButtons(oldFocusedViewId)) {
+                if (GridNavigation.isUpperButtons(oldFocusedViewId)) {
                     this.currentIndex = 0;
                     this.overallIndex = this.currentPage * gridType;
                     if (this.estatesToShow.size() == 0) {
                         newFocusedViewId = R.id.searchView;
                     }
-                } else if (oldFocusedViewId == R.id.main || BasicGridNavigation.isFirstRow(oldFocusedViewId)) {
-                    if (this.grid == BasicGridNavigation.six && this.overallIndex + 3 < this.estatesToShow.size()) {
+                } else if (oldFocusedViewId == R.id.main || GridNavigation.isFirstRow(oldFocusedViewId)) {
+                    if (this.grid == GridNavigation.six && this.overallIndex + 3 < this.estatesToShow.size()) {
                         this.overallIndex += 3;
                         this.currentIndex += 3;
                     } else newFocusedViewId = R.id.searchView;
-                } else if (BasicGridNavigation.isSecondRow(oldFocusedViewId)) {
+                } else if (GridNavigation.isSecondRow(oldFocusedViewId)) {
                     newFocusedViewId = R.id.searchView;
                 } else newFocusedViewId = 0;
 
             }
             // Pressed left
             if (keyCode == 21) {
-                if (BasicGridNavigation.isUpperButtons(oldFocusedViewId) || BasicGridNavigation.isLowerButtons(oldFocusedViewId)) {
+                if (GridNavigation.isUpperButtons(oldFocusedViewId) || GridNavigation.isLowerButtons(oldFocusedViewId)) {
                     // Do nothing
-                } else if (oldFocusedViewId == R.id.main || (this.grid == BasicGridNavigation.three && BasicGridNavigation.isFirstRow(oldFocusedViewId))) {
+                } else if (oldFocusedViewId == R.id.main || (this.grid == GridNavigation.three && GridNavigation.isFirstRow(oldFocusedViewId))) {
                     if (this.overallIndex - 1 >= 0) {
                         this.overallIndex--;
                         this.currentIndex = this.overallIndex % gridType;
@@ -163,15 +163,15 @@ public class EstateListActivity extends Activity {
                         this.currentPage = this.overallIndex / gridType;
                         if (oldPage != this.currentPage) setNewContentView();
                     } else newFocusedViewId = 0; // TODO: return false;
-                } else if (this.grid == BasicGridNavigation.six) {
-                    if (BasicGridNavigation.isLeftColumn(oldFocusedViewId)) {
+                } else if (this.grid == GridNavigation.six) {
+                    if (GridNavigation.isLeftColumn(oldFocusedViewId)) {
                         if (this.overallIndex - 4 >= 0) {
                             this.overallIndex -= 4;
                             this.currentPage = this.overallIndex / gridType;
                             this.currentIndex = this.overallIndex % gridType;
                             setNewContentView();
                         } else newFocusedViewId = 0; // TODO: return false;
-                    } else if (BasicGridNavigation.isMiddleColumn(oldFocusedViewId) || BasicGridNavigation.isRightColumn(oldFocusedViewId)) {
+                    } else if (GridNavigation.isMiddleColumn(oldFocusedViewId) || GridNavigation.isRightColumn(oldFocusedViewId)) {
                         this.overallIndex--;
                         this.currentPage = this.overallIndex / gridType;
                         this.currentIndex = this.overallIndex % gridType;
@@ -180,9 +180,9 @@ public class EstateListActivity extends Activity {
             }
             // Pressed right
             else if (keyCode == 22) {
-                if (BasicGridNavigation.isUpperButtons(oldFocusedViewId) || BasicGridNavigation.isLowerButtons(oldFocusedViewId)) {
+                if (GridNavigation.isUpperButtons(oldFocusedViewId) || GridNavigation.isLowerButtons(oldFocusedViewId)) {
                     // Do nothing
-                } else if (oldFocusedViewId == R.id.main || (this.grid == BasicGridNavigation.three && BasicGridNavigation.isFirstRow(oldFocusedViewId))) {
+                } else if (oldFocusedViewId == R.id.main || (this.grid == GridNavigation.three && GridNavigation.isFirstRow(oldFocusedViewId))) {
                     if (this.overallIndex + 1 < estatesToShow.size()) {
                         this.overallIndex++;
                         this.currentIndex = this.overallIndex % gridType;
@@ -191,15 +191,15 @@ public class EstateListActivity extends Activity {
                         this.currentPage = this.overallIndex / gridType;
                         if (oldPage != this.currentPage) setNewContentView();
                     } else newFocusedViewId = 0; // TODO: return false;
-                } else if (this.grid == BasicGridNavigation.six) {
-                    if (BasicGridNavigation.isRightColumn(oldFocusedViewId)) {
+                } else if (this.grid == GridNavigation.six) {
+                    if (GridNavigation.isRightColumn(oldFocusedViewId)) {
                         if (this.overallIndex + 4 < estatesToShow.size()) {
                             this.overallIndex += 4;
                             this.currentPage = this.overallIndex / gridType;
                             this.currentIndex = this.overallIndex % gridType;
                             setNewContentView();
                         } else newFocusedViewId = 0; // TODO: return false;
-                    } else if (BasicGridNavigation.isLeftColumn(oldFocusedViewId) || BasicGridNavigation.isMiddleColumn(oldFocusedViewId)) {
+                    } else if (GridNavigation.isLeftColumn(oldFocusedViewId) || GridNavigation.isMiddleColumn(oldFocusedViewId)) {
                         if (this.overallIndex + 1 < estatesToShow.size()) {
                             this.overallIndex++;
                             this.currentPage = this.overallIndex / gridType;
@@ -213,11 +213,11 @@ public class EstateListActivity extends Activity {
                 focusedView = findViewById(newFocusedViewId);
 
                 // Remove focus from old View
-                int row = BasicGridNavigation.getRowWithId(oldFocusedViewId);
+                int row = GridNavigation.getRowWithId(oldFocusedViewId);
                 updateView(row);
 
                 // Add focus to new View
-                row = BasicGridNavigation.getRowWithId(newFocusedViewId);
+                row = GridNavigation.getRowWithId(newFocusedViewId);
                 updateView(row);
             }
         }
@@ -289,18 +289,18 @@ public class EstateListActivity extends Activity {
                                 if (pageIndexNumber < 0 || pageIndexNumber >= totalPages) throw new Exception();
                                 if (pageIndexNumber != currentPage) {
                                     currentPage = pageIndexNumber;
-                                    overallIndex = BasicGridNavigation.getGridTypeAsInt(grid) * currentPage;
+                                    overallIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage;
                                     currentIndex = 0;
                                 }
                             } catch (Exception ex) {
                                 switch (language) {
-                                    case united_kingdom:
+                                    case english:
                                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_page_number_en) + " " + totalPages + ".", Toast.LENGTH_LONG).show();
                                         break;
-                                    case germany:
+                                    case german:
                                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_page_number_de) + " " + totalPages + ".", Toast.LENGTH_LONG).show();
                                         break;
-                                    case croatia:
+                                    case croatian:
                                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_page_number_hr) + " " + totalPages + ".", Toast.LENGTH_LONG).show();
                                         break;
                                 }
@@ -317,7 +317,7 @@ public class EstateListActivity extends Activity {
                 });
 
                 // setNewContentView();
-            } else if (oldFocusedViewId == R.id.main || BasicGridNavigation.isFirstRow(oldFocusedViewId) || BasicGridNavigation.isSecondRow(oldFocusedViewId)) {
+            } else if (oldFocusedViewId == R.id.main || GridNavigation.isFirstRow(oldFocusedViewId) || GridNavigation.isSecondRow(oldFocusedViewId)) {
                 this.navigateToCategoryListActivity();
             }
         }
@@ -330,14 +330,14 @@ public class EstateListActivity extends Activity {
     void setNewContentView() {
         setContentView();
 
-        int gridType = BasicGridNavigation.getGridTypeAsInt(this.grid);
+        int gridType = GridNavigation.getGridTypeAsInt(this.grid);
 
         this.currentPage = this.overallIndex / gridType;
         this.currentIndex = this.overallIndex % gridType;
         this.totalPages = (this.estatesToShow.size() - 1) / gridType + 1;
 
-        if (this.grid == BasicGridNavigation.one) setupMain();
-        else if (this.grid == BasicGridNavigation.three) {
+        if (this.grid == GridNavigation.one) setupMain();
+        else if (this.grid == GridNavigation.three) {
             setupImageButton(1);
             setupImageButton(2);
             setupImageButton(3);
@@ -396,7 +396,7 @@ public class EstateListActivity extends Activity {
             this.hideProgressBar();
 
             switch (this.language) {
-                case united_kingdom:
+                case english:
                     if (this.theme == Theme.dark) {
                         this.setTitleText(View.VISIBLE, R.string.real_estate_name_en, R.color.text_color_dark_mode);
                         this.setCenterText(View.VISIBLE, R.string.no_estates_en, R.color.text_color_dark_mode);
@@ -405,7 +405,7 @@ public class EstateListActivity extends Activity {
                         this.setCenterText(View.VISIBLE, R.string.no_estates_en, R.color.text_color_light_mode);
                     }
                     break;
-                case germany:
+                case german:
                     if (this.theme == Theme.dark) {
                         this.setTitleText(View.VISIBLE, R.string.real_estate_name_de, R.color.text_color_dark_mode);
                         this.setCenterText(View.VISIBLE, R.string.no_estates_de, R.color.text_color_dark_mode);
@@ -414,7 +414,7 @@ public class EstateListActivity extends Activity {
                         this.setCenterText(View.VISIBLE, R.string.no_estates_de, R.color.text_color_light_mode);
                     }
                     break;
-                case croatia:
+                case croatian:
                     if (this.theme == Theme.dark) {
                         this.setTitleText(View.VISIBLE, R.string.real_estate_name_hr, R.color.text_color_dark_mode);
                         this.setCenterText(View.VISIBLE, R.string.no_estates_hr, R.color.text_color_dark_mode);
@@ -443,7 +443,7 @@ public class EstateListActivity extends Activity {
         if (this.theme == Theme.light) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.light_theme));
         else if (this.theme == Theme.dark) background.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.color.dark_theme));
 
-        int gridType = BasicGridNavigation.getGridTypeAsInt(this.grid);
+        int gridType = GridNavigation.getGridTypeAsInt(this.grid);
         int viewIndex = this.currentPage * gridType + index - 1;
 
         if (this.focusedView == null) {
@@ -452,21 +452,21 @@ public class EstateListActivity extends Activity {
 
         if (this.estatesToShow.size() == 0) {
             switch (this.language) {
-                case united_kingdom:
+                case english:
                     if (this.theme == Theme.dark) {
                         this.setCenterText(View.VISIBLE, R.string.no_estates_en, R.color.text_color_dark_mode);
                     } else if (this.theme == Theme.light) {
                         this.setCenterText(View.VISIBLE, R.string.no_estates_en, R.color.text_color_light_mode);
                     }
                     break;
-                case germany:
+                case german:
                     if (this.theme == Theme.dark) {
                         this.setCenterText(View.VISIBLE, R.string.no_estates_de, R.color.text_color_dark_mode);
                     } else if (this.theme == Theme.light) {
                         this.setCenterText(View.VISIBLE, R.string.no_estates_de, R.color.text_color_light_mode);
                     }
                     break;
-                case croatia:
+                case croatian:
                     if (this.theme == Theme.dark) {
                         this.setCenterText(View.VISIBLE, R.string.no_estates_hr, R.color.text_color_dark_mode);
                     } else if (this.theme == Theme.light) {
@@ -492,17 +492,17 @@ public class EstateListActivity extends Activity {
 
         if (languageButton == null) return;
         switch (language) {
-            case united_kingdom:
+            case english:
                 languageButton.setText(R.string.language_en);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.united_kingdom));
+                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.english));
                 break;
-            case germany:
+            case german:
                 languageButton.setText(R.string.language_de);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.germany));
+                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.german));
                 break;
-            case croatia:
+            case croatian:
                 languageButton.setText(R.string.language_hr);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.croatia));
+                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.croatian));
                 break;
         }
 
@@ -517,16 +517,16 @@ public class EstateListActivity extends Activity {
         if (themeButton == null) return;
         switch (theme) {
             case light:
-                if (this.language == Language.united_kingdom) themeButton.setText(R.string.light_theme_en);
-                else if (this.language == Language.germany) themeButton.setText(R.string.light_theme_de);
-                else if (this.language == Language.croatia) themeButton.setText(R.string.light_theme_hr);
+                if (this.language == Language.english) themeButton.setText(R.string.light_theme_en);
+                else if (this.language == Language.german) themeButton.setText(R.string.light_theme_de);
+                else if (this.language == Language.croatian) themeButton.setText(R.string.light_theme_hr);
 
                 themeIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.sun));
                 break;
             case dark:
-                if (this.language == Language.united_kingdom) themeButton.setText(R.string.dark_theme_en);
-                else if (this.language == Language.germany) themeButton.setText(R.string.dark_theme_de);
-                else if (this.language == Language.croatia) themeButton.setText(R.string.dark_theme_hr);
+                if (this.language == Language.english) themeButton.setText(R.string.dark_theme_en);
+                else if (this.language == Language.german) themeButton.setText(R.string.dark_theme_de);
+                else if (this.language == Language.croatian) themeButton.setText(R.string.dark_theme_hr);
 
                 themeIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.moon));
                 break;
@@ -541,9 +541,9 @@ public class EstateListActivity extends Activity {
         ImageView gridIcon = findViewById(R.id.gridIcon);
 
         if (gridButton == null) return;
-        if (this.language == Language.united_kingdom) gridButton.setText(R.string.grid_en);
-        else if (this.language == Language.germany) gridButton.setText(R.string.grid_de);
-        else if (this.language == Language.croatia) gridButton.setText(R.string.grid_hr);
+        if (this.language == Language.english) gridButton.setText(R.string.grid_en);
+        else if (this.language == Language.german) gridButton.setText(R.string.grid_de);
+        else if (this.language == Language.croatian) gridButton.setText(R.string.grid_hr);
 
         gridIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.grid));
 
@@ -601,8 +601,8 @@ public class EstateListActivity extends Activity {
         else if (row == 3) setupTextClock();
         else if (row == 4) setupSearchBarButton();
         else if (row == 5) setupPaginationButton();
-        else if (row == 6 && this.grid == BasicGridNavigation.one) setupMain();
-        else if (row == 6 && (this.grid == BasicGridNavigation.three || this.grid == BasicGridNavigation.six)) setupImageButton(1);
+        else if (row == 6 && this.grid == GridNavigation.one) setupMain();
+        else if (row == 6 && (this.grid == GridNavigation.three || this.grid == GridNavigation.six)) setupImageButton(1);
         else if (row == 7) setupImageButton(2);
         else if (row == 8) setupImageButton(3);
         else if (row == 9) setupImageButton(4);

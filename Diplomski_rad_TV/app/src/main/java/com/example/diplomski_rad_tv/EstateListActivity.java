@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat;
 
 public class EstateListActivity extends Activity {
     Estate[] estates;
-    Language language = Language.germany;
+    Language language = Language.german;
     Theme theme = Theme.light;
     Grid grid = BasicGridNavigation.one;
     Clock format = Clock.h12;
@@ -434,17 +434,17 @@ public class EstateListActivity extends Activity {
 
         if (languageButton == null) return;
         switch (language) {
-            case united_kingdom:
+            case english:
                 languageButton.setText("English");
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.united_kingdom));
+                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.english));
                 break;
-            case germany:
+            case german:
                 languageButton.setText("Deutsche");
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.germany));
+                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.german));
                 break;
-            case croatia:
+            case croatiann:
                 languageButton.setText("Hrvatski");
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.croatia));
+                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.croatiann));
                 break;
         }
 

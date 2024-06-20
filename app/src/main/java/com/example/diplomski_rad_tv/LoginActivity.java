@@ -1,6 +1,7 @@
 package com.example.diplomski_rad_tv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,6 +29,7 @@ import java.util.Locale;
 
 public class LoginActivity extends Activity {
     FirebaseFirestore firestore;
+    SharedPreferencesService service;
     View focusedView;
     Language language;
     Theme theme;
@@ -40,38 +41,35 @@ public class LoginActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", MODE_PRIVATE);
+        SharedPreferencesService sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
 
-        String userId = sharedPreferences.getString("userId", "");
-        String estateId = sharedPreferences.getString("estateId", "");
-        /*if (!userId.isEmpty() && !estateId.isEmpty()) {
+        String userId = sharedPreferencesService.getUserId();
+        String estateId = sharedPreferencesService.getEstateId();
+        if (!userId.isEmpty() && !estateId.isEmpty()) {
             Intent i = new Intent(getApplicationContext(), WelcomeActivity.class);
             startActivity(i);
             return;
-        }*/ // TODO: remove comment
+        } // TODO: remove comment
 
         this.firestore = FirebaseFirestore.getInstance();
+
+        this.language = sharedPreferencesService.getLanguage();
+        // if (this.language == null) this.getDeviceLanguage(); // Default set to Language.english, so no need for this functionality (for now).
+
+        TextView loginTitle = findViewById(R.id.loginTitle);
+        this.setupLoginTitle(loginTitle);
+
+        EditText emailField = findViewById(R.id.emailAddress);
+        TextView emailFieldTitle = findViewById(R.id.emailAddressTitle);
+        focusedView = emailField;
+        LoginNavigation.setupEmailField(getApplicationContext(), emailField, emailFieldTitle, this.focusedView, this.language);
+
+        EditText passwordField = findViewById(R.id.password);
+        TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
+        LoginNavigation.setupPasswordField(getApplicationContext(), passwordField, passwordFieldTitle, this.focusedView, this.language);
+
         Button loginButton = findViewById(R.id.loginButton);
-
-        String languageCode = sharedPreferences.getString("language", "");
-        if (languageCode.isEmpty())  languageCode = Locale.getDefault().getLanguage();
-
-        switch (languageCode) {
-            case "en":
-                this.language = Language.united_kingdom;
-                break;
-            case "de":
-                this.language = Language.germany;
-                break;
-            case "hr":
-                this.language = Language.croatia;
-                break;
-        }
-
-        this.setupLoginTitle();
-        this.setupEmailField();
-        this.setupPasswordField();
-        this.setupLoginButton();
+        LoginNavigation.setupLoginButton(getApplicationContext(), loginButton, this.focusedView, this.language);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,36 +77,29 @@ public class LoginActivity extends Activity {
                 String email = "tfarina58@gmail.com"; // ((EditText) findViewById(R.id.emailAddress)).getText().toString();
                 String password = "password"; // ((EditText) findViewById(R.id.password)).getText().toString();
 
-                if (email.isEmpty()) Toast.makeText(getApplicationContext(), getResources().getString(R.string.email_empty_en), Toast.LENGTH_LONG);
-                if (password.isEmpty()) Toast.makeText(getApplicationContext(), getResources().getString(R.string.password_empty_en), Toast.LENGTH_LONG);
+                String emptyEmailFeedback, emptyPasswordFeedback, incorrectEmailOrPasswordFeedback, firebaseError;
+                switch (language) {
+                    case german:
+                        emptyEmailFeedback = getResources().getString(R.string.email_empty_de);
+                        emptyPasswordFeedback = getResources().getString(R.string.password_empty_de);
+                        incorrectEmailOrPasswordFeedback = getResources().getString(R.string.email_or_password_incorrect_de);
+                        firebaseError = getResources().getString(R.string.firebase_error_de);
+                        break;
+                    case croatian:
+                        emptyEmailFeedback = getResources().getString(R.string.email_empty_hr);
+                        emptyPasswordFeedback = getResources().getString(R.string.password_empty_hr);
+                        incorrectEmailOrPasswordFeedback = getResources().getString(R.string.email_or_password_incorrect_hr);
+                        firebaseError = getResources().getString(R.string.firebase_error_hr);
+                        break;
+                    default:
+                        emptyEmailFeedback = getResources().getString(R.string.email_empty_en);
+                        emptyPasswordFeedback = getResources().getString(R.string.password_empty_en);
+                        incorrectEmailOrPasswordFeedback = getResources().getString(R.string.email_or_password_incorrect_en);
+                        firebaseError = getResources().getString(R.string.firebase_error_en);
+                        break;
+                }
 
-                Query query = firestore.collection("users").whereEqualTo("email", email).whereEqualTo("password", password);
-
-                query.get()
-                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                        @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
-                            if (documents.size() == 1) {
-                                String documentId = documents.get(0).getId();
-
-                                SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString("userId", documentId);
-                                editor.apply();
-
-                                Intent i = new Intent(getApplicationContext(), EstateListActivity.class);
-                                startActivity(i);
-                            } else
-                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.email_or_password_incorrect_en), Toast.LENGTH_LONG).show();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.firebase_error_en), Toast.LENGTH_LONG).show();
-                        }
-                    });
+                firestoreLogin(getApplicationContext(), email, password, emptyEmailFeedback, emptyPasswordFeedback, incorrectEmailOrPasswordFeedback, firebaseError, sharedPreferencesService.sharedPreferences);
             }
         });
     }
@@ -136,11 +127,11 @@ public class LoginActivity extends Activity {
 
             // Remove focus from old View
             int row = LoginNavigation.getRowWithId(oldFocusedViewId);
-            updateView(row);
+            this.updateView(row);
 
             // Add focus to new View
             row = LoginNavigation.getRowWithId(newFocusedViewId);
-            updateView(row);
+            this.updateView(row);
         }
         // Enter button
         else if (keyCode == 23) {
@@ -176,104 +167,94 @@ public class LoginActivity extends Activity {
                 // TODO
 
             } else if (oldFocusedViewId == R.id.loginButton) {
-                EditText email = findViewById(R.id.emailAddress);
-                email.setFocusable(true);
-                email.requestFocus();
-                // TODO
-
+                // TODO: nothing should happen
             }
         }
         return true;
     }
 
-    void updateView(int row) {
-        if (row == 0) setupEmailField();
-        else if (row == 1) setupPasswordField();
-        else if (row == 2) setupLoginButton();
-    }
-
-    void setupEmailField() {
-        EditText emailField = findViewById(R.id.emailAddress);
-        TextView emailFieldTitle = findViewById(R.id.emailAddressTitle);
-
-        if (this.focusedView == null) {
-            this.focusedView = emailField;
-        }
-
-        if (emailField == null || emailFieldTitle == null) return;
-        emailField.clearFocus();
-
-        switch (language) {
-            case united_kingdom:
-                emailFieldTitle.setText(R.string.email_en);
-                break;
-            case germany:
-                emailFieldTitle.setText(R.string.email_de);
-                break;
-            case croatia:
-                emailFieldTitle.setText(R.string.email_hr);
-                break;
-        }
-
-        if (this.focusedView.getId() == R.id.emailAddress) emailField.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.edittext_design_focused));
-        else emailField.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.edittext_design));
-    }
-
-    void setupPasswordField() {
-        EditText passwordField = findViewById(R.id.password);
-        TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
-
-        if (passwordField == null || passwordFieldTitle == null) return;
-        switch (language) {
-            case united_kingdom:
-                passwordFieldTitle.setText(R.string.password_en);
-                break;
-            case germany:
-                passwordFieldTitle.setText(R.string.password_de);
-                break;
-            case croatia:
-                passwordFieldTitle.setText(R.string.password_hr);
-                break;
-        }
-
-        if (this.focusedView.getId() == R.id.password) passwordField.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.edittext_design_focused));
-        else passwordField.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.edittext_design));
-    }
-
-    void setupLoginTitle() {
-        TextView loginTitle = findViewById(R.id.loginTitle);
+    void setupLoginTitle(TextView loginTitle) {
         if (loginTitle == null) return;
 
         switch (language) {
-            case united_kingdom:
+            case english:
                 loginTitle.setText(R.string.login_en);
                 break;
-            case germany:
+            case german:
                 loginTitle.setText(R.string.login_de);
                 break;
-            case croatia:
+            case croatian:
                 loginTitle.setText(R.string.login_hr);
                 break;
         }
     }
 
-    void setupLoginButton() {
-        Button loginButton = findViewById(R.id.loginButton);
-
-        if (loginButton == null) return;
-        switch (language) {
-            case united_kingdom:
-                loginButton.setText(R.string.login_en);
+    public void updateView(int row) {
+        switch (row) {
+            case 0:
+                EditText emailField = findViewById(R.id.emailAddress);
+                TextView emailFieldTitle = findViewById(R.id.emailAddressTitle);
+                LoginNavigation.setupEmailField(getApplicationContext(), emailField, emailFieldTitle, this.focusedView, this.language);
                 break;
-            case germany:
-                loginButton.setText(R.string.login_de);
+            case 1:
+                EditText passwordField = findViewById(R.id.password);
+                TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
+                LoginNavigation.setupPasswordField(getApplicationContext(), passwordField, passwordFieldTitle, this.focusedView, this.language);
                 break;
-            case croatia:
-                loginButton.setText(R.string.login_hr);
+            case 2:
+                Button loginButton = findViewById(R.id.loginButton);
+                LoginNavigation.setupLoginButton(getApplicationContext(), loginButton, this.focusedView, this.language);
                 break;
         }
+    }
 
-        if (this.focusedView.getId() == R.id.loginButton) loginButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_design_focused));
-        else loginButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.button_design));
+    public void firestoreLogin(Context ctx, String email, String password, String emptyEmailFeedback, String emptyPasswordFeedback, String incorrectEmailOrPasswordFeedback, String firebaseError, SharedPreferences sharedPreferences) {
+        if (email.isEmpty()) Toast.makeText(ctx, emptyEmailFeedback, Toast.LENGTH_LONG).show();
+        if (password.isEmpty()) Toast.makeText(ctx, emptyPasswordFeedback, Toast.LENGTH_LONG).show();
+
+        Query query = this.firestore.collection("users")
+                .whereEqualTo("email", email)
+                .whereEqualTo("password", password);
+
+        query.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
+                        if (documents.size() != 1) {
+                            Toast.makeText(ctx, incorrectEmailOrPasswordFeedback, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        String documentId = documents.get(0).getId();
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("userId", documentId);
+                        editor.apply();
+
+                        String userId = sharedPreferences.getString("userId", "");
+                        if (userId.isEmpty()) return;
+
+                        Intent i = new Intent(getApplicationContext(), EstateListActivity.class);
+                        startActivity(i);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ctx, firebaseError, Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    public Language getDeviceLanguage() {
+        String languageCode = Locale.getDefault().getLanguage();
+        switch (languageCode) {
+            case "de":
+                return Language.german;
+            case "hr":
+                return Language.croatian;
+            default:
+                return Language.english;
+        }
     }
 }

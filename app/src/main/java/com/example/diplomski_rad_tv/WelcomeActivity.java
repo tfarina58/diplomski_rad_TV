@@ -13,15 +13,18 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.type.DateTime;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
 public class WelcomeActivity extends Activity {
-
-    Theme theme;
+    SharedPreferencesService sharedPreferencesService;
     Language language;
+    Theme theme;
     String guest = "";
     Timestamp to;
     boolean skipFunction = false;
@@ -31,37 +34,18 @@ public class WelcomeActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPreferences", MODE_PRIVATE);
+        this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
 
-        this.language = this.setLanguage(sharedPreferences);
-        this.theme = this.setTheme(sharedPreferences);
-        this.setGuest(sharedPreferences);
+        this.language = this.sharedPreferencesService.getLanguage();
+        this.theme = this.sharedPreferencesService.getTheme();
 
-        new java.util.Timer().schedule(
-            new java.util.TimerTask() {
-                @Override
-                public void run() {
-                    if (skipFunction) return;
-
-                    long toInEpoch = 0;
-                    long now = new Date().getTime();
-                    if (to != null) toInEpoch = (to.getSeconds() - 86400) * 1000; // (to - 1 day) in milliseconds
-
-                    if (to != null && toInEpoch < now) {
-                        Intent i = new Intent(getApplicationContext(), RatingActivity.class);
-                        startActivity(i);
-                    } else {
-                        Intent i = new Intent(getApplicationContext(), CategoryListActivity.class);
-                        startActivity(i);
-                    }
-                }
-            },
-            5000
-        );
+        this.setupTimer();
+        this.getGuestFromFirebase();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // super.onKeyDown(keyCode, event);
         // Enter button
         if (keyCode == 23) {
             skipFunction = true;
@@ -73,28 +57,8 @@ public class WelcomeActivity extends Activity {
         return false;
     }
 
-    Language setLanguage(SharedPreferences sharedPreferences) {
-        String language = sharedPreferences.getString("language", "en");
-
-        switch (language) {
-            case "de":
-                return Language.germany;
-            case "hr":
-                return Language.croatia;
-            default:
-                return Language.united_kingdom;
-        }
-    }
-
-    Theme setTheme(SharedPreferences sharedPreferences) {
-        String theme = sharedPreferences.getString("theme", "dark");
-
-        if (theme.equals("light")) return Theme.light;
-        return Theme.dark;
-    }
-
-    void setGuest(SharedPreferences sharedPreferences) {
-        String estateId = sharedPreferences.getString("estateId", "");
+    void getGuestFromFirebase() {
+        String estateId = this.sharedPreferencesService.getEstateId();
         if (estateId.isEmpty()) return;
 
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -104,20 +68,20 @@ public class WelcomeActivity extends Activity {
             .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
-                    HashMap<String, Object> variables = (HashMap<String, Object>)queryDocumentSnapshots.get("variables");
-                    if (variables == null || variables.size() == 0) return;
-
-                    ArrayList<HashMap<String, Object>> guests = (ArrayList<HashMap<String, Object>>)variables.get("guests"); // ArrayList<HashMap<String, Object>>
+                    ArrayList<HashMap<String, Object>> guests = (ArrayList<HashMap<String, Object>>)queryDocumentSnapshots.get("guests"); // ArrayList<HashMap<String, Object>>
                     if (guests == null || guests.size() == 0) return;
 
                     int guestsLength = guests.size();
-                    Timestamp currentTimestamp = Timestamp.now();
                     for (int i = 0; i < guestsLength; ++i) {
                         Timestamp fromStamp = (Timestamp)(guests.get(i).getOrDefault("from", null));
                         Timestamp toStamp = (Timestamp)(guests.get(i).getOrDefault("to", null));
                         if (fromStamp == null || toStamp == null) continue;
 
-                        if (fromStamp.compareTo(currentTimestamp) < 0 && toStamp.compareTo(currentTimestamp) > 0) {
+                        long epochFrom = fromStamp.getSeconds();
+                        long epochNow = System.currentTimeMillis() / 1000;
+                        long epochTo = toStamp.getSeconds();
+
+                        if (epochNow - epochFrom >= 0 && epochTo - epochNow > 0) {
                             guest = (String)(guests.get(i).getOrDefault("name", ""));
                             to = toStamp;
                             break;
@@ -125,31 +89,64 @@ public class WelcomeActivity extends Activity {
                     }
 
                     setContentView(R.layout.activity_welcome);
-
-                    TextView welcomeText = findViewById(R.id.welcomeText);
-                    ImageView welcomeBackground = findViewById(R.id.welcomeBackground);
-
-                    switch (language) {
-                        case united_kingdom:
-                            welcomeText.setText(getResources().getString(R.string.welcome_en) + " " + guest);
-                            break;
-                        case germany:
-                            welcomeText.setText(getResources().getString(R.string.welcome_de) + " " + guest);
-                            break;
-                        case croatia:
-                            welcomeText.setText(getResources().getString(R.string.welcome_hr) + " " + guest);
-                            break;
-                    }
-
-                    switch (theme) {
-                        case dark:
-                            welcomeBackground.setBackground(getResources().getDrawable(R.color.dark_theme));
-                            break;
-                        case light:
-                            welcomeBackground.setBackground(getResources().getDrawable(R.color.light_theme));
-                            break;
-                    }
+                    displayGuestName();
+                    setupHintText();
                 }
             });
+    }
+
+    public void displayGuestName() {
+        TextView welcomeText = findViewById(R.id.welcomeText);
+        ImageView welcomeBackground = findViewById(R.id.welcomeBackground);
+        if (welcomeText == null || welcomeBackground == null) return;
+
+        switch (language) {
+            case german:
+                welcomeText.setText(getResources().getString(R.string.welcome_de) + " " + guest);
+                break;
+            case croatian:
+                welcomeText.setText(getResources().getString(R.string.welcome_hr) + " " + guest);
+                break;
+            default:
+                welcomeText.setText(getResources().getString(R.string.welcome_en) + " " + guest);
+        }
+
+        if (this.theme == Theme.dark) welcomeBackground.setBackground(getResources().getDrawable(R.color.dark_theme));
+        else if (this.theme == Theme.light) welcomeBackground.setBackground(getResources().getDrawable(R.color.light_theme));
+    }
+
+    public void setupHintText() {
+        TextView hintText = findViewById(R.id.hintText);
+        if (hintText == null) return;
+
+        switch (language) {
+            case german:
+                hintText.setText(getResources().getString(R.string.hint_skip_welcome_de));
+                break;
+            case croatian:
+                hintText.setText(getResources().getString(R.string.hint_skip_welcome_hr));
+                break;
+            default:
+                hintText.setText(getResources().getString(R.string.hint_skip_welcome_en));
+        }
+    }
+
+    public void setupTimer() {
+        new java.util.Timer().schedule(
+            new java.util.TimerTask() {
+                @Override
+                public void run() {
+                    if (skipFunction) return;
+
+                    long toInEpoch = 0;
+                    long now = new Date().getTime();
+                    if (to != null) toInEpoch = (to.getSeconds() - 86400) * 1000; // (to - 1 day) in milliseconds
+
+                    if (to != null && toInEpoch < now) startActivity(new Intent(getApplicationContext(), RatingActivity.class));
+                    else startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
+                }
+            },
+            6000
+        );
     }
 }

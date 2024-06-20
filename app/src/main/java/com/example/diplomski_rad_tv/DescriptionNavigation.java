@@ -1,7 +1,5 @@
 package com.example.diplomski_rad_tv;
 
-import android.view.View;
-
 public class DescriptionNavigation {
     private static int[][] navigationDescription = {
             {0,                    R.id.descriptionText, 0,                   R.id.themeButton}, // languageButton

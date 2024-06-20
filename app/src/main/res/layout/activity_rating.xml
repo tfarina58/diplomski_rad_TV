@@ -44,7 +44,7 @@
         android:id="@+id/languageIcon"
         android:layout_width="24dp"
         android:layout_height="22dp"
-        android:background="@drawable/united_kingdom"
+        android:background="@drawable/english"
         android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="@+id/languageButton"
         app:layout_constraintEnd_toEndOf="@+id/languageButton"
@@ -67,7 +67,7 @@
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textSize="14sp"
-        app:layout_constraintEnd_toStartOf="@+id/gridButton"
+        app:layout_constraintEnd_toStartOf="@+id/textClock"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
@@ -81,36 +81,6 @@
         app:layout_constraintHorizontal_bias="0.184"
         app:layout_constraintStart_toStartOf="@+id/themeButton"
         app:layout_constraintTop_toTopOf="@+id/themeButton" />
-
-    <Button
-        android:id="@+id/gridButton"
-        android:layout_width="118dp"
-        android:layout_height="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:adjustViewBounds="true"
-        android:background="@drawable/header_button"
-        android:gravity="center"
-        android:paddingLeft="26dp"
-        android:scaleType="fitCenter"
-        android:text="List"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toStartOf="@+id/textClock"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:translationZ="2dp"
-        app:layout_constraintBottom_toBottomOf="@+id/gridButton"
-        app:layout_constraintEnd_toEndOf="@+id/gridButton"
-        app:layout_constraintHorizontal_bias="0.225"
-        app:layout_constraintStart_toStartOf="@+id/gridButton"
-        app:layout_constraintTop_toTopOf="@+id/gridButton"
-        app:srcCompat="@drawable/grid" />
 
     <TextClock
         android:id="@+id/textClock"
@@ -129,11 +99,13 @@
 
     <RatingBar
         android:id="@+id/ratingBar"
-        android:layout_width="240dp"
-        android:layout_height="50dp"
+        android:layout_width="250dp"
+        android:layout_height="60dp"
         android:layout_marginStart="148dp"
-        android:layout_marginBottom="56dp"
+        android:layout_marginBottom="51dp"
         android:stepSize="1"
+        android:rating="5"
+        android:background="@drawable/edittext_design_focused"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -153,8 +125,19 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="56dp"
+        android:background="@drawable/button_design"
+        android:text="@string/cancel_en"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ratingButton"
+        app:layout_constraintStart_toEndOf="@+id/ratingBar" />
+
+    <Button
         android:id="@+id/ratingButton"
-        android:layout_width="240dp"
+        android:layout_width="180dp"
         android:layout_height="50dp"
         android:layout_marginEnd="144dp"
         android:layout_marginBottom="56dp"

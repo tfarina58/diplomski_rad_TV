@@ -88,5 +88,13 @@
     <string name="rating_content_de">Bitte schreiben Sie Lob und Bemerkungen auf</string>
     <string name="rating_content_hr">Zapišite sve pohvale i primjedbe</string>
 
+    <string name="hint_skip_welcome_en">* Press the select button to skip the welcome screen</string>
+    <string name="hint_skip_welcome_de">* Drücken Sie die Auswahltaste, um den Begrüßungsbildschirm zu überspringen</string>
+    <string name="hint_skip_welcome_hr">* Pritisnite gumb za odabir kako biste preskočili ekran dobrodošlice</string>
+
+    <string name="cancel_en">Cancel</string>
+    <string name="cancel_de">Kündigen</string>
+    <string name="cancel_hr">Otkaži</string>
+
     <string name="empty_string"> </string>
 </resources>

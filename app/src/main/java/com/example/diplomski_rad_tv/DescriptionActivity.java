@@ -27,7 +27,7 @@ import androidx.core.content.ContextCompat;
 
 public class DescriptionActivity extends Activity {
     Element element;
-    Language language = Language.united_kingdom;
+    Language language = Language.english;
     Theme theme = Theme.dark;
     Clock format = Clock.h12;
     View focusedView;
@@ -192,13 +192,13 @@ public class DescriptionActivity extends Activity {
         if (!this.element.title.isEmpty()) title.setText(this.element.title);
         else {
             switch(this.language) {
-                case united_kingdom:
+                case english:
                     title.setText(getResources().getString(R.string.element_name_en));
                     break;
-                case germany:
+                case german:
                     title.setText(getResources().getString(R.string.element_name_de));
                     break;
-                case croatia:
+                case croatian:
                     title.setText(getResources().getString(R.string.element_name_hr));
                     break;
             }
@@ -320,17 +320,17 @@ public class DescriptionActivity extends Activity {
 
         if (languageButton == null) return;
         switch (language) {
-            case united_kingdom:
+            case english:
                 languageButton.setText(R.string.language_en);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.united_kingdom));
+                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.english));
                 break;
-            case germany:
+            case german:
                 languageButton.setText(R.string.language_de);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.germany));
+                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.german));
                 break;
-            case croatia:
+            case croatian:
                 languageButton.setText(R.string.language_hr);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.croatia));
+                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.croatian));
                 break;
         }
 
@@ -345,16 +345,16 @@ public class DescriptionActivity extends Activity {
         if (themeButton == null) return;
         switch (theme) {
             case light:
-                if (this.language == Language.united_kingdom) themeButton.setText(R.string.light_theme_en);
-                else if (this.language == Language.germany) themeButton.setText(R.string.light_theme_de);
-                else if (this.language == Language.croatia) themeButton.setText(R.string.light_theme_hr);
+                if (this.language == Language.english) themeButton.setText(R.string.light_theme_en);
+                else if (this.language == Language.german) themeButton.setText(R.string.light_theme_de);
+                else if (this.language == Language.croatian) themeButton.setText(R.string.light_theme_hr);
 
                 themeIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.sun));
                 break;
             case dark:
-                if (this.language == Language.united_kingdom) themeButton.setText(R.string.dark_theme_en);
-                else if (this.language == Language.germany) themeButton.setText(R.string.dark_theme_de);
-                else if (this.language == Language.croatia) themeButton.setText(R.string.dark_theme_hr);
+                if (this.language == Language.english) themeButton.setText(R.string.dark_theme_en);
+                else if (this.language == Language.german) themeButton.setText(R.string.dark_theme_de);
+                else if (this.language == Language.croatian) themeButton.setText(R.string.dark_theme_hr);
 
                 themeIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.moon));
                 break;

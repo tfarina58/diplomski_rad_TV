@@ -52,7 +52,7 @@
             android:id="@+id/languageIcon"
             android:layout_width="24dp"
             android:layout_height="22dp"
-            android:background="@drawable/united_kingdom"
+            android:background="@drawable/english"
             android:translationZ="2dp"
             app:layout_constraintBottom_toBottomOf="@+id/languageButton"
             app:layout_constraintEnd_toEndOf="@+id/languageButton"

@@ -1,7 +1,7 @@
 package com.example.diplomski_rad_tv;
 
 public enum Language {
-    croatia, germany, united_kingdom;
+    croatian, german, english;
 
     private static final Language[] values = values();
     public Language next() {
