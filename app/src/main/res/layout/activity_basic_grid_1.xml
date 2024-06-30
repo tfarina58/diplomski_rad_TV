@@ -7,8 +7,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/main"
+    <ImageButton
+        android:id="@+id/backgroundGrid1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/main_border_dark"
@@ -156,11 +156,12 @@
         android:background="@drawable/header_button"
         android:queryHint="Search..."
         android:focusable="true"
+        android:focusableInTouchMode="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/pageIndex"
+        android:id="@+id/pagination"
         android:layout_width="88dp"
         android:layout_height="40dp"
         android:layout_marginEnd="16dp"
@@ -171,11 +172,12 @@
         android:textSize="14sp"
         android:textColor="#ffffff"
         android:background="@drawable/header_button"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <EditText
-        android:id="@+id/pageIndexIndex"
+        android:id="@+id/pageNumber"
         android:layout_width="36dp"
         android:layout_height="32dp"
         android:background="@null"
@@ -185,12 +187,13 @@
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="22sp"
         android:translationZ="2dp"
-        app:layout_constraintBottom_toBottomOf="@+id/pageIndex"
-        app:layout_constraintStart_toStartOf="@+id/pageIndex"
-        app:layout_constraintTop_toTopOf="@+id/pageIndex" />
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/pagination"
+        app:layout_constraintStart_toStartOf="@+id/pagination"
+        app:layout_constraintTop_toTopOf="@+id/pagination" />
 
     <TextView
-        android:id="@+id/pageIndexSlash"
+        android:id="@+id/paginationSlash"
         android:layout_width="10dp"
         android:layout_height="32dp"
         android:gravity="center"
@@ -200,13 +203,13 @@
         android:textSize="22sp"
         android:translationZ="2dp"
         android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/pageIndex"
-        app:layout_constraintEnd_toEndOf="@+id/pageIndex"
-        app:layout_constraintStart_toStartOf="@+id/pageIndex"
-        app:layout_constraintTop_toTopOf="@+id/pageIndex" />
+        app:layout_constraintBottom_toBottomOf="@+id/pagination"
+        app:layout_constraintEnd_toEndOf="@+id/pagination"
+        app:layout_constraintStart_toStartOf="@+id/pagination"
+        app:layout_constraintTop_toTopOf="@+id/pagination" />
 
     <TextView
-        android:id="@+id/pageIndexTotal"
+        android:id="@+id/totalPagesNumber"
         android:layout_width="36dp"
         android:layout_height="32dp"
         android:text="12"
@@ -215,9 +218,10 @@
         android:textSize="22sp"
         android:translationZ="2dp"
         android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/pageIndex"
-        app:layout_constraintEnd_toEndOf="@+id/pageIndex"
-        app:layout_constraintTop_toTopOf="@+id/pageIndex"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/pagination"
+        app:layout_constraintEnd_toEndOf="@+id/pagination"
+        app:layout_constraintTop_toTopOf="@+id/pagination"
         app:layout_constraintVertical_bias="0.75" />
 
     <TextView

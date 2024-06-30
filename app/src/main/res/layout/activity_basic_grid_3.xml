@@ -8,7 +8,7 @@
     android:layout_height="match_parent">
 
     <ImageButton
-        android:id="@+id/background"
+        android:id="@+id/backgroundGrid3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/dark_theme"
@@ -141,11 +141,12 @@
         android:background="@drawable/header_button"
         android:queryHint="Search..."
         android:focusable="true"
+        android:focusableInTouchMode="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/pageIndex"
+        android:id="@+id/pagination"
         android:layout_width="88dp"
         android:layout_height="40dp"
         android:layout_marginEnd="16dp"
@@ -156,11 +157,12 @@
         android:textSize="14sp"
         android:textColor="#ffffff"
         android:background="@drawable/header_button"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <EditText
-        android:id="@+id/pageIndexIndex"
+        android:id="@+id/pageNumber"
         android:layout_width="36dp"
         android:layout_height="32dp"
         android:background="@null"
@@ -170,12 +172,13 @@
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="22sp"
         android:translationZ="2dp"
-        app:layout_constraintBottom_toBottomOf="@+id/pageIndex"
-        app:layout_constraintStart_toStartOf="@+id/pageIndex"
-        app:layout_constraintTop_toTopOf="@+id/pageIndex" />
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/pagination"
+        app:layout_constraintStart_toStartOf="@+id/pagination"
+        app:layout_constraintTop_toTopOf="@+id/pagination" />
 
     <TextView
-        android:id="@+id/pageIndexSlash"
+        android:id="@+id/paginationSlash"
         android:layout_width="10dp"
         android:layout_height="32dp"
         android:gravity="center"
@@ -185,13 +188,13 @@
         android:textSize="22sp"
         android:translationZ="2dp"
         android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/pageIndex"
-        app:layout_constraintEnd_toEndOf="@+id/pageIndex"
-        app:layout_constraintStart_toStartOf="@+id/pageIndex"
-        app:layout_constraintTop_toTopOf="@+id/pageIndex" />
+        app:layout_constraintBottom_toBottomOf="@+id/pagination"
+        app:layout_constraintEnd_toEndOf="@+id/pagination"
+        app:layout_constraintStart_toStartOf="@+id/pagination"
+        app:layout_constraintTop_toTopOf="@+id/pagination" />
 
     <TextView
-        android:id="@+id/pageIndexTotal"
+        android:id="@+id/totalPagesNumber"
         android:layout_width="36dp"
         android:layout_height="32dp"
         android:text="12"
@@ -200,46 +203,47 @@
         android:textSize="22sp"
         android:translationZ="2dp"
         android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/pageIndex"
-        app:layout_constraintEnd_toEndOf="@+id/pageIndex"
-        app:layout_constraintTop_toTopOf="@+id/pageIndex"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/pagination"
+        app:layout_constraintEnd_toEndOf="@+id/pagination"
+        app:layout_constraintTop_toTopOf="@+id/pagination"
         app:layout_constraintVertical_bias="0.75" />
 
     <Button
-        android:id="@+id/imageButtonBackground1"
+        android:id="@+id/gridButtonBackground1"
         android:layout_width="288dp"
         android:layout_height="240dp"
         android:translationZ="0dp"
         android:background="@drawable/highlighted_image_button_dark"
-        app:layout_constraintBottom_toBottomOf="@+id/imageButton1"
-        app:layout_constraintEnd_toEndOf="@+id/imageButton1"
-        app:layout_constraintStart_toStartOf="@+id/imageButton1"
-        app:layout_constraintTop_toBottomOf="@+id/title1" />
+        app:layout_constraintBottom_toBottomOf="@+id/gridButton1"
+        app:layout_constraintEnd_toEndOf="@+id/gridButton1"
+        app:layout_constraintStart_toStartOf="@+id/gridButton1"
+        app:layout_constraintTop_toBottomOf="@+id/gridButtonTitle1" />
 
     <Button
-        android:id="@+id/imageButtonBackground2"
+        android:id="@+id/gridButtonBackground2"
         android:layout_width="288dp"
         android:layout_height="240dp"
         android:translationZ="0dp"
         android:background="@drawable/image_button"
-        app:layout_constraintBottom_toBottomOf="@+id/imageButton2"
-        app:layout_constraintEnd_toEndOf="@+id/imageButton2"
-        app:layout_constraintStart_toStartOf="@+id/imageButton2"
-        app:layout_constraintTop_toBottomOf="@+id/title2" />
+        app:layout_constraintBottom_toBottomOf="@+id/gridButton2"
+        app:layout_constraintEnd_toEndOf="@+id/gridButton2"
+        app:layout_constraintStart_toStartOf="@+id/gridButton2"
+        app:layout_constraintTop_toBottomOf="@+id/gridButtonTitle2" />
 
     <Button
-        android:id="@+id/imageButtonBackground3"
+        android:id="@+id/gridButtonBackground3"
         android:layout_width="288dp"
         android:layout_height="240dp"
         android:translationZ="0dp"
         android:background="@drawable/image_button"
-        app:layout_constraintBottom_toBottomOf="@+id/imageButton3"
-        app:layout_constraintEnd_toEndOf="@+id/imageButton3"
-        app:layout_constraintStart_toStartOf="@+id/imageButton3"
-        app:layout_constraintTop_toBottomOf="@+id/title3" />
+        app:layout_constraintBottom_toBottomOf="@+id/gridButton3"
+        app:layout_constraintEnd_toEndOf="@+id/gridButton3"
+        app:layout_constraintStart_toStartOf="@+id/gridButton3"
+        app:layout_constraintTop_toBottomOf="@+id/gridButtonTitle3" />
 
     <TextView
-        android:id="@+id/title1"
+        android:id="@+id/gridButtonTitle1"
         android:layout_width="272dp"
         android:layout_height="20dp"
         android:layout_marginEnd="14dp"
@@ -251,11 +255,11 @@
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
         android:focusable="false"
-        app:layout_constraintBottom_toTopOf="@+id/imageButton1"
-        app:layout_constraintEnd_toStartOf="@+id/title2" />
+        app:layout_constraintBottom_toTopOf="@+id/gridButton1"
+        app:layout_constraintEnd_toStartOf="@+id/gridButtonTitle2" />
 
     <TextView
-        android:id="@+id/title2"
+        android:id="@+id/gridButtonTitle2"
         android:layout_width="272dp"
         android:layout_height="20dp"
         android:layout_marginBottom="4dp"
@@ -266,12 +270,12 @@
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
         android:focusable="false"
-        app:layout_constraintBottom_toTopOf="@+id/imageButton2"
+        app:layout_constraintBottom_toTopOf="@+id/gridButton2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/title3"
+        android:id="@+id/gridButtonTitle3"
         android:layout_width="272dp"
         android:layout_height="20dp"
         android:layout_marginStart="14dp"
@@ -283,22 +287,22 @@
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
         android:focusable="false"
-        app:layout_constraintBottom_toTopOf="@+id/imageButton3"
-        app:layout_constraintStart_toEndOf="@+id/title2" />
+        app:layout_constraintBottom_toTopOf="@+id/gridButton3"
+        app:layout_constraintStart_toEndOf="@+id/gridButtonTitle2" />
 
     <ImageButton
-        android:id="@+id/imageButton1"
+        android:id="@+id/gridButton1"
         android:layout_width="272dp"
         android:layout_height="153dp"
         android:background="#181820"
         android:scaleType="centerCrop"
         android:focusable="true"
-        android:nextFocusRight="@+id/imageButton2"
+        android:nextFocusRight="@+id/gridButton2"
         android:nextFocusUp="@+id/languageButton"
         android:nextFocusDown="@+id/searchView"
         android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton2"
+        app:layout_constraintEnd_toStartOf="@+id/gridButton2"
         app:layout_constraintHorizontal_bias="0.805"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -306,7 +310,7 @@
     </ImageButton>
 
     <ImageButton
-        android:id="@+id/imageButton2"
+        android:id="@+id/gridButton2"
         android:layout_width="272dp"
         android:layout_height="153dp"
         android:background="#181820"
@@ -324,7 +328,7 @@
         app:layout_constraintVertical_bias="0.501" />
 
     <ImageButton
-        android:id="@+id/imageButton3"
+        android:id="@+id/gridButton3"
         android:layout_width="272dp"
         android:layout_height="153dp"
         android:background="#181820"
@@ -337,7 +341,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.194"
-        app:layout_constraintStart_toEndOf="@+id/imageButton2"
+        app:layout_constraintStart_toEndOf="@+id/gridButton2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.501" />
 
@@ -352,6 +356,19 @@
         android:textSize="22sp"
         android:textColor="@color/text_color_dark_mode"
         android:translationZ="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:indeterminate="true"
+        android:translationZ="2dp"
+        android:indeterminateTint="@color/loader_color_dark_mode"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

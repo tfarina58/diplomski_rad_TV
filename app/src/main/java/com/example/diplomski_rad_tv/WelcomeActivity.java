@@ -1,6 +1,7 @@
 package com.example.diplomski_rad_tv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,6 +9,9 @@ import android.view.KeyEvent;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
@@ -26,6 +30,7 @@ public class WelcomeActivity extends Activity {
     Language language;
     Theme theme;
     String guest = "";
+    Timestamp from;
     Timestamp to;
     boolean skipFunction = false;
 
@@ -45,13 +50,11 @@ public class WelcomeActivity extends Activity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // super.onKeyDown(keyCode, event);
+        super.onKeyDown(keyCode, event);
         // Enter button
         if (keyCode == 23) {
             skipFunction = true;
-
-            Intent i = new Intent(getApplicationContext(), EstateListActivity.class);
-            startActivity(i);
+            navigateToNextPage();
             return true;
         }
         return false;
@@ -82,6 +85,7 @@ public class WelcomeActivity extends Activity {
                         long epochTo = toStamp.getSeconds();
 
                         if (epochNow - epochFrom >= 0 && epochTo - epochNow > 0) {
+                            from = fromStamp;
                             guest = (String)(guests.get(i).getOrDefault("name", ""));
                             to = toStamp;
                             break;
@@ -89,64 +93,87 @@ public class WelcomeActivity extends Activity {
                     }
 
                     setContentView(R.layout.activity_welcome);
-                    displayGuestName();
-                    setupHintText();
+
+                    ImageView welcomeBackground = findViewById(R.id.welcomeBackground);
+                    setupBackground(getApplicationContext(), welcomeBackground, theme);
+
+                    TextView welcomeText = findViewById(R.id.welcomeText);
+                    displayGuestName(getApplicationContext(), welcomeText, welcomeBackground, language, theme);
+
+                    TextView hintText = findViewById(R.id.welcomeHint);
+                    setupHintText(getApplicationContext(), hintText, language, theme);
                 }
             });
     }
 
-    public void displayGuestName() {
-        TextView welcomeText = findViewById(R.id.welcomeText);
-        ImageView welcomeBackground = findViewById(R.id.welcomeBackground);
+    void setupBackground(Context ctx, ImageView welcomeBackground, Theme theme) {
+        if (welcomeBackground == null) return;
+
+        if (theme == Theme.light) welcomeBackground.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
+        else welcomeBackground.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
+    }
+
+    void displayGuestName(Context ctx, TextView welcomeText, ImageView welcomeBackground, Language language, Theme theme) {
         if (welcomeText == null || welcomeBackground == null) return;
 
         switch (language) {
             case german:
-                welcomeText.setText(getResources().getString(R.string.welcome_de) + " " + guest);
+                welcomeText.setText(ContextCompat.getString(ctx, R.string.welcome_de) + " " + guest);
                 break;
             case croatian:
-                welcomeText.setText(getResources().getString(R.string.welcome_hr) + " " + guest);
+                welcomeText.setText(ContextCompat.getString(ctx, R.string.welcome_hr) + " " + guest);
                 break;
             default:
-                welcomeText.setText(getResources().getString(R.string.welcome_en) + " " + guest);
+                welcomeText.setText(ContextCompat.getString(ctx, R.string.welcome_en) + " " + guest);
         }
 
-        if (this.theme == Theme.dark) welcomeBackground.setBackground(getResources().getDrawable(R.color.dark_theme));
-        else if (this.theme == Theme.light) welcomeBackground.setBackground(getResources().getDrawable(R.color.light_theme));
+        if (theme == Theme.light) welcomeText.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+        else welcomeText.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
     }
 
-    public void setupHintText() {
-        TextView hintText = findViewById(R.id.hintText);
+    void setupHintText(Context ctx, TextView hintText, Language language, Theme theme) {
         if (hintText == null) return;
 
         switch (language) {
             case german:
-                hintText.setText(getResources().getString(R.string.hint_skip_welcome_de));
+                hintText.setText(ContextCompat.getString(ctx, R.string.hint_skip_welcome_de));
                 break;
             case croatian:
-                hintText.setText(getResources().getString(R.string.hint_skip_welcome_hr));
+                hintText.setText(ContextCompat.getString(ctx, R.string.hint_skip_welcome_hr));
                 break;
             default:
-                hintText.setText(getResources().getString(R.string.hint_skip_welcome_en));
+                hintText.setText(ContextCompat.getString(ctx, R.string.hint_skip_welcome_en));
         }
+
+        if (theme == Theme.light) hintText.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+        else hintText.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
     }
 
-    public void setupTimer() {
+    void setupTimer() {
         new java.util.Timer().schedule(
             new java.util.TimerTask() {
                 @Override
                 public void run() {
                     if (skipFunction) return;
-
-                    long toInEpoch = 0;
-                    long now = new Date().getTime();
-                    if (to != null) toInEpoch = (to.getSeconds() - 86400) * 1000; // (to - 1 day) in milliseconds
-
-                    if (to != null && toInEpoch < now) startActivity(new Intent(getApplicationContext(), RatingActivity.class));
-                    else startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
+                    navigateToNextPage();
                 }
             },
             6000
         );
+    }
+
+    void navigateToNextPage() {
+        if (from == null || to == null) {
+            startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        long startRatingInEpoch = (to.getSeconds() - 86400) * 1000; // (to - 1 day) in milliseconds;
+        long endRatingInEpoch = to.getSeconds() * 1000; // (to - 1 day) in milliseconds;
+        long lastRatingDate = sharedPreferencesService.getLastRatingDate();
+
+        if (startRatingInEpoch <= now && now < endRatingInEpoch && (lastRatingDate == -1 || !(startRatingInEpoch <= lastRatingDate && lastRatingDate < endRatingInEpoch))) startActivity(new Intent(getApplicationContext(), RatingActivity.class));
+        else startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
     }
 }

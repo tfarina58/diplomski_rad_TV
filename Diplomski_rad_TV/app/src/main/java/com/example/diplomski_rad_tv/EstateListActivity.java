@@ -434,10 +434,6 @@ public class EstateListActivity extends Activity {
 
         if (languageButton == null) return;
         switch (language) {
-            case english:
-                languageButton.setText("English");
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.english));
-                break;
             case german:
                 languageButton.setText("Deutsche");
                 languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.german));
@@ -446,6 +442,9 @@ public class EstateListActivity extends Activity {
                 languageButton.setText("Hrvatski");
                 languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.croatiann));
                 break;
+            default:
+                languageButton.setText("English");
+                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.english));
         }
 
         if (focusedView.getId() == R.id.languageButton) languageButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));

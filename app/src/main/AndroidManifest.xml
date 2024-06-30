@@ -3,6 +3,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +15,7 @@
         android:theme="@android:style/Theme.DeviceDefault">
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".EstateListActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
@@ -28,7 +30,7 @@
             android:exported="false"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
         <activity
-            android:name=".EstateListActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity
@@ -36,7 +38,7 @@
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".ElementListActivity"
+            android:name=".RatingActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity
@@ -44,7 +46,7 @@
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".RatingActivity"
+            android:name=".ElementListActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
     </application>

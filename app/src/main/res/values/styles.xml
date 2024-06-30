@@ -9,8 +9,16 @@
     <color name="text_color_dark_mode">#b3cccc</color>
     <color name="text_color_light_mode">#343343</color>
 
+    <color name="hint_color_dark_mode">#7c7c98</color>
+    <color name="hint_color_light_mode">#7c7c98</color>
+
     <color name="loader_color_dark_mode">#ff9933</color>
     <color name="loader_color_light_mode">#4d4dff</color>
 
     <color name="transparent">#00ffffff</color>
+
+    <style name="RatingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">#d3d3d3</item>
+        <item name="colorControlActivated">#ffc922</item>
+    </style>
 </resources>

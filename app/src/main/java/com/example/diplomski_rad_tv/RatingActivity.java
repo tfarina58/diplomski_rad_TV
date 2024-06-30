@@ -4,16 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.DocumentsProvider;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextClock;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,22 +27,17 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.type.DateTime;
 
-import java.io.ObjectStreamException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class RatingActivity extends Activity {
     SharedPreferencesService sharedPreferencesService;
     Language language;
     Theme theme;
-    Clock format = Clock.h12;
+    Clock format;
     View focusedView;
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     ArrayList<HashMap<String, Object>> ratings = new ArrayList<>();
@@ -57,9 +51,21 @@ public class RatingActivity extends Activity {
         this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
         this.language = sharedPreferencesService.getLanguage();
         this.theme = sharedPreferencesService.getTheme();
-        this.focusedView = findViewById(R.id.ratingButton);
+        this.format = sharedPreferencesService.getClockFormat();
 
-        this.setupBackground();
+        this.focusedView = findViewById(R.id.ratingButton);
+        this.focusedView.requestFocus();
+
+        {
+            ConstraintLayout background = findViewById(R.id.main);
+            setupBackground(getApplicationContext(), background, this.theme);
+        }
+
+        {
+            TextView titleView = findViewById(R.id.ratingTitle);
+            setupTitle(getApplicationContext(), titleView, this.language, this.theme);
+        }
+
         this.setupContent();
         this.getRatings();
     }
@@ -71,19 +77,13 @@ public class RatingActivity extends Activity {
 
         // Up, down, left, right navigation button
         if (keyCode == 4) {
-            this.focusedView.clearFocus();
-            this.focusedView.setFocusable(false);
-            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            if (imm != null) {
-                imm.hideSoftInputFromWindow(this.focusedView.getWindowToken(), 0);
-            }
-            // TODO
-
+            // startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
         } else if (keyCode >= 19 && keyCode <= 22) {
             int newFocusedViewId = RatingNavigation.navigateOverActivity(focusedView.getId(), keyCode - 19);
             if (newFocusedViewId == 0) return false;
 
-            focusedView = findViewById(newFocusedViewId);
+            this.focusedView = findViewById(newFocusedViewId);
+            this.focusedView.requestFocus();
 
             // Remove focus from old View
             int row = RatingNavigation.getRowWithId(oldFocusedViewId);
@@ -92,55 +92,148 @@ public class RatingActivity extends Activity {
             // Add focus to new View
             row = RatingNavigation.getRowWithId(newFocusedViewId);
             this.updateView(row);
-        }
-        // Enter button
-        else if (keyCode == 23) {
-            if (oldFocusedViewId == R.id.languageButton) {
-                language = language.next();
-                focusedView = findViewById(R.id.languageButton);
 
-                this.updateView(0);
-                this.updateView(1);
-                this.updateView(3);
-                this.updateView(5);
-                this.updateView(6);
-            } else if (oldFocusedViewId == R.id.themeButton) {
-                theme = theme.next();
-                focusedView = findViewById(R.id.themeButton);
-
-                this.setupBackground();
-                this.updateView(3);
-                this.updateView(4);
-            } else if (oldFocusedViewId == R.id.textClock) {
-                format = format.next();
-                focusedView = findViewById(R.id.textClock);
-                switch (format) {
-                    case h24:
-                        ((TextClock)focusedView).setFormat12Hour("HH:mm:ss");
-                        break;
-                    case h12:
-                        ((TextClock)focusedView).setFormat12Hour("hh:mm:ss a");
-                        break;
-                }
-            } else if (oldFocusedViewId == R.id.ratingContent) {
-                EditText email = findViewById(R.id.ratingContent);
-                email.setFocusable(true);
-                email.requestFocus();
-                // TODO
-
-            } else if (oldFocusedViewId == R.id.ratingBar) {
-                RatingBar email = findViewById(R.id.ratingBar);
-                email.setFocusable(true);
-                email.requestFocus();
-                // TODO
-
-            } else if (oldFocusedViewId == R.id.cancelButton) {
-                startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
-            } else if (oldFocusedViewId == R.id.ratingButton) {
-                this.saveRatings();
-            }
         }
         return true;
+    }
+
+    void setupBackground(Context ctx, ConstraintLayout background, Theme theme) {
+        if (background == null) return;
+
+        if (theme == Theme.dark) background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
+        else if (theme == Theme.light) background.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
+    }
+
+
+    void setupTitle(Context ctx, TextView title, Language language, Theme theme) {
+        if (title == null) return;
+
+        switch (language) {
+            case german:
+                title.setText(R.string.rating_de);
+                break;
+            case croatian:
+                title.setText(R.string.rating_hr);
+                break;
+            default:
+                title.setText(R.string.rating_en);
+        }
+
+        if (theme == Theme.dark) title.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+        else if (theme == Theme.light) title.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+    }
+
+    void updateView(int row) {
+        switch (row) {
+            case 0:
+                Button languageButton = findViewById(R.id.languageButton);
+                ImageView languageIcon = findViewById(R.id.languageIcon);
+                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+
+                if (!languageButton.hasOnClickListeners()) {
+                    languageButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            language = language.next();
+
+                            {
+                                TextView titleView = findViewById(R.id.ratingTitle);
+                                setupTitle(getApplicationContext(), titleView, language, theme);
+                            }
+
+                            updateView(0);
+                            updateView(1);
+                            updateView(3);
+                            updateView(5);
+                            updateView(6);
+                        }
+                    });
+                }
+                break;
+            case 1:
+                Button themeButton = findViewById(R.id.themeButton);
+                ImageView themeIcon = findViewById(R.id.themeIcon);
+                ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+
+                if (!themeButton.hasOnClickListeners()) {
+                    themeButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            theme = theme.next();
+
+                            {
+                                ConstraintLayout background = findViewById(R.id.main);
+                                setupBackground(getApplicationContext(), background, theme);
+                            }
+
+                            {
+                                TextView titleView = findViewById(R.id.ratingTitle);
+                                setupTitle(getApplicationContext(), titleView, language, theme);
+                            }
+
+                            updateView(3);
+                            updateView(4);
+                        }
+                    });
+                }
+                break;
+            case 2:
+                TextClock textClock = findViewById(R.id.textClock);
+                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+
+                if (!textClock.hasOnClickListeners()) {
+                    textClock.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            format = format.next();
+
+                            if (Objects.requireNonNull(format) == Clock.h12) ((TextClock) focusedView).setFormat12Hour("hh:mm:ss a");
+                            else ((TextClock) focusedView).setFormat12Hour("HH:mm:ss");
+                        }
+                    });
+                }
+                break;
+            case 3:
+                EditText ratingContent = findViewById(R.id.ratingContent);
+                RatingNavigation.setupRatingContentField(getApplicationContext(), ratingContent, this.focusedView, this.language, this.theme);
+                break;
+            case 4:
+                RatingBar ratingBar = findViewById(R.id.ratingBar);
+                RatingNavigation.setupRatingBarField(getApplicationContext(), ratingBar, this.focusedView, this.theme);
+            case 5:
+                Button cancelButton = findViewById(R.id.cancelButton);
+                RatingNavigation.setupCancelButton(getApplicationContext(), cancelButton, this.focusedView, this.language);
+
+                if (!cancelButton.hasOnClickListeners()) {
+                    cancelButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
+                        }
+                    });
+                }
+                break;
+            case 6:
+                Button ratingButton = findViewById(R.id.ratingButton);
+                RatingNavigation.setupRatingButton(getApplicationContext(), ratingButton, this.focusedView, this.language);
+
+                if (!ratingButton.hasOnClickListeners()) {
+                    ratingButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            EditText content = findViewById(R.id.ratingContent);
+                            RatingBar grade = findViewById(R.id.ratingBar);
+
+                            saveRatings(content, grade);
+                        }
+                    });
+                }
+                break;
+        }
+    }
+
+    void setupContent() {
+        for (int i = 0; i <= 6; ++i) this.updateView(i);
     }
 
     void getRatings() {
@@ -156,15 +249,28 @@ public class RatingActivity extends Activity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_LONG);
+                        switch (language) {
+                            case german:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_de), Toast.LENGTH_LONG).show();
+                                break;
+                            case croatian:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_hr), Toast.LENGTH_LONG).show();
+                                break;
+                            default:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_en), Toast.LENGTH_LONG).show();
+                                break;
+                        }
                     }
                 });
     }
 
-    void saveRatings() {
-        String ratingContent = ((EditText)findViewById(R.id.ratingContent)).getText().toString();
-        int ratingBar = (int)((RatingBar)findViewById(R.id.ratingBar)).getRating();
-        Timestamp created =  new Timestamp(Instant.ofEpochSecond(System.currentTimeMillis() / 1000));
+    void saveRatings(EditText content, RatingBar grade) {
+        if (content == null || grade == null) return;
+
+        String ratingContent = content.getText().toString();
+        int ratingBar = (int)grade.getRating();
+        long now = System.currentTimeMillis() / 1000;
+        Timestamp created =  new Timestamp(Instant.ofEpochSecond(now));
 
         HashMap<String, Object> currentRating = new HashMap<>();
         currentRating.put("content", ratingContent);
@@ -179,61 +285,24 @@ public class RatingActivity extends Activity {
                 .addOnSuccessListener(new OnSuccessListener() {
                     @Override
                     public void onSuccess(Object o) {
-                        Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_LONG);
+                        sharedPreferencesService.setLastRatingDate(now);
                         startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_LONG);
+                        switch (language) {
+                            case german:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_de), Toast.LENGTH_LONG).show();
+                                break;
+                            case croatian:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_hr), Toast.LENGTH_LONG).show();
+                                break;
+                            default:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_en), Toast.LENGTH_LONG).show();
+                                break;
+                        }
                     }
                 });
-    }
-
-    void setupBackground() {
-        ConstraintLayout layout = findViewById(R.id.main);
-
-        if (this.theme == Theme.dark) layout.setBackground(getResources().getDrawable(R.color.dark_theme));
-        else if (this.theme == Theme.light) layout.setBackground(getResources().getDrawable(R.color.light_theme));
-    }
-
-    void updateView(int row) {
-        switch (row) {
-            case 0:
-                Button languageButton = findViewById(R.id.languageButton);
-                ImageView languageIcon = findViewById(R.id.languageIcon);
-                RatingNavigation.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
-                break;
-            case 1:
-                Button themeButton = findViewById(R.id.themeButton);
-                ImageView themeIcon = findViewById(R.id.themeIcon);
-                RatingNavigation.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
-                break;
-            case 2:
-                TextClock textClock = findViewById(R.id.textClock);
-                RatingNavigation.setupTextClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
-                break;
-            case 3:
-                EditText ratingContent = findViewById(R.id.ratingContent);
-                RatingNavigation.setupRatingContentField(getApplicationContext(), ratingContent, this.focusedView, this.language, this.theme);
-                break;
-            case 4:
-                RatingBar ratingBar = findViewById(R.id.ratingBar);
-                RatingNavigation.setupRatingBarField(getApplicationContext(), ratingBar, this.focusedView, this.theme);
-                break;
-            case 5:
-                Button cancelButton = findViewById(R.id.cancelButton);
-                RatingNavigation.setupCancelButton(getApplicationContext(), cancelButton, this.focusedView);
-                break;
-            case 6:
-                Button ratingButton = findViewById(R.id.ratingButton);
-                int id = ratingButton.getId();
-                RatingNavigation.setupRatingButton(getApplicationContext(), ratingButton, this.focusedView);
-                break;
-        }
-    }
-
-    void setupContent() {
-        for (int i = 0; i <= 6; ++i) this.updateView(i);
     }
 }

@@ -1,5 +1,7 @@
 package com.example.diplomski_rad_tv;
 
+import static com.example.diplomski_rad_tv.DescriptionNavigation.getLinkIndexByViewId;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,36 +11,39 @@ import android.text.style.UnderlineSpan;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextClock;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import android.text.SpannableString;
+import android.widget.Toast;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
+import org.w3c.dom.Text;
+
 public class DescriptionActivity extends Activity {
+    SharedPreferencesService sharedPreferencesService;
     Element element;
-    Language language = Language.english;
-    Theme theme = Theme.dark;
-    Clock format = Clock.h12;
+    Language language;
+    Theme theme;
+    Clock format;
     View focusedView;
-    int overallImageIndex = 0;
-    int overallLinkIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_description);
+
+        this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
+        this.language = this.sharedPreferencesService.getLanguage();
+        this.theme = this.sharedPreferencesService.getTheme();
+        this.format = this.sharedPreferencesService.getClockFormat();
 
         Bundle bundle = getIntent().getExtras();
         String jsonElement = bundle.getString("element");
@@ -48,11 +53,114 @@ public class DescriptionActivity extends Activity {
 
         this.element = element;
 
-        this.setupTitle();
-        this.setupDescription();
-        this.setupLanguageButton();
-        this.setupThemeButton();
-        this.setupTextClock();
+        {
+            TextView title = findViewById(R.id.descriptionTitle);
+
+            this.setupTitle(getApplicationContext(), title, this.element.title, this.language, this.theme);
+        }
+
+        {
+            TextView description = findViewById(R.id.descriptionContent);
+            this.focusedView = description;
+
+            this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.theme);
+
+            if (!description.hasOnClickListeners()) {
+                description.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Change amount of lines displayed on descriptionText
+                        if (description.getMaxLines() == 16) description.setMaxLines(32);
+                        else if (description.getMaxLines() == 32) description.setMaxLines(16);
+                    }
+                });
+            }
+        }
+
+        {
+            Button languageButton = findViewById(R.id.languageButton);
+            ImageView languageIcon = findViewById(R.id.languageIcon);
+
+            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+
+            if (!languageButton.hasOnClickListeners()) {
+                languageButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        language = language.next();
+                        // focusedView = findViewById(R.id.languageButton);
+
+                        Toast.makeText(getApplicationContext(), "Listener: " + Integer.toString(focusedView.getId()), Toast.LENGTH_LONG).show();
+
+                        updateView(0);
+                        updateView(1);
+                        updateView(2);
+                    }
+                });
+            }
+        }
+
+        {
+            Button themeButton = findViewById(R.id.themeButton);
+            ImageView themeIcon = findViewById(R.id.themeIcon);
+
+            ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+
+            if (!themeButton.hasOnClickListeners()) {
+                themeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        theme = theme.next();
+                        // focusedView = findViewById(R.id.themeButton);
+
+                        updateView(1);
+                        updateView(3);
+
+                        ConstraintLayout background = findViewById(R.id.background);
+                        setupBackground(getApplicationContext(), background, theme);
+
+                        TextView titleDescription = findViewById(R.id.descriptionTitle);
+                        setupTitle(getApplicationContext(), titleDescription, element.title, language, theme);
+
+                        int focusedViewId = focusedView.getId();
+                        if (DescriptionNavigation.isImage(focusedViewId)) {
+                            int index = DescriptionNavigation.getImageIndexByViewId(focusedViewId);
+
+                            setupImage(getApplicationContext(), (ImageView)focusedView, element.images.get(index), focusedView, theme);
+                        } else if (DescriptionNavigation.isLinks(focusedViewId)) {
+                            int index = DescriptionNavigation.getLinkIndexByViewId(focusedViewId);
+
+                            setupLink(getApplicationContext(), (Button)focusedView, element.links.get(index).get("title"), element.links.get(index).get("url"), focusedView, theme);
+                        }
+                    }
+                });
+            }
+        }
+
+        {
+            TextClock textClock = findViewById(R.id.textClock);
+
+            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+
+            if (!textClock.hasOnClickListeners()) {
+                textClock.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        format = format.next();
+                        // focusedView = findViewById(R.id.textClock);
+                        switch (format) {
+                            case h24:
+                                ((TextClock)focusedView).setFormat12Hour("HH:mm:ss");
+                                break;
+                            case h12:
+                                ((TextClock)focusedView).setFormat12Hour("hh:mm:ss a");
+                                break;
+                        }
+                    }
+                });
+            }
+        }
+
         this.setupImages();
         this.setupLinks();
     }
@@ -65,367 +173,482 @@ public class DescriptionActivity extends Activity {
         // Up, down, left, right navigation button
         if (keyCode >= 19 && keyCode <= 22) {
             int newFocusedViewId = DescriptionNavigation.navigateOverActivity(oldFocusedViewId, keyCode - 19);
+            while (!checkViewExistence(newFocusedViewId) && newFocusedViewId != 0)
+                newFocusedViewId = DescriptionNavigation.navigateOverActivity(newFocusedViewId, keyCode - 19);
+
+            // If == 0, focusedView will stay the same
             if (newFocusedViewId == 0) return false;
 
-            // Pressed up
-            if (keyCode == 19) {
-                if (oldFocusedViewId == R.id.link1) {
-                    int imagesLength = element.images.size();
-
-                    if (imagesLength >= 7) {
-                        this.overallImageIndex = 6;
-                    } else if (imagesLength >= 4) {
-                        this.overallImageIndex = 3;
-                        newFocusedViewId = R.id.image4;
-                    } else if (imagesLength >= 1) {
-                        this.overallImageIndex = 0;
-                        newFocusedViewId = R.id.image1;
-                    } else if (!element.description.isEmpty()) newFocusedViewId = R.id.descriptionText;
-                    else newFocusedViewId = R.id.languageButton;
-                } else if (DescriptionNavigation.isFirstRow(oldFocusedViewId)) {
-                    if (!element.description.isEmpty()) {
-                        // Do nothing
-                    } else newFocusedViewId = R.id.languageButton;
-                }
-            }
-            // Pressed down
-            else if (keyCode == 20) {
-                if (DescriptionNavigation.isUpperButtons(oldFocusedViewId)) {
-                    if (!element.description.isEmpty()) {
-                        // Do nothing
-                    } else if (element.images.size() >= 1) {
-                        this.overallImageIndex = 0;
-                        newFocusedViewId = R.id.image1;
-                    } else if (element.links.size() >= 1) {
-                        this.overallLinkIndex = 0;
-                        newFocusedViewId = R.id.link1;
-                    } else newFocusedViewId = 0;
-                } else if (oldFocusedViewId == R.id.descriptionText) {
-                    if (element.images.size() >= 1) {
-                        this.overallImageIndex = 0;
-                    } else if (element.links.size() >= 1) {
-                        this.overallLinkIndex = 0;
-                        newFocusedViewId = R.id.link1;
-                    } else newFocusedViewId = 0;
-                } else if (DescriptionNavigation.isThirdRow(oldFocusedViewId)) {
-                    if (element.links.size() >= 1) {
-                        this.overallLinkIndex = 0;
-                    } else newFocusedViewId = 0;
-                }
-
-            }
-            // Pressed left
-            else if (keyCode == 21) {
-                if (DescriptionNavigation.isUpperButtons(oldFocusedViewId) || oldFocusedViewId == R.id.descriptionText || DescriptionNavigation.isLeftColumn(oldFocusedViewId) || DescriptionNavigation.isLinks(oldFocusedViewId)) {
-                    // Do nothing
-                } else if (DescriptionNavigation.isMiddleColumn(oldFocusedViewId) || DescriptionNavigation.isRightColumn(oldFocusedViewId)) {
-                    this.overallImageIndex--;
-                } else newFocusedViewId = 0;
-            }
-            // Pressed right
-            else if (keyCode == 22) {
-                if (DescriptionNavigation.isUpperButtons(oldFocusedViewId) || oldFocusedViewId == R.id.descriptionText || DescriptionNavigation.isRightColumn(oldFocusedViewId) || DescriptionNavigation.isLinks(oldFocusedViewId)) {
-                    // Do nothing
-                } else if (this.overallImageIndex + 1 < this.element.images.size() && (DescriptionNavigation.isLeftColumn(oldFocusedViewId) || DescriptionNavigation.isMiddleColumn(oldFocusedViewId))) {
-                    this.overallImageIndex++;
-                } else newFocusedViewId = 0;
-            }
-
-            if (newFocusedViewId != 0) {
-                focusedView = findViewById(newFocusedViewId);
-
-                // Remove focus from old View
-                int row = DescriptionNavigation.getRowWithId(oldFocusedViewId);
-                updateView(row);
-
-                // Add focus to new View
-                row = DescriptionNavigation.getRowWithId(newFocusedViewId);
-                updateView(row);
-            }
-
+            // If != 0, focusedView will change its value
             this.focusedView = findViewById(newFocusedViewId);
-        }
-        // Enter button
-        else if (keyCode == 23) {
-            if (oldFocusedViewId == R.id.languageButton) {
-                language = language.next();
-                focusedView = findViewById(R.id.languageButton);
-                setNewContentView();
-            } else if (oldFocusedViewId == R.id.themeButton) {
-                theme = theme.next();
-                focusedView = findViewById(R.id.themeButton);
-                setNewContentView();
-            } else if (oldFocusedViewId == R.id.textClock) {
-                format = format.next();
-                focusedView = findViewById(R.id.textClock);
-                switch (format) {
-                    case h24:
-                        ((TextClock)focusedView).setFormat12Hour("HH:mm:ss");
-                        break;
-                    case h12:
-                        ((TextClock)focusedView).setFormat12Hour("hh:mm:ss a");
-                        break;
-                }
-            } else if (oldFocusedViewId == R.id.descriptionText) {
-                TextView description = findViewById(oldFocusedViewId);
-                if (description == null) return false;
+            this.focusedView.requestFocus();
 
-                if (description.getMaxLines() == 16) description.setMaxLines(32);
-                else if (description.getMaxLines() == 32)((TextView)findViewById(oldFocusedViewId)).setMaxLines(16);
-            } else if (DescriptionNavigation.isImage(oldFocusedViewId)) {
-                // Display image full-screen
-            } else if (DescriptionNavigation.isLinks(oldFocusedViewId)) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(element.links.get(this.overallLinkIndex).get("url")));
+            // Remove focus from old View
+            int row = DescriptionNavigation.getRowWithId(oldFocusedViewId);
+            updateView(row);
 
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent);
-                }
-            }
+            // Add focus to new View
+            row = DescriptionNavigation.getRowWithId(newFocusedViewId);
+            updateView(row);
+
+            CustomScrollView scrollView = findViewById(R.id.scrollView);
+
+            this.scrollToCenterView(scrollView, this.focusedView);
         }
         return true;
     }
 
-    void setupTitle() {
-        TextView title = findViewById(R.id.titleDescription);
-        if (title == null) return;
-
-        if (!this.element.title.isEmpty()) title.setText(this.element.title);
-        else {
-            switch(this.language) {
-                case english:
-                    title.setText(getResources().getString(R.string.element_name_en));
-                    break;
-                case german:
-                    title.setText(getResources().getString(R.string.element_name_de));
-                    break;
-                case croatian:
-                    title.setText(getResources().getString(R.string.element_name_hr));
-                    break;
-            }
-        }
+    boolean checkViewExistence(int focusedViewId) {
+        if (focusedViewId == R.id.languageButton) return true;
+        if (focusedViewId == R.id.themeButton) return true;
+        if (focusedViewId == R.id.textClock) return true;
+        if (focusedViewId == R.id.descriptionContent) return this.element.description != null && !this.element.description.isEmpty();
+        if (focusedViewId == R.id.descriptionImage1) return this.element.images.size() > 0 && !this.element.images.get(0).isEmpty();
+        if (focusedViewId == R.id.descriptionImage2) return this.element.images.size() > 1 && !this.element.images.get(1).isEmpty();
+        if (focusedViewId == R.id.descriptionImage3) return this.element.images.size() > 2 && !this.element.images.get(2).isEmpty();
+        if (focusedViewId == R.id.descriptionImage4) return this.element.images.size() > 3 && !this.element.images.get(3).isEmpty();
+        if (focusedViewId == R.id.descriptionImage5) return this.element.images.size() > 4 && !this.element.images.get(4).isEmpty();
+        if (focusedViewId == R.id.descriptionImage6) return this.element.images.size() > 5 && !this.element.images.get(5).isEmpty();
+        if (focusedViewId == R.id.descriptionImage7) return this.element.images.size() > 6 && !this.element.images.get(6).isEmpty();
+        if (focusedViewId == R.id.descriptionImage8) return this.element.images.size() > 7 && !this.element.images.get(7).isEmpty();
+        if (focusedViewId == R.id.descriptionImage9) return this.element.images.size() > 8 && !this.element.images.get(8).isEmpty();
+        if (focusedViewId == R.id.descriptionLink1) return this.element.links.size() > 0 && !this.element.links.get(0).get("url").isEmpty() && !this.element.links.get(0).get("title").isEmpty();
+        if (focusedViewId == R.id.descriptionLink2) return this.element.links.size() > 1 && !this.element.links.get(1).get("url").isEmpty() && !this.element.links.get(1).get("title").isEmpty();
+        if (focusedViewId == R.id.descriptionLink3) return this.element.links.size() > 2 && !this.element.links.get(2).get("url").isEmpty() && !this.element.links.get(2).get("title").isEmpty();
+        return false;
     }
 
-    void setupDescription() {
-        TextView description = findViewById(R.id.descriptionText);
-        if (description == null) return;
+    void setupBackground(Context ctx, ConstraintLayout background, Theme theme) {
+        if (background == null) return;
 
-        if (this.focusedView == null) {
-            this.focusedView = description;
-        }
+        if (theme == Theme.light) background.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
+        else background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
+    }
 
-        if (!this.element.description.isEmpty()) description.setText(this.element.description);
+    void setupTitle(Context ctx, TextView titleText, String title, Language language, Theme theme) {
+        if (titleText == null) return;
+
+        if (!title.isEmpty()) titleText.setText(title);
         else {
-            description.setText("");
-            description.setVisibility(View.INVISIBLE);
+            switch(language) {
+                case german:
+                    titleText.setText(ContextCompat.getString(ctx, R.string.element_name_de));
+                    break;
+                case croatian:
+                    titleText.setText(ContextCompat.getString(ctx, R.string.element_name_hr));
+                    break;
+                default:
+                    titleText.setText(ContextCompat.getString(ctx, R.string.element_name_en));
+            }
         }
 
-        if (this.focusedView == description) {
-           if (this.theme == Theme.dark) description.setBackground(getResources().getDrawable(R.drawable.main_border_dark));
-           else if (this.theme == Theme.light) description.setBackground(getResources().getDrawable(R.drawable.main_border_light));
-        } else description.setBackground(getResources().getDrawable(R.drawable.image_button));
+        if (theme == Theme.light) titleText.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+        else titleText.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+    }
+
+    void setupDescription(Context ctx, TextView descriptionView, String description, View focusedView, Theme theme) {
+        if (descriptionView == null) return;
+
+        if (!description.isEmpty()) descriptionView.setText(description);
+        else {
+            descriptionView.setText("");
+            descriptionView.setVisibility(View.INVISIBLE);
+        }
+
+        if (focusedView.getId() == descriptionView.getId()) {
+           if (theme == Theme.light) {
+               descriptionView.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_light));
+               descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+           } else {
+               descriptionView.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_dark));
+               descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+           }
+        } else {
+            descriptionView.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+            if (theme == Theme.light) descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+            else descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+        }
     }
 
     void setupImages() {
-        this.setupImage(0);
-        this.setupImage(1);
-        this.setupImage(2);
-        this.setupImage(3);
-        this.setupImage(4);
-        this.setupImage(5);
-        this.setupImage(6);
-        this.setupImage(7);
-        this.setupImage(8);
+        int imagesLength = this.element.images.size();
+        ImageView image;
+
+        image = findViewById(R.id.descriptionImage1);
+        if (0 < imagesLength) this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
+        else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+
+        if (!image.hasOnClickListeners()) {
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), "0", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        image = findViewById(R.id.descriptionImage2);
+        if (1 < imagesLength) this.setupImage(getApplicationContext(), image, this.element.images.get(1), this.focusedView, this.theme);
+        else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+
+        if (!image.hasOnClickListeners()) {
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), "1", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        image = findViewById(R.id.descriptionImage3);
+        if (2 < imagesLength) this.setupImage(getApplicationContext(), image, this.element.images.get(2), this.focusedView, this.theme);
+        else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+
+        if (!image.hasOnClickListeners()) {
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), "2", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        image = findViewById(R.id.descriptionImage4);
+        if (3 < imagesLength) this.setupImage(getApplicationContext(), image, this.element.images.get(3), this.focusedView, this.theme);
+        else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+
+        if (!image.hasOnClickListeners()) {
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), "3", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        image = findViewById(R.id.descriptionImage5);
+        if (4 < imagesLength) this.setupImage(getApplicationContext(), image, this.element.images.get(4), this.focusedView, this.theme);
+        else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+
+        if (!image.hasOnClickListeners()) {
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), "4", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        image = findViewById(R.id.descriptionImage6);
+        if (5 < imagesLength) this.setupImage(getApplicationContext(), image, this.element.images.get(5), this.focusedView, this.theme);
+        else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+
+        if (!image.hasOnClickListeners()) {
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), "5", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        image = findViewById(R.id.descriptionImage7);
+        if (6 < imagesLength) this.setupImage(getApplicationContext(), image, this.element.images.get(6), this.focusedView, this.theme);
+        else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+
+        if (!image.hasOnClickListeners()) {
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), "6", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        image = findViewById(R.id.descriptionImage8);
+        if (7 < imagesLength) this.setupImage(getApplicationContext(), image, this.element.images.get(7), this.focusedView, this.theme);
+        else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+
+        if (!image.hasOnClickListeners()) {
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), "7", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        image = findViewById(R.id.descriptionImage9);
+        if (8 < imagesLength) this.setupImage(getApplicationContext(), image, this.element.images.get(8), this.focusedView, this.theme);
+        else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+
+        if (!image.hasOnClickListeners()) {
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), "8", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
-    void setupImage(int index) {
-        ImageView image = getImageByIndex(index);
-        if (image == null) {
+    void setupImage(Context ctx, ImageView image, String imageUrl, View focusedView, Theme theme) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
             image.setVisibility(View.GONE);
             return;
         }
 
-        int imagesLength = this.element.images.size();
+        if (focusedView.getId() == image.getId()) {
+            if (theme == Theme.light) image.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_light));
+            else image.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_dark));
+        } else image.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
 
-        if (this.focusedView.getId() == image.getId()) {
-            if (this.theme == Theme.dark) image.setBackground(getResources().getDrawable(R.drawable.highlighted_image_button_dark));
-            if (this.theme == Theme.light) image.setBackground(getResources().getDrawable(R.drawable.highlighted_image_button_light));
-        } else image.setBackground(getResources().getDrawable(R.drawable.image_button));
-
-        if (index < imagesLength && !this.element.images.get(index).isEmpty()) {
-            try {
-                Picasso.get()
-                        .load(this.element.images.get(index))
-                        .fit()
-                        .into(image);
-            } catch (Exception e) {
-                e.printStackTrace();
-                image.setVisibility(View.GONE);
-            }
-        } else image.setVisibility(View.GONE);
+        try {
+            Picasso.get()
+                    .load(imageUrl)
+                    .fit()
+                    .into(image);
+        } catch (Exception e) {
+            e.printStackTrace();
+            image.setVisibility(View.GONE);
+        }
     }
 
     void setupLinks() {
-        this.setupLink(0);
-        this.setupLink(1);
-        this.setupLink(2);
+        int linksLength = this.element.links.size();
+        Button button;
+
+        button = findViewById(R.id.descriptionLink1);
+        if (0 < linksLength) this.setupLink(getApplicationContext(), button, this.element.links.get(0).get("title"), this.element.links.get(0).get("url"), this.focusedView, this.theme);
+        else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+
+        if (!button.hasOnClickListeners()) {
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int linkIndex = 0; // getLinkIndexByViewId(focusedView.getId());
+                    // if (linkIndex == -1) return;
+
+                    if (linkIndex >= element.links.size()) return;
+
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(element.links.get(linkIndex).get("url")));
+                    if (intent.resolveActivity(getPackageManager()) != null)
+                        startActivity(intent);
+                }
+            });
+        }
+
+        button = findViewById(R.id.descriptionLink2);
+        if (1 < linksLength) this.setupLink(getApplicationContext(), button, this.element.links.get(1).get("title"), this.element.links.get(1).get("url"), this.focusedView, this.theme);
+        else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+
+        if (!button.hasOnClickListeners()) {
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int linkIndex = 1; // getLinkIndexByViewId(focusedView.getId());
+                    // if (linkIndex == -1) return;
+
+                    if (linkIndex >= element.links.size()) return;
+
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(element.links.get(linkIndex).get("url")));
+                    if (intent.resolveActivity(getPackageManager()) != null)
+                        startActivity(intent);
+                }
+            });
+        }
+
+        button = findViewById(R.id.descriptionLink3);
+        if (2 < linksLength) this.setupLink(getApplicationContext(), button, this.element.links.get(2).get("title"), this.element.links.get(2).get("url"), this.focusedView, this.theme);
+        else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+
+        if (!button.hasOnClickListeners()) {
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int linkIndex = 2; // getLinkIndexByViewId(focusedView.getId());
+                    // if (linkIndex == -1) return;
+
+                    if (linkIndex >= element.links.size()) return;
+
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(element.links.get(linkIndex).get("url")));
+                    if (intent.resolveActivity(getPackageManager()) != null)
+                        startActivity(intent);
+                }
+            });
+        }
     }
 
-    void setupLink(int index) {
-        Button link = getLinkByIndex(index);
-        if (link == null) {
-            link.setVisibility(View.GONE);
+    void setupLink(Context ctx, Button button, String linkTitle, String linkUrl, View focusedView, Theme theme) {
+        if (linkTitle == null || linkTitle.isEmpty() || linkUrl == null || linkUrl.isEmpty()) {
+            button.setVisibility(View.GONE);
             return;
         }
 
-        int linksLength = this.element.links.size();
+        if (focusedView.getId() == button.getId()) {
+            if (theme == Theme.light) {
+                button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_light));
+                button.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+            } else {
+                button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_dark));
+                button.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+            }
+        } else {
+            button.setBackground(ContextCompat.getDrawable(ctx, R.color.transparent));
+            if (theme == Theme.light) button.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+            else button.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+        }
 
-        if (this.focusedView == link) {
-            if (this.theme == Theme.dark) link.setBackground(getResources().getDrawable(R.drawable.highlighted_image_button_dark));
-            if (this.theme == Theme.light) link.setBackground(getResources().getDrawable(R.drawable.highlighted_image_button_light));
-        } else link.setBackground(getResources().getDrawable(R.color.transparent));
+        SpannableString content = new SpannableString(linkTitle);
+        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 
-        if (index < linksLength && !this.element.links.get(index).get("title").isEmpty()) {
-            SpannableString content = new SpannableString(this.element.links.get(index).get("title"));
-            content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-
-            link.setText(content);
-            if (this.theme == Theme.dark) link.setTextColor(getResources().getColor(R.color.text_color_dark_mode));
-            else if (this.theme == Theme.light) link.setTextColor(getResources().getColor(R.color.text_color_light_mode));
-
-        } else link.setVisibility(View.GONE);
+        button.setText(content);
+        if (theme == Theme.light) button.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+        else button.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
     }
 
     void updateView(int row) {
-        if (row == 0) setupLanguageButton();
-        else if (row == 1) setupThemeButton();
-        else if (row == 2) setupTextClock();
-        else if (row == 3) setupDescription();
-        else if (row == 4) setupImage(0);
-        else if (row == 5) setupImage(1);
-        else if (row == 6) setupImage(2);
-        else if (row == 7) setupImage(3);
-        else if (row == 8) setupImage(4);
-        else if (row == 9) setupImage(5);
-        else if (row == 10) setupImage(6);
-        else if (row == 11) setupImage(7);
-        else if (row == 12) setupImage(8);
-        else if (row == 13) setupLink(0);
-        else if (row == 14) setupLink(1);
-        else if (row == 15) setupLink(2);
-    }
+        if (row == 0) {
+            Button languageButton = findViewById(R.id.languageButton);
+            ImageView languageIcon = findViewById(R.id.languageIcon);
 
-    void setupLanguageButton() {
-        Button languageButton = findViewById(R.id.languageButton);
-        ImageView languageIcon = findViewById(R.id.languageIcon);
-
-        if (languageButton == null) return;
-        switch (language) {
-            case english:
-                languageButton.setText(R.string.language_en);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.english));
-                break;
-            case german:
-                languageButton.setText(R.string.language_de);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.german));
-                break;
-            case croatian:
-                languageButton.setText(R.string.language_hr);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.croatian));
-                break;
+            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
         }
+        else if (row == 1) {
+            Button themeButton = findViewById(R.id.themeButton);
+            ImageView themeIcon = findViewById(R.id.themeIcon);
 
-        if (focusedView.getId() == R.id.languageButton) languageButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
-        else languageButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
-    }
-
-    void setupThemeButton() {
-        Button themeButton = findViewById(R.id.themeButton);
-        ImageView themeIcon = findViewById(R.id.themeIcon);
-
-        if (themeButton == null) return;
-        switch (theme) {
-            case light:
-                if (this.language == Language.english) themeButton.setText(R.string.light_theme_en);
-                else if (this.language == Language.german) themeButton.setText(R.string.light_theme_de);
-                else if (this.language == Language.croatian) themeButton.setText(R.string.light_theme_hr);
-
-                themeIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.sun));
-                break;
-            case dark:
-                if (this.language == Language.english) themeButton.setText(R.string.dark_theme_en);
-                else if (this.language == Language.german) themeButton.setText(R.string.dark_theme_de);
-                else if (this.language == Language.croatian) themeButton.setText(R.string.dark_theme_hr);
-
-                themeIcon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.moon));
-                break;
+            ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
         }
+        else if (row == 2) {
+            TextClock textClock = findViewById(R.id.textClock);
 
-        if (focusedView.getId() == R.id.themeButton) themeButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
-        else themeButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
-    }
-
-    void setupTextClock() {
-        TextClock clockButton = findViewById(R.id.textClock);
-
-        if (clockButton == null) return;
-        switch (format) {
-            case h24:
-                clockButton.setFormat12Hour("HH:mm:ss");
-                break;
-            case h12:
-                clockButton.setFormat12Hour("hh:mm:ss a");
-                break;
-            default:
-                return;
+            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
         }
+        else if (row == 3) {
+            TextView description = findViewById(R.id.descriptionContent);
 
-        if (focusedView.getId() == R.id.textClock) clockButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
-        else clockButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
+            this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.theme);
+        }
+        else if (row == 4) {
+            ImageView image = findViewById(R.id.descriptionImage1);
+
+            if (0 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
+            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+        }
+        else if (row == 5) {
+            ImageView image = findViewById(R.id.descriptionImage2);
+
+            if (1 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(1), this.focusedView, this.theme);
+            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+        }
+        else if (row == 6) {
+            ImageView image = findViewById(R.id.descriptionImage3);
+
+            if (2 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(2), this.focusedView, this.theme);
+            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+        }
+        else if (row == 7) {
+            ImageView image = findViewById(R.id.descriptionImage4);
+
+            if (3 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(3), this.focusedView, this.theme);
+            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+        }
+        else if (row == 8) {
+            ImageView image = findViewById(R.id.descriptionImage5);
+
+            if (4 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(4), this.focusedView, this.theme);
+            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+        }
+        else if (row == 9) {
+            ImageView image = findViewById(R.id.descriptionImage6);
+
+            if (5 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(5), this.focusedView, this.theme);
+            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+        }
+        else if (row == 10) {
+            ImageView image = findViewById(R.id.descriptionImage7);
+
+            if (6 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(6), this.focusedView, this.theme);
+            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+        }
+        else if (row == 11) {
+            ImageView image = findViewById(R.id.descriptionImage8);
+
+            if (7 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(7), this.focusedView, this.theme);
+            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+        }
+        else if (row == 12) {
+            ImageView image = findViewById(R.id.descriptionImage9);
+
+            if (8 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(8), this.focusedView, this.theme);
+            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+        }
+        else if (row == 13) {
+            Button button = findViewById(R.id.descriptionLink1);
+
+            if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, this.element.links.get(0).get("title"), this.element.links.get(0).get("url"), this.focusedView, this.theme);
+            else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+        }
+        else if (row == 14) {
+            Button button = findViewById(R.id.descriptionLink2);
+
+            if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, this.element.links.get(1).get("title"), this.element.links.get(1).get("url"), this.focusedView, this.theme);
+            else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+        }
+        else if (row == 15) {
+            Button button = findViewById(R.id.descriptionLink3);
+
+            if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, this.element.links.get(2).get("title"), this.element.links.get(2).get("url"), this.focusedView, this.theme);
+            else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+        }
     }
 
     void setNewContentView() {
-        this.setupTitle();
-        this.setupDescription();
-        this.setupLanguageButton();
-        this.setupThemeButton();
-        this.setupTextClock();
+        {
+            TextView titleDescription = findViewById(R.id.descriptionTitle);
+
+            this.setupTitle(getApplicationContext(), titleDescription, this.element.title, this.language, this.theme);
+        }
+
+        {
+            TextView description = findViewById(R.id.descriptionContent);
+
+            this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.theme);
+        }
+
+        {
+            Button languageButton = findViewById(R.id.languageButton);
+            ImageView languageIcon = findViewById(R.id.languageIcon);
+
+            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+        }
+
+        {
+            Button themeButton = findViewById(R.id.themeButton);
+            ImageView themeIcon = findViewById(R.id.themeIcon);
+
+            ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+        }
+
+        {
+            TextClock textClock = findViewById(R.id.textClock);
+
+            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+        }
+
         this.setupImages();
         this.setupLinks();
     }
 
-    ImageView getImageByIndex(int index) {
-        switch (index) {
-            case 0:
-                return findViewById(R.id.image1);
-            case 1:
-                return findViewById(R.id.image2);
-            case 2:
-                return findViewById(R.id.image3);
-            case 3:
-                return findViewById(R.id.image4);
-            case 4:
-                return findViewById(R.id.image5);
-            case 5:
-                return findViewById(R.id.image6);
-            case 6:
-                return findViewById(R.id.image7);
-            case 7:
-                return findViewById(R.id.image8);
-            case 8:
-                return findViewById(R.id.image9);
-        }
-        return null;
-    }
+    void scrollToCenterView(CustomScrollView scrollView, View focusedView) {
+        if (scrollView == null || focusedView == null) return;
 
-    Button getLinkByIndex(int index) {
-        switch (index) {
-            case 0:
-                return findViewById(R.id.link1);
-            case 1:
-                return findViewById(R.id.link2);
-            case 2:
-                return findViewById(R.id.link3);
-        }
-        return null;
+        int scrollViewHeight = scrollView.getHeight();
+        int viewTop = focusedView.getTop();
+        int viewHeight = focusedView.getHeight();
+        int scrollToY = viewTop - (scrollViewHeight / 2) + (viewHeight / 2);
+
+        scrollView.smoothScrollTo(0, scrollToY);
     }
 }

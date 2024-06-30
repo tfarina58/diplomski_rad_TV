@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,7 +32,7 @@ import java.util.Locale;
 
 public class LoginActivity extends Activity {
     FirebaseFirestore firestore;
-    SharedPreferencesService service;
+    SharedPreferencesService sharedPreferencesService;
     View focusedView;
     Language language;
     Theme theme;
@@ -41,67 +44,31 @@ public class LoginActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
 
-        SharedPreferencesService sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
+        this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
 
         String userId = sharedPreferencesService.getUserId();
         String estateId = sharedPreferencesService.getEstateId();
-        if (!userId.isEmpty() && !estateId.isEmpty()) {
-            Intent i = new Intent(getApplicationContext(), WelcomeActivity.class);
-            startActivity(i);
+
+        if (!userId.isEmpty()) {
+            if (!estateId.isEmpty()) startActivity(new Intent(getApplicationContext(), WelcomeActivity.class));
+            else startActivity(new Intent(getApplicationContext(), EstateListActivity.class));
             return;
-        } // TODO: remove comment
+        }
 
         this.firestore = FirebaseFirestore.getInstance();
 
         this.language = sharedPreferencesService.getLanguage();
         // if (this.language == null) this.getDeviceLanguage(); // Default set to Language.english, so no need for this functionality (for now).
 
+        ConstraintLayout background = findViewById(R.id.main);
+        this.setupBackground(getApplicationContext(), background, this.theme);
+
         TextView loginTitle = findViewById(R.id.loginTitle);
-        this.setupLoginTitle(loginTitle);
+        this.setupLoginTitle(getApplicationContext(), loginTitle, this.language, this.theme);
 
         EditText emailField = findViewById(R.id.emailAddress);
-        TextView emailFieldTitle = findViewById(R.id.emailAddressTitle);
-        focusedView = emailField;
-        LoginNavigation.setupEmailField(getApplicationContext(), emailField, emailFieldTitle, this.focusedView, this.language);
-
-        EditText passwordField = findViewById(R.id.password);
-        TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
-        LoginNavigation.setupPasswordField(getApplicationContext(), passwordField, passwordFieldTitle, this.focusedView, this.language);
-
-        Button loginButton = findViewById(R.id.loginButton);
-        LoginNavigation.setupLoginButton(getApplicationContext(), loginButton, this.focusedView, this.language);
-
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = "tfarina58@gmail.com"; // ((EditText) findViewById(R.id.emailAddress)).getText().toString();
-                String password = "password"; // ((EditText) findViewById(R.id.password)).getText().toString();
-
-                String emptyEmailFeedback, emptyPasswordFeedback, incorrectEmailOrPasswordFeedback, firebaseError;
-                switch (language) {
-                    case german:
-                        emptyEmailFeedback = getResources().getString(R.string.email_empty_de);
-                        emptyPasswordFeedback = getResources().getString(R.string.password_empty_de);
-                        incorrectEmailOrPasswordFeedback = getResources().getString(R.string.email_or_password_incorrect_de);
-                        firebaseError = getResources().getString(R.string.firebase_error_de);
-                        break;
-                    case croatian:
-                        emptyEmailFeedback = getResources().getString(R.string.email_empty_hr);
-                        emptyPasswordFeedback = getResources().getString(R.string.password_empty_hr);
-                        incorrectEmailOrPasswordFeedback = getResources().getString(R.string.email_or_password_incorrect_hr);
-                        firebaseError = getResources().getString(R.string.firebase_error_hr);
-                        break;
-                    default:
-                        emptyEmailFeedback = getResources().getString(R.string.email_empty_en);
-                        emptyPasswordFeedback = getResources().getString(R.string.password_empty_en);
-                        incorrectEmailOrPasswordFeedback = getResources().getString(R.string.email_or_password_incorrect_en);
-                        firebaseError = getResources().getString(R.string.firebase_error_en);
-                        break;
-                }
-
-                firestoreLogin(getApplicationContext(), email, password, emptyEmailFeedback, emptyPasswordFeedback, incorrectEmailOrPasswordFeedback, firebaseError, sharedPreferencesService.sharedPreferences);
-            }
-        });
+        if (emailField != null) this.focusedView = emailField;
+        this.setupContent();
     }
 
     @Override
@@ -110,20 +77,12 @@ public class LoginActivity extends Activity {
         int oldFocusedViewId = focusedView.getId();
 
         // Up, down, left, right navigation button
-        if (keyCode == 4) {
-            this.focusedView.clearFocus();
-            this.focusedView.setFocusable(false);
-            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            if (imm != null) {
-                imm.hideSoftInputFromWindow(this.focusedView.getWindowToken(), 0);
-            }
-            // TODO
-
-        } else if (keyCode >= 19 && keyCode <= 22) {
+        if (keyCode >= 19 && keyCode <= 22) {
             int newFocusedViewId = LoginNavigation.navigateOverActivity(focusedView.getId(), keyCode - 19);
             if (newFocusedViewId == 0) return false;
 
             focusedView = findViewById(newFocusedViewId);
+            focusedView.requestFocus();
 
             // Remove focus from old View
             int row = LoginNavigation.getRowWithId(oldFocusedViewId);
@@ -133,60 +92,33 @@ public class LoginActivity extends Activity {
             row = LoginNavigation.getRowWithId(newFocusedViewId);
             this.updateView(row);
         }
-        // Enter button
-        else if (keyCode == 23) {
-            if (oldFocusedViewId == R.id.languageButton) {
-                language = language.next();
-                focusedView = findViewById(R.id.languageButton);
-                // refreshContentView();
-            } else if (oldFocusedViewId == R.id.themeButton) {
-                theme = theme.next();
-                focusedView = findViewById(R.id.themeButton);
-                // refreshContentView();
-            } else if (oldFocusedViewId == R.id.textClock) {
-                format = format.next();
-                focusedView = findViewById(R.id.textClock);
-                switch (format) {
-                    case h24:
-                        ((TextClock)focusedView).setFormat12Hour("HH:mm:ss");
-                        break;
-                    case h12:
-                        ((TextClock)focusedView).setFormat12Hour("hh:mm:ss a");
-                        break;
-                }
-            } else if (oldFocusedViewId == R.id.emailAddress) {
-                EditText email = findViewById(R.id.emailAddress);
-                email.setFocusable(true);
-                email.requestFocus();
-                // TODO
-
-            } else if (oldFocusedViewId == R.id.password) {
-                EditText email = findViewById(R.id.emailAddress);
-                email.setFocusable(true);
-                email.requestFocus();
-                // TODO
-
-            } else if (oldFocusedViewId == R.id.loginButton) {
-                // TODO: nothing should happen
-            }
-        }
         return true;
     }
 
-    void setupLoginTitle(TextView loginTitle) {
+    void setupBackground(Context ctx, ConstraintLayout background, Theme theme) {
+        if (background == null) return;
+
+        if (theme == Theme.light) background.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
+        else background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
+    }
+
+    void setupLoginTitle(Context ctx, TextView loginTitle, Language language, Theme theme) {
         if (loginTitle == null) return;
 
         switch (language) {
-            case english:
-                loginTitle.setText(R.string.login_en);
-                break;
             case german:
                 loginTitle.setText(R.string.login_de);
                 break;
             case croatian:
                 loginTitle.setText(R.string.login_hr);
                 break;
+            default:
+                loginTitle.setText(R.string.login_en);
+                break;
         }
+
+        if (theme == Theme.light) loginTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+        else loginTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
     }
 
     public void updateView(int row) {
@@ -194,16 +126,50 @@ public class LoginActivity extends Activity {
             case 0:
                 EditText emailField = findViewById(R.id.emailAddress);
                 TextView emailFieldTitle = findViewById(R.id.emailAddressTitle);
-                LoginNavigation.setupEmailField(getApplicationContext(), emailField, emailFieldTitle, this.focusedView, this.language);
+                LoginNavigation.setupEmailField(getApplicationContext(), emailField, emailFieldTitle, this.focusedView, this.language, this.theme);
                 break;
             case 1:
                 EditText passwordField = findViewById(R.id.password);
                 TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
-                LoginNavigation.setupPasswordField(getApplicationContext(), passwordField, passwordFieldTitle, this.focusedView, this.language);
+                LoginNavigation.setupPasswordField(getApplicationContext(), passwordField, passwordFieldTitle, this.focusedView, this.language, this.theme);
                 break;
             case 2:
                 Button loginButton = findViewById(R.id.loginButton);
                 LoginNavigation.setupLoginButton(getApplicationContext(), loginButton, this.focusedView, this.language);
+
+                if (!loginButton.hasOnClickListeners()) {
+                    loginButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String email = "tfarina58@gmail.com"; // ((EditText) findViewById(R.id.emailAddress)).getText().toString();
+                            String password = "password"; // ((EditText) findViewById(R.id.password)).getText().toString();
+
+                            String emptyEmailFeedback, emptyPasswordFeedback, incorrectEmailOrPasswordFeedback, firebaseError;
+                            switch (language) {
+                                case german:
+                                    emptyEmailFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_empty_de);
+                                    emptyPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.password_empty_de);
+                                    incorrectEmailOrPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_or_password_incorrect_de);
+                                    firebaseError = ContextCompat.getString(getApplicationContext(), R.string.firebase_error_de);
+                                    break;
+                                case croatian:
+                                    emptyEmailFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_empty_hr);
+                                    emptyPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.password_empty_hr);
+                                    incorrectEmailOrPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_or_password_incorrect_hr);
+                                    firebaseError = ContextCompat.getString(getApplicationContext(), R.string.firebase_error_hr);
+                                    break;
+                                default:
+                                    emptyEmailFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_empty_en);
+                                    emptyPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.password_empty_en);
+                                    incorrectEmailOrPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_or_password_incorrect_en);
+                                    firebaseError = ContextCompat.getString(getApplicationContext(), R.string.firebase_error_en);
+                                    break;
+                            }
+
+                            firestoreLogin(getApplicationContext(), email, password, emptyEmailFeedback, emptyPasswordFeedback, incorrectEmailOrPasswordFeedback, firebaseError, sharedPreferencesService.sharedPreferences);
+                        }
+                    });
+                }
                 break;
         }
     }
@@ -244,6 +210,10 @@ public class LoginActivity extends Activity {
                         Toast.makeText(ctx, firebaseError, Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    void setupContent() {
+        for (int i = 0; i <= 2; ++i) this.updateView(i);
     }
 
     public Language getDeviceLanguage() {

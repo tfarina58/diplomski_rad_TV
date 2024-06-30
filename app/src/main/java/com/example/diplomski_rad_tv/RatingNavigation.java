@@ -1,6 +1,7 @@
 package com.example.diplomski_rad_tv;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,9 +17,9 @@ public class RatingNavigation {
             {0,                   R.id.ratingContent, R.id.languageButton, R.id.textClock},    // themeButton
             {0,                   R.id.ratingContent, R.id.themeButton,    0},                 // textClock
             {R.id.languageButton, R.id.ratingBar,     0,                   0},                 // ratingContent
-            {R.id.ratingContent,  0,                  0,                   R.id.cancelButton}, // ratingBar
-            {R.id.ratingContent,  0,                  R.id.ratingBar,      R.id.ratingButton}, // cancelButton
-            {R.id.ratingContent,  0,                  R.id.cancelButton,   0},                 // ratingButton
+            {R.id.ratingContent,  R.id.cancelButton,  0,                   0},                 // ratingBar
+            {R.id.ratingBar,      0,                  0,                   R.id.ratingButton}, // cancelButton
+            {R.id.ratingBar,      0,                  R.id.cancelButton,   0},                 // ratingButton
     };
     public static int navigateOverActivity(int currentViewId, int direction) {
         return navigationRating[getRowWithId(currentViewId)][direction];
@@ -42,86 +43,40 @@ public class RatingNavigation {
         return viewId == R.id.ratingBar || viewId == R.id.cancelButton || viewId == R.id.ratingButton;
     }
 
-    public static void setupLanguageButton(Context ctx, Button languageButton, ImageView languageIcon, View focusedView, Language language, Theme theme) {
-        if (languageButton == null || languageIcon == null) return;
-
-        switch (language) {
-            case english:
-                languageButton.setText(R.string.language_en);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.english));
-                break;
-            case german:
-                languageButton.setText(R.string.language_de);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.german));
-                break;
-            case croatian:
-                languageButton.setText(R.string.language_hr);
-                languageIcon.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.croatian));
-                break;
-        }
-
-        if (focusedView.getId() == R.id.languageButton) languageButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_header_button));
-        else languageButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.header_button));
-    }
-
-    public static void setupThemeButton(Context ctx, Button themeButton, ImageView themeIcon, View focusedView, Language language, Theme theme) {
-        if (themeButton == null || themeIcon == null) return;
-
-        switch (theme) {
-            case light:
-                if (language == Language.english) themeButton.setText(R.string.light_theme_en);
-                else if (language == Language.german) themeButton.setText(R.string.light_theme_de);
-                else if (language == Language.croatian) themeButton.setText(R.string.light_theme_hr);
-
-                themeIcon.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.sun));
-                break;
-            case dark:
-                if (language == Language.english) themeButton.setText(R.string.dark_theme_en);
-                else if (language == Language.german) themeButton.setText(R.string.dark_theme_de);
-                else if (language == Language.croatian) themeButton.setText(R.string.dark_theme_hr);
-
-                themeIcon.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.moon));
-                break;
-        }
-
-        if (focusedView.getId() == R.id.themeButton) themeButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_header_button));
-        else themeButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.header_button));
-    }
-    public static void setupTextClockButton(Context ctx, TextClock clockButton, View focusedView, Clock format, Theme theme) {
-        if (clockButton == null) return;
-        switch (format) {
-            case h24:
-                clockButton.setFormat12Hour("HH:mm:ss");
-                break;
-            case h12:
-                clockButton.setFormat12Hour("hh:mm:ss a");
-                break;
-            default:
-                return;
-        }
-
-        if (focusedView.getId() == R.id.textClock) clockButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_header_button));
-        else clockButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.header_button));
-    }
-
     public static void setupRatingContentField(Context ctx, EditText ratingContent, View focusedView, Language language, Theme theme) {
         if (ratingContent == null) return;
 
         switch (language) {
             case german:
-                ratingContent.setText(R.string.rating_content_de);
+                ratingContent.setHint(R.string.rating_content_de);
                 break;
             case croatian:
-                ratingContent.setText(R.string.rating_content_hr);
+                ratingContent.setHint(R.string.rating_content_hr);
                 break;
             default:
-                ratingContent.setText(R.string.rating_content_en);
+                ratingContent.setHint(R.string.rating_content_en);
         }
 
         if (focusedView.getId() == R.id.ratingContent) {
-            if (theme == Theme.dark) ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_dark));
-            else ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_light));
-        } else ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+            if (theme == Theme.dark) {
+                ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_dark));
+                ratingContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+                ratingContent.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_dark_mode));
+            } else {
+                ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_light));
+                ratingContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+                ratingContent.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_light_mode));
+            }
+        } else {
+            ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+            if (theme == Theme.dark) {
+                ratingContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+                ratingContent.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_dark_mode));
+            } else {
+                ratingContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+                ratingContent.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_light_mode));
+            }
+        }
     }
 
     public static void setupRatingBarField(Context ctx, RatingBar ratingBar, View focusedView, Theme theme) {
@@ -131,18 +86,44 @@ public class RatingNavigation {
             if (theme == Theme.dark) ratingBar.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_dark));
             else ratingBar.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_light));
         } else ratingBar.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+
+        ratingBar.setNumStars(5);
+        ratingBar.setStepSize(1);
+        ratingBar.setRating(5);
     }
 
 
-    public static void setupCancelButton(Context ctx, Button button, View focusedView) {
+    public static void setupCancelButton(Context ctx, Button button, View focusedView, Language language) {
         if (button == null) return;
+
+        switch (language) {
+            case german:
+                button.setText(R.string.cancel_de);
+                break;
+            case croatian:
+                button.setText(R.string.cancel_hr);
+                break;
+            default:
+                button.setText(R.string.cancel_en);
+        }
 
         if (focusedView.getId() == R.id.cancelButton) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design_focused));
         else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design));
     }
 
-    public static void setupRatingButton(Context ctx, Button button, View focusedView) {
+    public static void setupRatingButton(Context ctx, Button button, View focusedView, Language language) {
         if (button == null) return;
+
+        switch (language) {
+            case german:
+                button.setText(R.string.send_rating_de);
+                break;
+            case croatian:
+                button.setText(R.string.send_rating_hr);
+                break;
+            default:
+                button.setText(R.string.send_rating_en);
+        }
 
         if (focusedView.getId() == R.id.ratingButton) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design_focused));
         else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design));

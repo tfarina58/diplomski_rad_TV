@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#fb6da9" /> <!-- Background color of the EditText -->
-    <gradient
-        android:startColor="#d993ec"
-        android:endColor="#ffdacc"
-        android:angle="0" />
+    <solid android:color="#c8d9ed" /> <!-- Background color of the EditText -->
     <stroke
-        android:width="0dp"
-        android:color="#343343" />
+        android:width="2dp"
+        android:color="#003333" />
     <corners android:radius="8dp" />
     <padding
         android:left="5dp"

@@ -96,5 +96,17 @@
     <string name="cancel_de">Kündigen</string>
     <string name="cancel_hr">Otkaži</string>
 
+    <string name="rating_en">Rating</string>
+    <string name="rating_de">Bewertungen</string>
+    <string name="rating_hr">Ocjenivanje</string>
+
+    <string name="cannot_uploading_rating_en">There was an error while uploading your rating.</string>
+    <string name="cannot_uploading_rating_de">Beim Hochladen Ihrer Bewertung ist ein Fehler aufgetreten.</string>
+    <string name="cannot_uploading_rating_hr">Došlo je do pogreške prilikom slanja vaše ocjene.</string>
+
+    <string name="cannot_download_rating_en">There was an error while downloading previous rating.</string>
+    <string name="cannot_download_rating_de">Beim Herunterladen der vorherigen Bewertung ist ein Fehler aufgetreten.</string>
+    <string name="cannot_download_rating_hr">Došlo je do pogreške prilikom preuzimanja prethodnih ocjene.</string>
+
     <string name="empty_string"> </string>
 </resources>
