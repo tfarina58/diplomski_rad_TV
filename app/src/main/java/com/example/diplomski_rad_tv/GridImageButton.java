@@ -41,4 +41,66 @@ public class GridImageButton {
             }
         } // TODO: else set color when no image can be displayed
     }
+
+    public static void setupImageButton(Context ctx, ImageButton imageButton, Button imageBackground, TextView imageTitle, View focusedView, Theme theme, Category category) {
+        if (imageButton == null || imageBackground == null || imageTitle == null) return;
+
+        int visibility = category == null ? View.INVISIBLE: View.VISIBLE;
+        String titleText = category == null ? "" : category.title;
+
+        if (focusedView.getId() == imageButton.getId()) {
+            if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_light));
+            else imageBackground.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_dark));
+        } else imageBackground.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+
+        imageTitle.setText(titleText);
+        if (theme == Theme.light) imageTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+        else imageTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+
+        imageButton.setVisibility(visibility);
+        imageTitle.setVisibility(visibility);
+        imageBackground.setVisibility(visibility);
+
+        if (visibility == View.VISIBLE && category.image != null && !category.image.isEmpty()) {
+            try {
+                Picasso.get()
+                        .load(category.image)
+                        .fit()
+                        .into(imageButton);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } // TODO: else set color when no image can be displayed
+    }
+
+    public static void setupImageButton(Context ctx, ImageButton imageButton, Button imageBackground, TextView imageTitle, View focusedView, Theme theme, Element element) {
+        if (imageButton == null || imageBackground == null || imageTitle == null) return;
+
+        int visibility = element == null ? View.INVISIBLE: View.VISIBLE;
+        String titleText = element == null ? "" : element.title;
+
+        if (focusedView.getId() == imageButton.getId()) {
+            if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_light));
+            else imageBackground.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_dark));
+        } else imageBackground.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+
+        imageTitle.setText(titleText);
+        if (theme == Theme.light) imageTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+        else imageTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+
+        imageButton.setVisibility(visibility);
+        imageTitle.setVisibility(visibility);
+        imageBackground.setVisibility(visibility);
+
+        if (visibility == View.VISIBLE && element.background != null && !element.background.isEmpty()) {
+            try {
+                Picasso.get()
+                        .load(element.background)
+                        .fit()
+                        .into(imageButton);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } // TODO: else set color when no image can be displayed
+    }
 }

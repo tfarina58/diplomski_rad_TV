@@ -20,13 +20,13 @@
         android:translationZ="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@+id/title1"
+        android:id="@+id/gridButtonTitle1"
         android:layout_width="300dp"
         android:layout_height="35dp"
         android:layout_marginStart="16dp"
@@ -64,7 +64,8 @@
         android:id="@+id/languageIcon"
         android:layout_width="24dp"
         android:layout_height="22dp"
-        android:translationZ="2dp"
+        android:translationZ="20dp"
+        app:srcCompat="@drawable/croatian"
         app:layout_constraintBottom_toBottomOf="@+id/languageButton"
         app:layout_constraintEnd_toEndOf="@+id/languageButton"
         app:layout_constraintHorizontal_bias="0.109"
@@ -93,7 +94,8 @@
         android:id="@+id/themeIcon"
         android:layout_width="22dp"
         android:layout_height="22dp"
-        android:translationZ="2dp"
+        android:translationZ="20dp"
+        app:srcCompat="@drawable/moon"
         app:layout_constraintBottom_toBottomOf="@+id/themeButton"
         app:layout_constraintEnd_toEndOf="@+id/themeButton"
         app:layout_constraintHorizontal_bias="0.184"
@@ -123,7 +125,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         app:srcCompat="@drawable/grid"
-        android:translationZ="2dp"
+        android:translationZ="20dp"
         app:layout_constraintBottom_toBottomOf="@+id/gridButton"
         app:layout_constraintEnd_toEndOf="@+id/gridButton"
         app:layout_constraintHorizontal_bias="0.225"
@@ -145,7 +147,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <SearchView
+    <android.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="300dp"
         android:layout_height="40dp"

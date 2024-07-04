@@ -1,7 +1,5 @@
 package com.example.diplomski_rad_tv;
 
-import static com.example.diplomski_rad_tv.DescriptionNavigation.getLinkIndexByViewId;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,8 +21,6 @@ import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-
-import org.w3c.dom.Text;
 
 public class DescriptionActivity extends Activity {
     SharedPreferencesService sharedPreferencesService;

@@ -24,7 +24,7 @@ public class SharedPreferencesService {
 
         if (userId == null) return;
 
-        editor.putString(userId, "");
+        editor.putString("userId", userId);
         editor.apply();
     }
 
@@ -37,7 +37,33 @@ public class SharedPreferencesService {
 
         if (estateId == null) return;
 
-        editor.putString(estateId, "");
+        editor.putString("estateId", estateId);
+        editor.apply();
+    }
+
+    public String getCategoryId() {
+        return sharedPreferences.getString("categoryId", "");
+    }
+
+    public void setCategoryId(String categoryId) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        if (categoryId == null) return;
+
+        editor.putString("categoryId", categoryId);
+        editor.apply();
+    }
+
+    public String getElementId() {
+        return sharedPreferences.getString("elementId", "");
+    }
+
+    public void setElementId(String elementId) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        if (elementId == null) return;
+
+        editor.putString("elementId", elementId);
         editor.apply();
     }
 

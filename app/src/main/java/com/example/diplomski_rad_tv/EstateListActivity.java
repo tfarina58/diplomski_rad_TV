@@ -49,6 +49,8 @@ public class EstateListActivity extends Activity {
     int currentPage = 0;
     int totalPages;
     boolean loadingInProgress = true;
+    boolean backgroundAlreadySet = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +87,9 @@ public class EstateListActivity extends Activity {
                         loadingInProgress = false;
                         setupEstatesToShow();
 
-                        currentPage = GridNavigation.getNewPageNumber(currentPage, grid);
+                        currentPage = 0;
                         totalPages = (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+                        backgroundAlreadySet = false;
 
                         setNewContentView();
                     }
@@ -117,13 +120,15 @@ public class EstateListActivity extends Activity {
 
             int newFocusedViewId = GridNavigation.navigateOverActivity(this.grid, oldFocusedViewId, keyCode - 19);
 
-            while (!checkViewExistence(newFocusedViewId) && newFocusedViewId != 0)
-                newFocusedViewId = GridNavigation.navigateOverActivity(this.grid, newFocusedViewId, keyCode - 19);
+            // If navigating up or down
+            if (keyCode == 19 || keyCode == 20)
+                while (!checkViewExistence(newFocusedViewId) && newFocusedViewId != 0)
+                    newFocusedViewId = GridNavigation.navigateOverActivity(this.grid, newFocusedViewId, keyCode - 19);
 
-            if (newFocusedViewId == 0) return false;
+            if (newFocusedViewId == 0 || !checkViewExistence(newFocusedViewId)) return false;
 
             this.focusedView = findViewById(newFocusedViewId);
-            this.focusedView.requestFocus(); // TODO: check if necessary
+            this.focusedView.requestFocus();
 
             // Remove focus from old View
             int row = GridNavigation.getRowWithId(oldFocusedViewId);
@@ -134,17 +139,14 @@ public class EstateListActivity extends Activity {
             updateView(row);
 
             if (newFocusedViewId == R.id.searchView || newFocusedViewId == R.id.pagination) {
-                this.focusedView.requestFocus();
+                // this.focusedView.requestFocus();
                 this.focusedView.callOnClick();
             }
         }
         // Enter button
-        else if (keyCode == 23) {
-            Toast.makeText(getApplicationContext(), "onKeyDown: " + focusedView.getId(), Toast.LENGTH_LONG).show();
-        }
+        else if (keyCode == 23) this.focusedView.callOnClick();
         // else return keyCode != 4;
 
-        // Toast.makeText(getApplicationContext(), Integer.toString(overallIndex) + ", " + Integer.toString(currentIndex) + ", " + Integer.toString(currentPage) + ", " + Integer.toString(totalPages), Toast.LENGTH_SHORT).show();
         return true;
     }
 
@@ -167,144 +169,19 @@ public class EstateListActivity extends Activity {
 
             this.setupMain(getApplicationContext(), main, title, progressBar, centerText);
         } else if (this.grid == GridNavigation.three) {
-            ImageButton imageButton;
-            Button imageBackground;
-            TextView imageTitle;
-            int viewIndex;
+            Estate[] tmpEstates = new Estate[3];
+            for (int i = 0; i < 3; ++i)
+                if (this.currentPage * gridType + i < this.estatesToShow.size())
+                    tmpEstates[i] = this.estates[this.estatesToShow.get(this.currentPage * gridType + i)];
 
-            // Image button 1
-            imageButton = findViewById(R.id.gridButton1);
-            imageBackground = findViewById(R.id.gridButtonBackground1);
-            imageTitle = findViewById(R.id.gridButtonTitle1);
-            viewIndex = this.currentPage * gridType;
-
-            if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
-
-            // Image button 2
-            imageButton = findViewById(R.id.gridButton2);
-            imageBackground = findViewById(R.id.gridButtonBackground2);
-            imageTitle = findViewById(R.id.gridButtonTitle2);
-            viewIndex = this.currentPage * gridType + 1;
-
-            if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
-
-            // Image button 3
-            imageButton = findViewById(R.id.gridButton3);
-            imageBackground = findViewById(R.id.gridButtonBackground3);
-            imageTitle = findViewById(R.id.gridButtonTitle3);
-            viewIndex = this.currentPage * gridType + 2;
-
-            if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
-
-            // Center text
-            TextView centerText = findViewById(R.id.centerText);
-
-            CenterText.setupCenterText(getApplicationContext(), centerText, this.language, this.theme, this.loadingInProgress, this.estatesToShow.size());
-
-            // Background
-            ImageButton background = findViewById(R.id.backgroundGrid3);
-
-            this.setupGridBackground(getApplicationContext(), background, this.theme);
-
-            // Progress bar
-            ProgressBar progressBar = findViewById(R.id.progressBar);
-
-            ProgressBarLoader.manageProgressBar(getApplicationContext(), progressBar, this.theme, this.loadingInProgress);
+            this.setupGrid(getApplicationContext(), this.focusedView, this.language, this.theme, this.loadingInProgress, tmpEstates);
         } else {
-            ImageButton imageButton;
-            Button imageBackground;
-            TextView imageTitle;
-            int viewIndex;
+            Estate[] tmpEstates = new Estate[6];
+            for (int i = 0; i < 6; ++i)
+                if (this.currentPage * gridType + i < this.estatesToShow.size())
+                    tmpEstates[i] = this.estates[this.estatesToShow.get(this.currentPage * gridType + i)];
 
-            // Image button 1
-            imageButton = findViewById(R.id.gridButton1);
-            imageBackground = findViewById(R.id.gridButtonBackground1);
-            imageTitle = findViewById(R.id.gridButtonTitle1);
-            viewIndex = this.currentPage * gridType;
-
-            if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
-
-            // Image button 2
-            imageButton = findViewById(R.id.gridButton2);
-            imageBackground = findViewById(R.id.gridButtonBackground2);
-            imageTitle = findViewById(R.id.gridButtonTitle2);
-            viewIndex = this.currentPage * gridType + 1;
-
-            if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
-
-            // Image button 3
-            imageButton = findViewById(R.id.gridButton3);
-            imageBackground = findViewById(R.id.gridButtonBackground3);
-            imageTitle = findViewById(R.id.gridButtonTitle3);
-            viewIndex = this.currentPage * gridType + 2;
-
-            if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
-
-            // Image button 4
-            imageButton = findViewById(R.id.gridButton4);
-            imageBackground = findViewById(R.id.gridButtonBackground4);
-            imageTitle = findViewById(R.id.gridButtonTitle4);
-            viewIndex = this.currentPage * gridType + 3;
-
-            if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
-
-            // Image button 5
-            imageButton = findViewById(R.id.gridButton5);
-            imageBackground = findViewById(R.id.gridButtonBackground5);
-            imageTitle = findViewById(R.id.gridButtonTitle5);
-            viewIndex = this.currentPage * gridType + 4;
-
-            if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
-
-            // Image button 6
-            imageButton = findViewById(R.id.gridButton6);
-            imageBackground = findViewById(R.id.gridButtonBackground6);
-            imageTitle = findViewById(R.id.gridButtonTitle6);
-            viewIndex = this.currentPage * gridType + 5;
-
-            if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
-
-            // Center text
-            TextView centerText = findViewById(R.id.centerText);
-
-            CenterText.setupCenterText(getApplicationContext(), centerText, this.language, this.theme, this.loadingInProgress, this.estatesToShow.size());
-
-            // Background
-            ImageButton background = findViewById(R.id.backgroundGrid6);
-
-            this.setupGridBackground(getApplicationContext(), background, this.theme);
-
-            // Progress bar
-            ProgressBar progressBar = findViewById(R.id.progressBar);
-
-            ProgressBarLoader.manageProgressBar(getApplicationContext(), progressBar, this.theme, this.loadingInProgress);
+            this.setupGrid(getApplicationContext(), this.focusedView, this.language, this.theme, this.loadingInProgress, tmpEstates);
         }
 
         {
@@ -317,22 +194,18 @@ public class EstateListActivity extends Activity {
 
             LanguageHeaderButton.setupLanguageButton(getApplicationContext(), button, icon, this.focusedView, this.language);
 
-            if (!button.hasOnClickListeners()) {
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        language = language.next();
-                        // focusedView = findViewById(R.id.languageButton);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    language = language.next();
+                    // focusedView = findViewById(R.id.languageButton);
 
-                        Toast.makeText(getApplicationContext(), "Listener: " + Integer.toString(focusedView.getId()), Toast.LENGTH_LONG).show();
-
-                        updateView(0);
-                        updateView(1);
-                        updateView(2);
-                        updateView(4);
-                    }
-                });
-            }
+                    updateView(0);
+                    updateView(1);
+                    updateView(2);
+                    updateView(4);
+                }
+            });
 
             // Theme button
             button = findViewById(R.id.themeButton);
@@ -340,108 +213,106 @@ public class EstateListActivity extends Activity {
 
             ThemeHeaderButton.setupThemeButton(getApplicationContext(), button, icon, this.focusedView, this.language, this.theme);
 
-            if (!button.hasOnClickListeners()) {
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        theme = theme.next();
-                        // focusedView = findViewById(R.id.themeButton);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    theme = theme.next();
+                    // focusedView = findViewById(R.id.themeButton);
 
-                        updateView(1);
-                        if (grid == GridNavigation.three) {
-                            ImageButton background = findViewById(R.id.backgroundGrid3);
+                    updateView(1);
+                    if (grid == GridNavigation.three) {
+                        ImageButton background = findViewById(R.id.backgroundGrid3);
 
-                            setupGridBackground(getApplicationContext(), background, theme);
+                        setupGridBackground(getApplicationContext(), background, theme);
 
-                            ImageButton imageButton;
-                            Button imageBackground;
-                            TextView imageTitle;
-                            int viewIndex;
+                        ImageButton imageButton;
+                        Button imageBackground;
+                        TextView imageTitle;
+                        int viewIndex;
 
-                            imageButton = findViewById(R.id.gridButton1);
-                            imageBackground = findViewById(R.id.gridButtonBackground1);
-                            imageTitle = findViewById(R.id.gridButtonTitle1);
-                            viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid);
+                        imageButton = findViewById(R.id.gridButton1);
+                        imageBackground = findViewById(R.id.gridButtonBackground1);
+                        imageTitle = findViewById(R.id.gridButtonTitle1);
+                        viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid);
 
-                            if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
 
-                            imageButton = findViewById(R.id.gridButton2);
-                            imageBackground = findViewById(R.id.gridButtonBackground2);
-                            imageTitle = findViewById(R.id.gridButtonTitle2);
-                            viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 1;
+                        imageButton = findViewById(R.id.gridButton2);
+                        imageBackground = findViewById(R.id.gridButtonBackground2);
+                        imageTitle = findViewById(R.id.gridButtonTitle2);
+                        viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 1;
 
-                            if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
 
-                            imageButton = findViewById(R.id.gridButton3);
-                            imageBackground = findViewById(R.id.gridButtonBackground3);
-                            imageTitle = findViewById(R.id.gridButtonTitle3);
-                            viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 2;
+                        imageButton = findViewById(R.id.gridButton3);
+                        imageBackground = findViewById(R.id.gridButtonBackground3);
+                        imageTitle = findViewById(R.id.gridButtonTitle3);
+                        viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 2;
 
-                            if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, null);
-                        } else if (grid == GridNavigation.six) {
-                            ImageButton background = findViewById(R.id.backgroundGrid6);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                    } else if (grid == GridNavigation.six) {
+                        ImageButton background = findViewById(R.id.backgroundGrid6);
 
-                            setupGridBackground(getApplicationContext(), background, theme);
+                        setupGridBackground(getApplicationContext(), background, theme);
 
-                            ImageButton imageButton;
-                            Button imageBackground;
-                            TextView imageTitle;
-                            int viewIndex;
+                        ImageButton imageButton;
+                        Button imageBackground;
+                        TextView imageTitle;
+                        int viewIndex;
 
-                            imageButton = findViewById(R.id.gridButton1);
-                            imageBackground = findViewById(R.id.gridButtonBackground1);
-                            imageTitle = findViewById(R.id.gridButtonTitle1);
-                            viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid);
+                        imageButton = findViewById(R.id.gridButton1);
+                        imageBackground = findViewById(R.id.gridButtonBackground1);
+                        imageTitle = findViewById(R.id.gridButtonTitle1);
+                        viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid);
 
-                            if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
 
-                            imageButton = findViewById(R.id.gridButton2);
-                            imageBackground = findViewById(R.id.gridButtonBackground2);
-                            imageTitle = findViewById(R.id.gridButtonTitle2);
-                            viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 1;
+                        imageButton = findViewById(R.id.gridButton2);
+                        imageBackground = findViewById(R.id.gridButtonBackground2);
+                        imageTitle = findViewById(R.id.gridButtonTitle2);
+                        viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 1;
 
-                            if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
 
-                            imageButton = findViewById(R.id.gridButton3);
-                            imageBackground = findViewById(R.id.gridButtonBackground3);
-                            imageTitle = findViewById(R.id.gridButtonTitle3);
-                            viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 2;
+                        imageButton = findViewById(R.id.gridButton3);
+                        imageBackground = findViewById(R.id.gridButtonBackground3);
+                        imageTitle = findViewById(R.id.gridButtonTitle3);
+                        viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 2;
 
-                            if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
 
-                            imageButton = findViewById(R.id.gridButton4);
-                            imageBackground = findViewById(R.id.gridButtonBackground4);
-                            imageTitle = findViewById(R.id.gridButtonTitle4);
-                            viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 3;
+                        imageButton = findViewById(R.id.gridButton4);
+                        imageBackground = findViewById(R.id.gridButtonBackground4);
+                        imageTitle = findViewById(R.id.gridButtonTitle4);
+                        viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 3;
 
-                            if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
 
-                            imageButton = findViewById(R.id.gridButton5);
-                            imageBackground = findViewById(R.id.gridButtonBackground5);
-                            imageTitle = findViewById(R.id.gridButtonTitle5);
-                            viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 4;
+                        imageButton = findViewById(R.id.gridButton5);
+                        imageBackground = findViewById(R.id.gridButtonBackground5);
+                        imageTitle = findViewById(R.id.gridButtonTitle5);
+                        viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 4;
 
-                            if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
 
-                            imageButton = findViewById(R.id.gridButton6);
-                            imageBackground = findViewById(R.id.gridButtonBackground6);
-                            imageTitle = findViewById(R.id.gridButtonTitle6);
-                            viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 5;
+                        imageButton = findViewById(R.id.gridButton6);
+                        imageBackground = findViewById(R.id.gridButtonBackground6);
+                        imageTitle = findViewById(R.id.gridButtonTitle6);
+                        viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 5;
 
-                            if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, null);
-                        } else updateView(6);
-                    }
-                });
-            }
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                    } else updateView(6);
+                }
+            });
 
             // Grid button
             button = findViewById(R.id.gridButton);
@@ -449,20 +320,19 @@ public class EstateListActivity extends Activity {
 
             GridHeaderButton.setupGridButton(getApplicationContext(), button, icon, this.focusedView, this.language);
 
-            if (!button.hasOnClickListeners()) {
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        grid = grid.next();
-                        // focusedView = findViewById(R.id.gridButton);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    grid = grid.next();
+                    // focusedView = findViewById(R.id.gridButton);
 
-                        currentPage = GridNavigation.getNewPageNumber(currentPage, grid);
-                        totalPages = (estatesToShow.size() - 1) / gridType + 1;
+                    currentPage = GridNavigation.getNewPageNumber(currentPage, grid);
+                    totalPages = (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+                    backgroundAlreadySet = false;
 
-                        setNewContentView();
-                    }
-                });
-            }
+                    setNewContentView();
+                }
+            });
         }
 
         {
@@ -471,23 +341,21 @@ public class EstateListActivity extends Activity {
 
             ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
 
-            if (!textClock.hasOnClickListeners()) {
-                textClock.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        format = format.next();
-                        focusedView = findViewById(R.id.textClock);
-                        switch (format) {
-                            case h24:
-                                ((TextClock) focusedView).setFormat12Hour("HH:mm:ss");
-                                break;
-                            case h12:
-                                ((TextClock) focusedView).setFormat12Hour("hh:mm:ss a");
-                                break;
-                        }
+            textClock.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    format = format.next();
+                    focusedView = findViewById(R.id.textClock);
+                    switch (format) {
+                        case h24:
+                            ((TextClock) focusedView).setFormat12Hour("HH:mm:ss");
+                            break;
+                        case h12:
+                            ((TextClock) focusedView).setFormat12Hour("hh:mm:ss a");
+                            break;
                     }
-                });
-            }
+                }
+            });
         }
 
         {
@@ -496,38 +364,35 @@ public class EstateListActivity extends Activity {
 
             setupSearchBarButton(searchbarButton);
 
-            if (!searchbarButton.hasOnClickListeners()) {
-                searchbarButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        if (imm != null) {
-                            imm.showSoftInput(((SearchView) focusedView), InputMethodManager.SHOW_IMPLICIT);
-                        }
+            searchbarButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.showSoftInput(((SearchView) focusedView), InputMethodManager.SHOW_IMPLICIT);
                     }
-                });
+                }
+            });
 
-                searchbarButton.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String query) {
-                        searchbarText = query;
-                        setupEstatesToShow();
+            searchbarButton.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    searchbarText = query;
+                    setupEstatesToShow();
 
-                        currentPage = 0;
-                        totalPages = (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+                    currentPage = 0;
+                    totalPages = (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
 
-                        Toast.makeText(EstateListActivity.this, "searchButton", Toast.LENGTH_SHORT).show();
 
-                        setNewContentView();
-                        return true;
-                    }
+                    setNewContentView();
+                    return true;
+                }
 
-                    @Override
-                    public boolean onQueryTextChange(String s) {
-                        return true;
-                    }
-                });
-            }
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    return true;
+                }
+            });
         }
 
         {
@@ -546,6 +411,7 @@ public class EstateListActivity extends Activity {
                     paginationCurrentPage.setFocusableInTouchMode(true);
                     paginationCurrentPage.requestFocus();
                     // paginationCurrentPage.callOnClick();
+
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     if (imm != null) {
                         imm.showSoftInput(((EditText) paginationCurrentPage), InputMethodManager.SHOW_IMPLICIT);
@@ -588,6 +454,8 @@ public class EstateListActivity extends Activity {
                         }
                         paginationCurrentPage.clearFocus();
                         paginationButton.requestFocus();
+
+                        backgroundAlreadySet = false;
                         setNewContentView();
                         return true; // Return true to indicate that the event has been handled
                     }
@@ -619,7 +487,6 @@ public class EstateListActivity extends Activity {
 
     void setupMain(Context ctx, ImageButton main, TextView titleText, ProgressBar progressBar, TextView centerText) {
         if (main == null || titleText == null) return;
-
 
         if (this.currentPage < this.estatesToShow.size()) {
             this.setupMainBackground(ctx, main, this.focusedView, this.estates[this.estatesToShow.get(this.currentPage)].image, this.theme);
@@ -686,15 +553,20 @@ public class EstateListActivity extends Activity {
         }
 
         // TODO: fix focus border
-        if (imageUrl != null && !imageUrl.isEmpty()) {
-            try {
-                Picasso.get()
-                        .load(imageUrl)
-                        .fit()
-                        .into(main);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (!this.backgroundAlreadySet) {
+            if (imageUrl == null || imageUrl.isEmpty()) main.setImageDrawable(null);
+            else {
+                try {
+                    Picasso.get()
+                            .load(imageUrl)
+                            .fit()
+                            .into(main);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+
+            this.backgroundAlreadySet = true;
         }
     }
 
@@ -712,7 +584,6 @@ public class EstateListActivity extends Activity {
 
         if (focusedView.getId() == R.id.searchView) {
             searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
-            searchbarButton.requestFocus();
         } else
             searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
     }
@@ -756,108 +627,12 @@ public class EstateListActivity extends Activity {
             SearchView searchbarButton = findViewById(R.id.searchView);
 
             this.setupSearchBarButton(searchbarButton);
-
-            if (!searchbarButton.hasOnClickListeners()) {
-                searchbarButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        if (imm != null) {
-                            imm.showSoftInput(((SearchView) focusedView), InputMethodManager.SHOW_IMPLICIT);
-                        }
-                    }
-                });
-
-                searchbarButton.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String query) {
-                        searchbarText = query;
-                        setupEstatesToShow();
-
-                        currentPage = 0;
-                        totalPages = (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
-
-                        Toast.makeText(EstateListActivity.this, "searchButton", Toast.LENGTH_SHORT).show();
-
-                        setNewContentView();
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onQueryTextChange(String s) {
-                        return true;
-                    }
-                });
-            }
         } else if (row == 5) {
             Button paginationButton = findViewById(R.id.pagination);
             EditText paginationCurrentPage = findViewById(R.id.pageNumber);
             TextView paginationTotalPages = findViewById(R.id.totalPagesNumber);
 
             this.setupPaginationButton(paginationButton, paginationCurrentPage, paginationTotalPages);
-
-            paginationButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    paginationCurrentPage.setEnabled(true);
-                    paginationCurrentPage.setFocusable(true);
-                    paginationCurrentPage.setFocusableInTouchMode(true);
-                    paginationCurrentPage.requestFocus();
-                    // paginationCurrentPage.callOnClick();
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (imm != null) {
-                        imm.showSoftInput(((EditText) paginationCurrentPage), InputMethodManager.SHOW_IMPLICIT);
-                    }
-                }
-            });
-
-            paginationCurrentPage.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                        try {
-                            String input = paginationCurrentPage.getText().toString();
-                            int pageIndexNumber = Integer.parseInt(input) - 1;
-                            if (pageIndexNumber < 0 || pageIndexNumber >= totalPages)
-                                throw new Exception();
-                            if (pageIndexNumber != currentPage) {
-                                currentPage = pageIndexNumber;
-                            }
-                        } catch (Exception ex) {
-                            switch (language) {
-                                case german:
-                                    Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.invalid_page_number_de) + " " + totalPages + ".", Toast.LENGTH_LONG).show();
-                                    break;
-                                case croatian:
-                                    Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.invalid_page_number_hr) + " " + totalPages + ".", Toast.LENGTH_LONG).show();
-                                    break;
-                                default:
-                                    Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.invalid_page_number_en) + " " + totalPages + ".", Toast.LENGTH_LONG).show();
-                            }
-                            InputMethodManager imm = (InputMethodManager) paginationCurrentPage.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                            if (imm != null) {
-                                imm.hideSoftInputFromWindow(paginationCurrentPage.getWindowToken(), 0);
-                            }
-
-                            paginationCurrentPage.clearFocus();
-                            paginationButton.requestFocus();
-                            return false;
-                        }
-                        paginationCurrentPage.clearFocus();
-                        paginationButton.requestFocus();
-                        setNewContentView();
-                        return true; // Return true to indicate that the event has been handled
-                    }
-                    InputMethodManager imm = (InputMethodManager) paginationCurrentPage.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (imm != null) {
-                        imm.hideSoftInputFromWindow(paginationCurrentPage.getWindowToken(), 0);
-                    }
-
-                    paginationCurrentPage.clearFocus();
-                    paginationButton.requestFocus();
-                    return false; // Return false to indicate that the event has not been handled
-                }
-            });
         } else if (row == 6 && this.grid == GridNavigation.one) {
             ImageButton main = findViewById(R.id.backgroundGrid1);
             TextView title = findViewById(R.id.gridButtonTitle1);
@@ -876,7 +651,7 @@ public class EstateListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage;
 
             if (viewIndex < this.estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
+            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
         } else if (row == 7) {
             ImageButton imageButton = findViewById(R.id.gridButton2);
             Button imageBackground = findViewById(R.id.gridButtonBackground2);
@@ -886,7 +661,7 @@ public class EstateListActivity extends Activity {
             if (viewIndex < this.estatesToShow.size())
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
         } else if (row == 8) {
             ImageButton imageButton = findViewById(R.id.gridButton3);
             Button imageBackground = findViewById(R.id.gridButtonBackground3);
@@ -896,7 +671,7 @@ public class EstateListActivity extends Activity {
             if (viewIndex < this.estatesToShow.size())
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
         } else if (row == 9) {
             ImageButton imageButton = findViewById(R.id.gridButton4);
             Button imageBackground = findViewById(R.id.gridButtonBackground4);
@@ -906,7 +681,7 @@ public class EstateListActivity extends Activity {
             if (viewIndex < this.estatesToShow.size())
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
         } else if (row == 10) {
             ImageButton imageButton = findViewById(R.id.gridButton5);
             Button imageBackground = findViewById(R.id.gridButtonBackground5);
@@ -916,7 +691,7 @@ public class EstateListActivity extends Activity {
             if (viewIndex < this.estatesToShow.size())
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
         } else if (row == 11) {
             ImageButton imageButton = findViewById(R.id.gridButton6);
             Button imageBackground = findViewById(R.id.gridButtonBackground6);
@@ -926,7 +701,7 @@ public class EstateListActivity extends Activity {
             if (viewIndex < this.estatesToShow.size())
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
         }
     }
 
@@ -938,9 +713,11 @@ public class EstateListActivity extends Activity {
     }
 
     void navigateToCategoryListActivity() {
-        int overallIndex;
         int viewIndex = GridNavigation.getViewIndexAsInt(this.focusedView.getId());
-        overallIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + viewIndex;
+        int overallIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + viewIndex;
+
+        // Happens only when array length == 0
+        if (overallIndex >= this.estatesToShow.size()) return;
 
         String estateId = this.estates[this.estatesToShow.get(overallIndex)].id;
         if (estateId == null || estateId.isEmpty()) return;
@@ -958,12 +735,18 @@ public class EstateListActivity extends Activity {
                 if (focusedViewId == R.id.textClock) return true;
                 if (focusedViewId == R.id.searchView) return true;
                 if (focusedViewId == R.id.pagination) return true;
-                if (focusedViewId == R.id.gridButton1)
-                    return this.estatesToShow.size() > 0 && !this.estates[this.estatesToShow.get(0)].name.isEmpty();
-                if (focusedViewId == R.id.gridButton2)
-                    return this.estatesToShow.size() > 1 && !this.estates[this.estatesToShow.get(1)].name.isEmpty();
-                if (focusedViewId == R.id.gridButton3)
-                    return this.estatesToShow.size() > 2 && !this.estates[this.estatesToShow.get(2)].name.isEmpty();
+                if (focusedViewId == R.id.gridButton1) {
+                    int viewIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid);
+                    return this.estatesToShow.size() > viewIndex && !this.estates[this.estatesToShow.get(viewIndex)].name.isEmpty();
+                }
+                if (focusedViewId == R.id.gridButton2) {
+                    int viewIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + 1;
+                    return this.estatesToShow.size() > viewIndex && !this.estates[this.estatesToShow.get(viewIndex)].name.isEmpty();
+                }
+                if (focusedViewId == R.id.gridButton3) {
+                    int viewIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + 2;
+                    return this.estatesToShow.size() > viewIndex && !this.estates[this.estatesToShow.get(viewIndex)].name.isEmpty();
+                }
                 break;
             case six:
                 if (focusedViewId == R.id.languageButton) return true;
@@ -972,18 +755,30 @@ public class EstateListActivity extends Activity {
                 if (focusedViewId == R.id.textClock) return true;
                 if (focusedViewId == R.id.searchView) return true;
                 if (focusedViewId == R.id.pagination) return true;
-                if (focusedViewId == R.id.gridButton1)
-                    return this.estatesToShow.size() > 0 && !this.estates[this.estatesToShow.get(0)].name.isEmpty();
-                if (focusedViewId == R.id.gridButton2)
-                    return this.estatesToShow.size() > 1 && !this.estates[this.estatesToShow.get(1)].name.isEmpty();
-                if (focusedViewId == R.id.gridButton3)
-                    return this.estatesToShow.size() > 2 && !this.estates[this.estatesToShow.get(2)].name.isEmpty();
-                if (focusedViewId == R.id.gridButton4)
-                    return this.estatesToShow.size() > 3 && !this.estates[this.estatesToShow.get(3)].name.isEmpty();
-                if (focusedViewId == R.id.gridButton5)
-                    return this.estatesToShow.size() > 4 && !this.estates[this.estatesToShow.get(4)].name.isEmpty();
-                if (focusedViewId == R.id.gridButton6)
-                    return this.estatesToShow.size() > 5 && !this.estates[this.estatesToShow.get(5)].name.isEmpty();
+                if (focusedViewId == R.id.gridButton1) {
+                    int viewIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid);
+                    return this.estatesToShow.size() > viewIndex && !this.estates[this.estatesToShow.get(viewIndex)].name.isEmpty();
+                }
+                if (focusedViewId == R.id.gridButton2) {
+                    int viewIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + 1;
+                    return this.estatesToShow.size() > viewIndex && !this.estates[this.estatesToShow.get(viewIndex)].name.isEmpty();
+                }
+                if (focusedViewId == R.id.gridButton3) {
+                    int viewIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + 2;
+                    return this.estatesToShow.size() > viewIndex && !this.estates[this.estatesToShow.get(viewIndex)].name.isEmpty();
+                }
+                if (focusedViewId == R.id.gridButton4) {
+                    int viewIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + 3;
+                    return this.estatesToShow.size() > viewIndex && !this.estates[this.estatesToShow.get(viewIndex)].name.isEmpty();
+                }
+                if (focusedViewId == R.id.gridButton5) {
+                    int viewIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + 4;
+                    return this.estatesToShow.size() > viewIndex && !this.estates[this.estatesToShow.get(viewIndex)].name.isEmpty();
+                }
+                if (focusedViewId == R.id.gridButton6) {
+                    int viewIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + 5;
+                    return this.estatesToShow.size() > viewIndex && !this.estates[this.estatesToShow.get(viewIndex)].name.isEmpty();
+                }
                 break;
             default:
                 if (focusedViewId == R.id.languageButton) return true;
@@ -992,8 +787,10 @@ public class EstateListActivity extends Activity {
                 if (focusedViewId == R.id.textClock) return true;
                 if (focusedViewId == R.id.searchView) return true;
                 if (focusedViewId == R.id.pagination) return true;
-                if (focusedViewId == R.id.backgroundGrid1)
-                    return this.estatesToShow.size() > 0 && !this.estates[this.estatesToShow.get(0)].name.isEmpty();
+                if (focusedViewId == R.id.backgroundGrid1) {
+                    int viewIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid);
+                    return this.estatesToShow.size() > viewIndex && !this.estates[this.estatesToShow.get(viewIndex)].name.isEmpty();
+                }
         }
         return false;
     }
@@ -1004,53 +801,184 @@ public class EstateListActivity extends Activity {
             if (oldFocusedViewId == R.id.backgroundGrid1 || oldFocusedViewId == R.id.gridButton1 || oldFocusedViewId == R.id.gridButton4) {
                 if (this.currentPage > 0) {
                     this.currentPage--;
-                    if (this.grid == GridNavigation.one) this.updateView(6);
-                    else if (this.grid == GridNavigation.three) {
+                    if (this.grid == GridNavigation.one) {
+                        backgroundAlreadySet = false;
+                        this.updateView(6);
+                    } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton3);
                         this.updateView(6);
+                        this.updateView(7);
                         this.updateView(8);
                     } else if (this.grid == GridNavigation.six) {
                         if (GridNavigation.isFirstRow(this.focusedView.getId())) {
                             this.focusedView = findViewById(R.id.gridButton3);
                             this.updateView(6);
+                            this.updateView(7);
                             this.updateView(8);
                         } else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
                             this.focusedView = findViewById(R.id.gridButton6);
                             this.updateView(9);
+                            this.updateView(10);
                             this.updateView(11);
                         }
                     }
                     this.updateView(5);
-                    return true;
                 }
+                return true;
             }
         }
         // Direction right
         else if (direction == 3) {
             if (oldFocusedViewId == R.id.backgroundGrid1 || oldFocusedViewId == R.id.gridButton3 || oldFocusedViewId == R.id.gridButton6) {
-                if (this.currentPage < this.estatesToShow.size() - 1) {
+                if (this.currentPage < this.totalPages - 1) {
                     this.currentPage++;
-                    if (this.grid == GridNavigation.one) this.updateView(6);
-                    else if (this.grid == GridNavigation.three) {
+                    if (this.grid == GridNavigation.one) {
+                        backgroundAlreadySet = false;
+                        this.updateView(6);
+                    } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton1);
                         this.updateView(6);
+                        this.updateView(7);
                         this.updateView(8);
                     } else if (this.grid == GridNavigation.six) {
-                        if (GridNavigation.isFirstRow(this.focusedView.getId())) {
+                        if (GridNavigation.isFirstRow(this.focusedView.getId()))
                             this.focusedView = findViewById(R.id.gridButton1);
-                            this.updateView(6);
-                            this.updateView(8);
-                        } else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
+                        else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
                             this.focusedView = findViewById(R.id.gridButton4);
+
+                            this.updateView(6);
+                            this.updateView(7);
+                            this.updateView(8);
+
                             this.updateView(9);
+                            this.updateView(10);
                             this.updateView(11);
                         }
                     }
                     this.updateView(5);
-                    return true;
                 }
+                return true;
             }
         }
         return false;
+    }
+
+    void setupGrid(Context ctx, View focusedView, Language language, Theme theme, boolean loadingInProgress, Estate[] estates) {
+        ImageButton imageButton;
+        Button imageBackground;
+        TextView imageTitle;
+
+        // Image button 1
+        imageButton = findViewById(R.id.gridButton1);
+        imageBackground = findViewById(R.id.gridButtonBackground1);
+        imageTitle = findViewById(R.id.gridButtonTitle1);
+
+        if (0 < estates.length && estates[0] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, estates[0]);
+
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    navigateToCategoryListActivity();
+                }
+            });
+        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+
+        // Image button 2
+        imageButton = findViewById(R.id.gridButton2);
+        imageBackground = findViewById(R.id.gridButtonBackground2);
+        imageTitle = findViewById(R.id.gridButtonTitle2);
+
+        if (1 < estates.length && estates[1] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, estates[1]);
+
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    navigateToCategoryListActivity();
+                }
+            });
+        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+
+        // Image button 3
+        imageButton = findViewById(R.id.gridButton3);
+        imageBackground = findViewById(R.id.gridButtonBackground3);
+        imageTitle = findViewById(R.id.gridButtonTitle3);
+
+        if (2 < estates.length && estates[2] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, estates[2]);
+
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    navigateToCategoryListActivity();
+                }
+            });
+        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+
+        // Image button 4
+        imageButton = findViewById(R.id.gridButton4);
+        imageBackground = findViewById(R.id.gridButtonBackground4);
+        imageTitle = findViewById(R.id.gridButtonTitle4);
+
+        if (3 < estates.length && estates[3] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[3]);
+
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    navigateToCategoryListActivity();
+                }
+            });
+        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+
+        // Image button 5
+        imageButton = findViewById(R.id.gridButton5);
+        imageBackground = findViewById(R.id.gridButtonBackground5);
+        imageTitle = findViewById(R.id.gridButtonTitle5);
+
+        if (4 < estates.length && estates[4] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[4]);
+
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    navigateToCategoryListActivity();
+                }
+            });
+        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+
+        // Image button 6
+        imageButton = findViewById(R.id.gridButton6);
+        imageBackground = findViewById(R.id.gridButtonBackground6);
+        imageTitle = findViewById(R.id.gridButtonTitle6);
+
+        if (5 < estates.length && estates[5] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[5]);
+
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    navigateToCategoryListActivity();
+                }
+            });
+        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+
+        // Center text
+        TextView centerText = findViewById(R.id.centerText);
+
+        CenterText.setupCenterText(ctx, centerText, language, theme, loadingInProgress, estates.length);
+
+        // Background
+        ImageButton background = null;
+        if (grid == GridNavigation.three) background = findViewById(R.id.backgroundGrid3);
+        else if (grid == GridNavigation.six) background = findViewById(R.id.backgroundGrid6);
+
+        this.setupGridBackground(ctx, background, theme);
+
+        // Progress bar
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+
+        ProgressBarLoader.manageProgressBar(ctx, progressBar, theme, loadingInProgress);
     }
 }
