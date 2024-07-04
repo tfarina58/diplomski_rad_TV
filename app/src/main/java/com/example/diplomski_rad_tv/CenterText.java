@@ -15,7 +15,7 @@ public class CenterText {
             centerText.setText(ContextCompat.getString(ctx, R.string.empty_string));
             centerText.setTextColor(ContextCompat.getColor(ctx, R.color.transparent));
         } else if (estatesToShowSize == 0) {
-            centerText.setVisibility(View.INVISIBLE);
+            centerText.setVisibility(View.VISIBLE);
 
             switch (language) {
                 case german:

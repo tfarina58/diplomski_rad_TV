@@ -83,7 +83,7 @@ public class CategoryListActivity extends Activity {
                         setupCategoriesToShow();
 
                         currentPage = 0;
-                        totalPages = (categoriesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+                        totalPages = categoriesToShow.size() == 0 ? 0 : (categoriesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
                         backgroundAlreadySet = false;
 
                         setNewContentView();
@@ -134,14 +134,15 @@ public class CategoryListActivity extends Activity {
             updateView(row);
 
             if (newFocusedViewId == R.id.searchView || newFocusedViewId == R.id.pagination) {
-                // this.focusedView.requestFocus();
                 this.focusedView.callOnClick();
             }
+        } else if (keyCode == 4) {
+            // TODO: Create popup to ask for password
         }
         // Enter button
         else if (keyCode == 23) this.focusedView.callOnClick();
 
-        return keyCode != 4;
+        return true;
     }
 
     void setNewContentView() {
@@ -192,7 +193,22 @@ public class CategoryListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     language = language.next();
-                    // focusedView = findViewById(R.id.languageButton);
+                    sharedPreferencesService.setLanguage(language);
+
+                    if (grid == GridNavigation.one) {
+                        TextView titleText = findViewById(R.id.gridButtonTitle1);
+                        if (currentPage < categoriesToShow.size()) {
+                            setMainTitle(getApplicationContext(), titleText, categories[categoriesToShow.get(currentPage)].title, language, theme, loadingInProgress, categoriesToShow.size(), currentPage);
+                        } else {
+                            setMainTitle(getApplicationContext(), titleText, "", language, theme, loadingInProgress, categoriesToShow.size(), currentPage);
+                        }
+                    }
+
+                    TextView centerText = findViewById(R.id.centerText);
+                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, categoriesToShow.size());
+
+                    SearchView searchbarButton = findViewById(R.id.searchView);
+                    setupSearchBarButton(getApplicationContext(), searchbarButton, searchbarText, language);
 
                     updateView(0);
                     updateView(1);
@@ -211,9 +227,13 @@ public class CategoryListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     theme = theme.next();
-                    // focusedView = findViewById(R.id.themeButton);
+                    sharedPreferencesService.setTheme(theme);
 
                     updateView(1);
+
+                    TextView centerText = findViewById(R.id.centerText);
+                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, categoriesToShow.size());
+
                     if (grid == GridNavigation.three) {
                         ImageButton background = findViewById(R.id.backgroundGrid3);
 
@@ -318,10 +338,10 @@ public class CategoryListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     grid = grid.next();
-                    // focusedView = findViewById(R.id.gridButton);
+                    sharedPreferencesService.setGrid(grid);
 
                     currentPage = GridNavigation.getNewPageNumber(currentPage, grid);
-                    totalPages = (categoriesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+                    totalPages = categoriesToShow.size() == 0 ? 0 :(categoriesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
                     backgroundAlreadySet = false;
 
                     setNewContentView();
@@ -339,7 +359,8 @@ public class CategoryListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     format = format.next();
-                    focusedView = findViewById(R.id.textClock);
+                    sharedPreferencesService.setClockFormat(format);
+
                     switch (format) {
                         case h24:
                             ((TextClock) focusedView).setFormat12Hour("HH:mm:ss");
@@ -356,7 +377,7 @@ public class CategoryListActivity extends Activity {
             // Searchbar button
             SearchView searchbarButton = findViewById(R.id.searchView);
 
-            setupSearchBarButton(searchbarButton);
+            this.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.language);
 
             searchbarButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -375,7 +396,7 @@ public class CategoryListActivity extends Activity {
                     setupCategoriesToShow();
 
                     currentPage = 0;
-                    totalPages = (categoriesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+                    totalPages = categoriesToShow.size() == 0 ? 0 : (categoriesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
 
 
                     setNewContentView();
@@ -571,15 +592,25 @@ public class CategoryListActivity extends Activity {
         else background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
     }
 
-    void setupSearchBarButton(SearchView searchbarButton) {
+    void setupSearchBarButton(Context ctx, SearchView searchbarButton, String searchbarText, Language language) {
         if (searchbarButton == null) return;
 
-        searchbarButton.setQuery(searchbarText, false);
+        if (!searchbarText.isEmpty()) searchbarButton.setQuery(searchbarText, false);
+        else {
+            switch (language) {
+                case german:
+                    searchbarButton.setQueryHint(ContextCompat.getString(ctx, R.string.search_de));
+                    break;
+                case croatian:
+                    searchbarButton.setQueryHint(ContextCompat.getString(ctx, R.string.search_hr));
+                    break;
+                default:
+                    searchbarButton.setQueryHint(ContextCompat.getString(ctx, R.string.search_en));
+            }
+        }
 
-        if (focusedView.getId() == R.id.searchView) {
-            searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
-        } else
-            searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
+        if (focusedView.getId() == R.id.searchView) searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
+        else searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
     }
 
     void setupPaginationButton(Button paginationButton, EditText paginationCurrentPage, TextView paginationTotalPages) {
@@ -620,7 +651,7 @@ public class CategoryListActivity extends Activity {
         } else if (row == 4) {
             SearchView searchbarButton = findViewById(R.id.searchView);
 
-            this.setupSearchBarButton(searchbarButton);
+            this.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.language);
         } else if (row == 5) {
             Button paginationButton = findViewById(R.id.pagination);
             EditText paginationCurrentPage = findViewById(R.id.pageNumber);
@@ -961,7 +992,7 @@ public class CategoryListActivity extends Activity {
         // Center text
         TextView centerText = findViewById(R.id.centerText);
 
-        CenterText.setupCenterText(ctx, centerText, language, theme, loadingInProgress, categories.length);
+        CenterText.setupCenterText(ctx, centerText, language, theme, loadingInProgress, categoriesToShow.size());
 
         // Background
         ImageButton background = null;

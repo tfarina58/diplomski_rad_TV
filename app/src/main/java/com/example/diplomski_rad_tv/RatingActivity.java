@@ -130,25 +130,24 @@ public class RatingActivity extends Activity {
                 ImageView languageIcon = findViewById(R.id.languageIcon);
                 LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
 
-                if (!languageButton.hasOnClickListeners()) {
-                    languageButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            language = language.next();
+                languageButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        language = language.next();
+                        sharedPreferencesService.setLanguage(language);
 
-                            {
-                                TextView titleView = findViewById(R.id.ratingTitle);
-                                setupTitle(getApplicationContext(), titleView, language, theme);
-                            }
-
-                            updateView(0);
-                            updateView(1);
-                            updateView(3);
-                            updateView(5);
-                            updateView(6);
+                        {
+                            TextView titleView = findViewById(R.id.ratingTitle);
+                            setupTitle(getApplicationContext(), titleView, language, theme);
                         }
-                    });
-                }
+
+                        updateView(0);
+                        updateView(1);
+                        updateView(3);
+                        updateView(5);
+                        updateView(6);
+                    }
+                });
                 break;
             case 1:
                 Button themeButton = findViewById(R.id.themeButton);
@@ -160,6 +159,7 @@ public class RatingActivity extends Activity {
                         @Override
                         public void onClick(View view) {
                             theme = theme.next();
+                            sharedPreferencesService.setTheme(theme);
 
                             {
                                 ConstraintLayout background = findViewById(R.id.main);
@@ -181,17 +181,16 @@ public class RatingActivity extends Activity {
                 TextClock textClock = findViewById(R.id.textClock);
                 ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
 
-                if (!textClock.hasOnClickListeners()) {
-                    textClock.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            format = format.next();
+                textClock.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        format = format.next();
+                        sharedPreferencesService.setClockFormat(format);
 
-                            if (Objects.requireNonNull(format) == Clock.h12) ((TextClock) focusedView).setFormat12Hour("hh:mm:ss a");
-                            else ((TextClock) focusedView).setFormat12Hour("HH:mm:ss");
-                        }
-                    });
-                }
+                        if (Objects.requireNonNull(format) == Clock.h12) ((TextClock) focusedView).setFormat12Hour("hh:mm:ss a");
+                        else ((TextClock) focusedView).setFormat12Hour("HH:mm:ss");
+                    }
+                });
                 break;
             case 3:
                 EditText ratingContent = findViewById(R.id.ratingContent);

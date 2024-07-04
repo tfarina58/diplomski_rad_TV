@@ -88,7 +88,7 @@ public class EstateListActivity extends Activity {
                         setupEstatesToShow();
 
                         currentPage = 0;
-                        totalPages = (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+                        totalPages = estatesToShow.size() == 0 ? 0 : (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
                         backgroundAlreadySet = false;
 
                         setNewContentView();
@@ -198,7 +198,22 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     language = language.next();
-                    // focusedView = findViewById(R.id.languageButton);
+                    sharedPreferencesService.setLanguage(language);
+
+                    if (grid == GridNavigation.one) {
+                        TextView titleText = findViewById(R.id.gridButtonTitle1);
+                        if (currentPage < estatesToShow.size()) {
+                            setMainTitle(getApplicationContext(), titleText, estates[estatesToShow.get(currentPage)].name, language, theme, loadingInProgress, estatesToShow.size(), currentPage);
+                        } else {
+                            setMainTitle(getApplicationContext(), titleText, "", language, theme, loadingInProgress, estatesToShow.size(), currentPage);
+                        }
+                    }
+
+                    TextView centerText = findViewById(R.id.centerText);
+                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, estatesToShow.size());
+
+                    SearchView searchbarButton = findViewById(R.id.searchView);
+                    setupSearchBarButton(getApplicationContext(), searchbarButton, searchbarText, language);
 
                     updateView(0);
                     updateView(1);
@@ -217,9 +232,13 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     theme = theme.next();
-                    // focusedView = findViewById(R.id.themeButton);
+                    sharedPreferencesService.setTheme(theme);
 
                     updateView(1);
+
+                    TextView centerText = findViewById(R.id.centerText);
+                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, estatesToShow.size());
+
                     if (grid == GridNavigation.three) {
                         ImageButton background = findViewById(R.id.backgroundGrid3);
 
@@ -324,10 +343,10 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     grid = grid.next();
-                    // focusedView = findViewById(R.id.gridButton);
+                    sharedPreferencesService.setGrid(grid);
 
                     currentPage = GridNavigation.getNewPageNumber(currentPage, grid);
-                    totalPages = (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+                    totalPages = estatesToShow.size() == 0 ? 0 : (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
                     backgroundAlreadySet = false;
 
                     setNewContentView();
@@ -345,7 +364,8 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     format = format.next();
-                    focusedView = findViewById(R.id.textClock);
+                    sharedPreferencesService.setClockFormat(format);
+
                     switch (format) {
                         case h24:
                             ((TextClock) focusedView).setFormat12Hour("HH:mm:ss");
@@ -362,7 +382,7 @@ public class EstateListActivity extends Activity {
             // Searchbar button
             SearchView searchbarButton = findViewById(R.id.searchView);
 
-            setupSearchBarButton(searchbarButton);
+            this.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.language);
 
             searchbarButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -381,7 +401,7 @@ public class EstateListActivity extends Activity {
                     setupEstatesToShow();
 
                     currentPage = 0;
-                    totalPages = (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+                    totalPages = estatesToShow.size() == 0 ? 0 : (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
 
 
                     setNewContentView();
@@ -577,15 +597,25 @@ public class EstateListActivity extends Activity {
         else background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
     }
 
-    void setupSearchBarButton(SearchView searchbarButton) {
+    void setupSearchBarButton(Context ctx, SearchView searchbarButton, String searchbarText, Language language) {
         if (searchbarButton == null) return;
 
-        searchbarButton.setQuery(searchbarText, false);
+        if (!searchbarText.isEmpty()) searchbarButton.setQuery(searchbarText, false);
+        else {
+            switch (language) {
+                case german:
+                    searchbarButton.setQueryHint(ContextCompat.getString(ctx, R.string.search_de));
+                    break;
+                case croatian:
+                    searchbarButton.setQueryHint(ContextCompat.getString(ctx, R.string.search_hr));
+                    break;
+                default:
+                    searchbarButton.setQueryHint(ContextCompat.getString(ctx, R.string.search_en));
+            }
+        }
 
-        if (focusedView.getId() == R.id.searchView) {
-            searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
-        } else
-            searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
+        if (focusedView.getId() == R.id.searchView) searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
+        else searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
     }
 
     void setupPaginationButton(Button paginationButton, EditText paginationCurrentPage, TextView paginationTotalPages) {
@@ -626,7 +656,7 @@ public class EstateListActivity extends Activity {
         } else if (row == 4) {
             SearchView searchbarButton = findViewById(R.id.searchView);
 
-            this.setupSearchBarButton(searchbarButton);
+            this.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.language);
         } else if (row == 5) {
             Button paginationButton = findViewById(R.id.pagination);
             EditText paginationCurrentPage = findViewById(R.id.pageNumber);
@@ -967,7 +997,7 @@ public class EstateListActivity extends Activity {
         // Center text
         TextView centerText = findViewById(R.id.centerText);
 
-        CenterText.setupCenterText(ctx, centerText, language, theme, loadingInProgress, estates.length);
+        CenterText.setupCenterText(ctx, centerText, language, theme, loadingInProgress, estatesToShow.size());
 
         // Background
         ImageButton background = null;

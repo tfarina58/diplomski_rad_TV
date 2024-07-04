@@ -39,7 +39,7 @@ public class GridImageButton {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } // TODO: else set color when no image can be displayed
+        }
     }
 
     public static void setupImageButton(Context ctx, ImageButton imageButton, Button imageBackground, TextView imageTitle, View focusedView, Theme theme, Category category) {
@@ -70,7 +70,7 @@ public class GridImageButton {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } // TODO: else set color when no image can be displayed
+        }
     }
 
     public static void setupImageButton(Context ctx, ImageButton imageButton, Button imageBackground, TextView imageTitle, View focusedView, Theme theme, Element element) {
@@ -101,6 +101,6 @@ public class GridImageButton {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } // TODO: else set color when no image can be displayed
+        }
     }
 }

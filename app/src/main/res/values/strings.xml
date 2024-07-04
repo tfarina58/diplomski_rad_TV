@@ -108,5 +108,9 @@
     <string name="cannot_download_rating_de">Beim Herunterladen der vorherigen Bewertung ist ein Fehler aufgetreten.</string>
     <string name="cannot_download_rating_hr">Došlo je do pogreške prilikom preuzimanja prethodnih ocjene.</string>
 
+    <string name="search_en">Search...</string>
+    <string name="search_de">Suchen...</string>
+    <string name="search_hr">Traži...</string>
+
     <string name="empty_string"> </string>
 </resources>
