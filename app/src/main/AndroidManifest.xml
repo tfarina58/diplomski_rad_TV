@@ -15,7 +15,7 @@
         android:theme="@android:style/Theme.DeviceDefault">
 
         <activity
-            android:name=".EstateListActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
@@ -30,11 +30,11 @@
             android:exported="false"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".CategoryListActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".CategoryListActivity"
+            android:name=".EstateListActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity

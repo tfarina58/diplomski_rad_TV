@@ -178,6 +178,7 @@ public class DescriptionActivity extends Activity {
 
             this.scrollToCenterView(scrollView, this.focusedView);
         } else if (keyCode == 4) {
+            sharedPreferencesService.setElementId("");
             startActivity(new Intent(getApplicationContext(), ElementListActivity.class));
         }
         return true;

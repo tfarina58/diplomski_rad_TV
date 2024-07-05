@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -20,17 +21,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class CategoryListActivity extends Activity {
     String estateId;
@@ -43,11 +51,13 @@ public class CategoryListActivity extends Activity {
     GridNavigation grid;
     Clock format;
     View focusedView;
+    View layoutFocusedView;
     String searchbarText = "";
     int currentPage = 0;
     int totalPages;
     boolean loadingInProgress = true;
     boolean backgroundAlreadySet = false;
+    boolean focusOnLayout = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,9 +117,52 @@ public class CategoryListActivity extends Activity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // super.onKeyDown(keyCode, event);
-        int oldFocusedViewId = this.focusedView.getId();
 
         // Up, down, left, right navigation button
+        if (this.focusOnLayout) {
+            int oldFocusedViewId = this.layoutFocusedView.getId();
+
+            if (keyCode >= 19 && keyCode <= 22) {
+                int newFocusedViewId = EnterPasswordLayoutNavigation.navigateOverActivity(oldFocusedViewId, keyCode - 19);
+
+                if (newFocusedViewId == 0) return true;
+
+                this.layoutFocusedView = findViewById(newFocusedViewId);
+                this.layoutFocusedView.requestFocus();
+
+                // Remove focus from old View
+                int row = EnterPasswordLayoutNavigation.getRowWithId(oldFocusedViewId);
+                updateLayoutView(row);
+
+                // Add focus to new View
+                row = EnterPasswordLayoutNavigation.getRowWithId(newFocusedViewId);
+                updateLayoutView(row);
+
+            } else if (keyCode == 4) {
+                FrameLayout enterPasswordLayout = findViewById(R.id.enterPasswordLayout);
+                ConstraintLayout background = findViewById(R.id.main);
+                TextView enterPasswordTitle = findViewById(R.id.enterPasswordTitle);
+                EditText passwordField = findViewById(R.id.password);
+                TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
+                Button cancelButton = findViewById(R.id.cancelButton);
+                Button submitButton = findViewById(R.id.submitButton);
+
+                this.focusOnLayout = false;
+                this.layoutFocusedView = null;
+                this.focusedView.requestFocus();
+
+                this.setupPasswordLayout(getApplicationContext(), enterPasswordLayout, background, enterPasswordTitle, passwordField, passwordFieldTitle, cancelButton, submitButton, this.focusOnLayout, this.layoutFocusedView, this.language, this.theme);
+            }
+            // Enter button
+            else if (keyCode == 23) this.layoutFocusedView.callOnClick();
+
+            return true;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        int oldFocusedViewId = this.focusedView.getId();
+
         if (keyCode >= 19 && keyCode <= 22) {
             if (specialCaseNavigation(oldFocusedViewId, keyCode - 19)) return true;
 
@@ -137,7 +190,19 @@ public class CategoryListActivity extends Activity {
                 this.focusedView.callOnClick();
             }
         } else if (keyCode == 4) {
-            // TODO: Create popup to ask for password
+            FrameLayout enterPasswordLayout = findViewById(R.id.enterPasswordLayout);
+            ConstraintLayout background = findViewById(R.id.main);
+            TextView enterPasswordTitle = findViewById(R.id.enterPasswordTitle);
+            EditText passwordField = findViewById(R.id.password);
+            TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
+            Button cancelButton = findViewById(R.id.cancelButton);
+            Button submitButton = findViewById(R.id.submitButton);
+
+            this.focusOnLayout = true;
+            this.layoutFocusedView = findViewById(R.id.password);
+            this.layoutFocusedView.requestFocus();
+
+            this.setupPasswordLayout(getApplicationContext(), enterPasswordLayout, background, enterPasswordTitle, passwordField, passwordFieldTitle, cancelButton, submitButton, this.focusOnLayout, this.layoutFocusedView, this.language, this.theme);
         }
         // Enter button
         else if (keyCode == 23) this.focusedView.callOnClick();
@@ -485,6 +550,16 @@ public class CategoryListActivity extends Activity {
                 }
             });
         }
+
+        FrameLayout enterPasswordLayout = findViewById(R.id.enterPasswordLayout);
+        ConstraintLayout background = findViewById(R.id.main);
+        TextView enterPasswordTitle = findViewById(R.id.enterPasswordTitle);
+        EditText passwordField = findViewById(R.id.password);
+        TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
+        Button cancelButton = findViewById(R.id.cancelButton);
+        Button submitButton = findViewById(R.id.submitButton);
+
+        this.setupPasswordLayout(getApplicationContext(), enterPasswordLayout, background, enterPasswordTitle, passwordField, passwordFieldTitle, cancelButton, submitButton, this.focusOnLayout, this.layoutFocusedView, this.language, this.theme);
     }
 
     void setContentView() {
@@ -727,6 +802,27 @@ public class CategoryListActivity extends Activity {
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
             else
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Category) null);
+        }
+    }
+
+    public void updateLayoutView(int row) {
+        switch (row) {
+            case 0:
+                EditText passwordField = findViewById(R.id.password);
+                TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
+
+                EnterPasswordLayout.setupPasswordField(getApplicationContext(), passwordField, passwordFieldTitle, this.layoutFocusedView, this.language, this.theme);
+                break;
+            case 1:
+                Button cancelButton = findViewById(R.id.cancelButton);
+
+                EnterPasswordLayout.setupCancelButton(getApplicationContext(), cancelButton, this.layoutFocusedView, this.language);
+                break;
+            case 2:
+                Button submitButton = findViewById(R.id.submitButton);
+
+                EnterPasswordLayout.setupSubmitButton(getApplicationContext(), submitButton, this.layoutFocusedView, this.language);
+                break;
         }
     }
 
@@ -1005,5 +1101,74 @@ public class CategoryListActivity extends Activity {
         ProgressBar progressBar = findViewById(R.id.progressBar);
 
         ProgressBarLoader.manageProgressBar(ctx, progressBar, theme, loadingInProgress);
+    }
+
+    void checkPasswordMatching(String password) {
+        if (password == null || password.isEmpty()) return;
+
+        DocumentReference query = firestore.collection("users").document(sharedPreferencesService.getUserId());
+
+        query.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
+                        String firestorePassword = queryDocumentSnapshots.getString("password");
+                        // if (!password.equals(firestorePassword)) return;
+                        if (!"password".equals(firestorePassword)) return; // TODO: remove predefined value
+
+                        FrameLayout enterPasswordLayout = findViewById(R.id.enterPasswordLayout);
+                        enterPasswordLayout.setVisibility(View.INVISIBLE);
+                        focusOnLayout = false;
+
+                        sharedPreferencesService.setEstateId("");
+                        startActivity(new Intent(getApplicationContext(), EstateListActivity.class));
+                    }
+                });
+    }
+
+    void setupPasswordLayout(Context ctx, FrameLayout enterPasswordLayout, ConstraintLayout background, TextView enterPasswordTitle, EditText passwordField, TextView passwordFieldTitle, Button cancelButton, Button submitButton, boolean visible, View layoutFocusedView, Language language, Theme theme) {
+        if (enterPasswordLayout == null || background == null || enterPasswordTitle == null || passwordField == null || passwordFieldTitle == null || cancelButton == null || submitButton == null) return;
+
+        if (!visible) {
+            enterPasswordLayout.setVisibility(View.INVISIBLE);
+            return;
+        }
+        enterPasswordLayout.setVisibility(View.VISIBLE);
+
+        EnterPasswordLayout.setupLayoutTitle(ctx, enterPasswordTitle, language, theme);
+        EnterPasswordLayout.setupLayoutBackground(ctx, background, theme);
+        EnterPasswordLayout.setupPasswordField(ctx, passwordField, passwordFieldTitle, layoutFocusedView, language, theme);
+        EnterPasswordLayout.setupCancelButton(ctx, cancelButton, layoutFocusedView, language);
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FrameLayout enterPasswordLayout = findViewById(R.id.enterPasswordLayout);
+                ConstraintLayout background = findViewById(R.id.main);
+                TextView enterPasswordTitle = findViewById(R.id.enterPasswordTitle);
+                EditText passwordField = findViewById(R.id.password);
+                TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
+                Button cancelButton = findViewById(R.id.cancelButton);
+                Button submitButton = findViewById(R.id.submitButton);
+
+                focusOnLayout = false;
+                focusedView.requestFocus();
+
+                setupPasswordLayout(getApplicationContext(), enterPasswordLayout, background, enterPasswordTitle, passwordField, passwordFieldTitle, cancelButton, submitButton, focusOnLayout, layoutFocusedView, language, theme);
+            }
+        });
+
+        EnterPasswordLayout.setupSubmitButton(getApplicationContext(), submitButton, layoutFocusedView, language);
+
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText passwordField = findViewById(R.id.password);
+                if (passwordField == null) return;
+
+                String password = passwordField.getText().toString();
+                checkPasswordMatching(password);
+            }
+        });
     }
 }

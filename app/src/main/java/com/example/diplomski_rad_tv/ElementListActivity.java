@@ -143,6 +143,7 @@ public class ElementListActivity extends Activity {
                 this.focusedView.callOnClick();
             }
         } else if (keyCode == 4) {
+            sharedPreferencesService.setCategoryId("");
             startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
         }
         // Enter button

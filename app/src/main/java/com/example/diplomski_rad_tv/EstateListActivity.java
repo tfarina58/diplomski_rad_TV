@@ -145,7 +145,10 @@ public class EstateListActivity extends Activity {
         }
         // Enter button
         else if (keyCode == 23) this.focusedView.callOnClick();
-        // else return keyCode != 4;
+        else if (keyCode == 4) {
+            this.sharedPreferencesService.setUserId("");
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }
 
         return true;
     }

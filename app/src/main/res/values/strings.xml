@@ -112,5 +112,15 @@
     <string name="search_de">Suchen...</string>
     <string name="search_hr">Traži...</string>
 
+    <string name="enter_password_en">Enter password</string>
+    <string name="enter_password_de">Passwort eingeben</string>
+    <string name="enter_password_hr">Upišite lozinku</string>
+
+    <string name="submit_password_en">Submit password</string>
+    <string name="submit_password_de">Passwort einreichen</string>
+    <string name="submit_password_hr">Pošalji lozinku</string>
+
     <string name="empty_string"> </string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
