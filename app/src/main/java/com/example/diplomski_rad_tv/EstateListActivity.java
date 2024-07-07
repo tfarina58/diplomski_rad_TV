@@ -213,7 +213,7 @@ public class EstateListActivity extends Activity {
                     }
 
                     TextView centerText = findViewById(R.id.centerText);
-                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, estatesToShow.size());
+                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, estatesToShow.size(), "estates");
 
                     SearchView searchbarButton = findViewById(R.id.searchView);
                     setupSearchBarButton(getApplicationContext(), searchbarButton, searchbarText, language);
@@ -240,7 +240,7 @@ public class EstateListActivity extends Activity {
                     updateView(1);
 
                     TextView centerText = findViewById(R.id.centerText);
-                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, estatesToShow.size());
+                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, estatesToShow.size(), "estates");
 
                     if (grid == GridNavigation.three) {
                         ImageButton background = findViewById(R.id.backgroundGrid3);
@@ -520,7 +520,7 @@ public class EstateListActivity extends Activity {
         }
 
         ProgressBarLoader.manageProgressBar(ctx, progressBar, this.theme, this.loadingInProgress);
-        CenterText.setupCenterText(ctx, centerText, this.language, this.theme, this.loadingInProgress, this.estatesToShow.size());
+        CenterText.setupCenterText(ctx, centerText, this.language, this.theme, this.loadingInProgress, this.estatesToShow.size(), "estates");
 
         main.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1000,7 +1000,7 @@ public class EstateListActivity extends Activity {
         // Center text
         TextView centerText = findViewById(R.id.centerText);
 
-        CenterText.setupCenterText(ctx, centerText, language, theme, loadingInProgress, estatesToShow.size());
+        CenterText.setupCenterText(ctx, centerText, language, theme, loadingInProgress, estatesToShow.size(), "estates");
 
         // Background
         ImageButton background = null;

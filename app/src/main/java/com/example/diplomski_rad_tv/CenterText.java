@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 public class CenterText {
-    public static void setupCenterText(Context ctx, TextView centerText, Language language, Theme theme, boolean loadingInProgress, int estatesToShowSize) {
+    public static void setupCenterText(Context ctx, TextView centerText, Language language, Theme theme, boolean loadingInProgress, int estatesToShowSize, String activity) {
         if (centerText == null) return;
 
         if (loadingInProgress || estatesToShowSize > 0) {
@@ -17,15 +17,43 @@ public class CenterText {
         } else if (estatesToShowSize == 0) {
             centerText.setVisibility(View.VISIBLE);
 
-            switch (language) {
-                case german:
-                    centerText.setText(ContextCompat.getString(ctx, R.string.no_estates_de));
+            switch (activity) {
+                case "estates":
+                    switch (language) {
+                        case german:
+                            centerText.setText(ContextCompat.getString(ctx, R.string.no_estates_de));
+                            break;
+                        case croatian:
+                            centerText.setText(ContextCompat.getString(ctx, R.string.no_estates_hr));
+                            break;
+                        default:
+                            centerText.setText(ContextCompat.getString(ctx, R.string.no_estates_en));
+                    }
                     break;
-                case croatian:
-                    centerText.setText(ContextCompat.getString(ctx, R.string.no_estates_hr));
+                case "categories":
+                    switch (language) {
+                        case german:
+                            centerText.setText(ContextCompat.getString(ctx, R.string.no_categories_de));
+                            break;
+                        case croatian:
+                            centerText.setText(ContextCompat.getString(ctx, R.string.no_categories_hr));
+                            break;
+                        default:
+                            centerText.setText(ContextCompat.getString(ctx, R.string.no_categories_en));
+                    }
                     break;
-                default:
-                    centerText.setText(ContextCompat.getString(ctx, R.string.no_estates_en));
+                case "elements":
+                    switch (language) {
+                        case german:
+                            centerText.setText(ContextCompat.getString(ctx, R.string.no_elements_de));
+                            break;
+                        case croatian:
+                            centerText.setText(ContextCompat.getString(ctx, R.string.no_elements_hr));
+                            break;
+                        default:
+                            centerText.setText(ContextCompat.getString(ctx, R.string.no_elements_en));
+                    }
+                    break;
             }
 
             if (theme == Theme.light) centerText.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));

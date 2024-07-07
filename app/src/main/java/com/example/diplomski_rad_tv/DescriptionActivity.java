@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.viewpager2.widget.ViewPager2;
 
 public class DescriptionActivity extends Activity {
     SharedPreferencesService sharedPreferencesService;
@@ -29,6 +30,7 @@ public class DescriptionActivity extends Activity {
     Theme theme;
     Clock format;
     View focusedView;
+    boolean fullscreenMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,6 +153,30 @@ public class DescriptionActivity extends Activity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         super.onKeyDown(keyCode, event);
+
+        if (this.fullscreenMode) {
+            ViewPager2 viewPager = findViewById(R.id.viewPager);
+            int currentItem = viewPager.getCurrentItem();
+
+            if (keyCode == 21) {
+                if (currentItem > 0) viewPager.setCurrentItem(currentItem - 1);
+            } else if (keyCode == 22) {
+                if (currentItem < this.element.images.size() - 1) viewPager.setCurrentItem(currentItem + 1);
+            } else if (keyCode == 4) {
+                viewPager.setVisibility(View.INVISIBLE);
+
+                this.fullscreenMode = false;
+
+                CustomScrollView scrollView = findViewById(R.id.scrollView);
+
+                this.scrollToCenterView(scrollView, this.focusedView);
+
+                return false;
+            }
+
+            return true;
+        }
+
         int oldFocusedViewId = focusedView.getId();
 
         // Up, down, left, right navigation button
@@ -160,7 +186,7 @@ public class DescriptionActivity extends Activity {
                 newFocusedViewId = DescriptionNavigation.navigateOverActivity(newFocusedViewId, keyCode - 19);
 
             // If == 0, focusedView will stay the same
-            if (newFocusedViewId == 0) return false;
+            if (newFocusedViewId == 0) return true;
 
             // If != 0, focusedView will change its value
             this.focusedView = findViewById(newFocusedViewId);
@@ -181,6 +207,8 @@ public class DescriptionActivity extends Activity {
             sharedPreferencesService.setElementId("");
             startActivity(new Intent(getApplicationContext(), ElementListActivity.class));
         }
+        // Enter button
+        else if (keyCode == 23) this.focusedView.callOnClick();
         return true;
     }
 
@@ -268,6 +296,7 @@ public class DescriptionActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "0", Toast.LENGTH_LONG).show();
+                showViewPager(0);
             }
         });
 
@@ -279,6 +308,7 @@ public class DescriptionActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "1", Toast.LENGTH_LONG).show();
+                showViewPager(1);
             }
         });
 
@@ -290,6 +320,7 @@ public class DescriptionActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "2", Toast.LENGTH_LONG).show();
+                showViewPager(2);
             }
         });
 
@@ -301,6 +332,7 @@ public class DescriptionActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "3", Toast.LENGTH_LONG).show();
+                showViewPager(3);
             }
         });
 
@@ -312,6 +344,7 @@ public class DescriptionActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "4", Toast.LENGTH_LONG).show();
+                showViewPager(4);
             }
         });
 
@@ -323,6 +356,7 @@ public class DescriptionActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "5", Toast.LENGTH_LONG).show();
+                showViewPager(5);
             }
         });
 
@@ -334,6 +368,7 @@ public class DescriptionActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "6", Toast.LENGTH_LONG).show();
+                showViewPager(6);
             }
         });
 
@@ -345,6 +380,7 @@ public class DescriptionActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "7", Toast.LENGTH_LONG).show();
+                showViewPager(7);
             }
         });
 
@@ -356,6 +392,7 @@ public class DescriptionActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "8", Toast.LENGTH_LONG).show();
+                showViewPager(8);
             }
         });
     }
@@ -566,43 +603,6 @@ public class DescriptionActivity extends Activity {
         }
     }
 
-    void setNewContentView() {
-        {
-            TextView titleDescription = findViewById(R.id.descriptionTitle);
-
-            this.setupTitle(getApplicationContext(), titleDescription, this.element.title, this.language, this.theme);
-        }
-
-        {
-            TextView description = findViewById(R.id.descriptionContent);
-
-            this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.theme);
-        }
-
-        {
-            Button languageButton = findViewById(R.id.languageButton);
-            ImageView languageIcon = findViewById(R.id.languageIcon);
-
-            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
-        }
-
-        {
-            Button themeButton = findViewById(R.id.themeButton);
-            ImageView themeIcon = findViewById(R.id.themeIcon);
-
-            ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
-        }
-
-        {
-            TextClock textClock = findViewById(R.id.textClock);
-
-            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
-        }
-
-        this.setupImages();
-        this.setupLinks();
-    }
-
     void scrollToCenterView(CustomScrollView scrollView, View focusedView) {
         if (scrollView == null || focusedView == null) return;
 
@@ -612,5 +612,18 @@ public class DescriptionActivity extends Activity {
         int scrollToY = viewTop - (scrollViewHeight / 2) + (viewHeight / 2);
 
         scrollView.smoothScrollTo(0, scrollToY);
+    }
+
+    void showViewPager(int imageIndex) {
+        Adapter adapter = new Adapter(this.element.images);
+        ViewPager2 viewPager = findViewById(R.id.viewPager);
+        viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(imageIndex);
+        viewPager.setVisibility(View.VISIBLE);
+        this.fullscreenMode = true;
+
+        CustomScrollView scrollView = findViewById(R.id.scrollView);
+
+        this.scrollToCenterView(scrollView, viewPager);
     }
 }

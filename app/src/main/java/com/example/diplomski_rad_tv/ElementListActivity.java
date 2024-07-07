@@ -212,7 +212,7 @@ public class ElementListActivity extends Activity {
                     }
 
                     TextView centerText = findViewById(R.id.centerText);
-                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, elementsToShow.size());
+                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, elementsToShow.size(), "elements");
 
                     SearchView searchbarButton = findViewById(R.id.searchView);
                     setupSearchBarButton(getApplicationContext(), searchbarButton, searchbarText, language);
@@ -239,7 +239,7 @@ public class ElementListActivity extends Activity {
                     updateView(1);
 
                     TextView centerText = findViewById(R.id.centerText);
-                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, elementsToShow.size());
+                    CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, elementsToShow.size(), "elements");
 
                     if (grid == GridNavigation.three) {
                         ImageButton background = findViewById(R.id.backgroundGrid3);
@@ -519,7 +519,7 @@ public class ElementListActivity extends Activity {
         }
 
         ProgressBarLoader.manageProgressBar(ctx, progressBar, this.theme, this.loadingInProgress);
-        CenterText.setupCenterText(ctx, centerText, this.language, this.theme, this.loadingInProgress, this.elementsToShow.size());
+        CenterText.setupCenterText(ctx, centerText, this.language, this.theme, this.loadingInProgress, this.elementsToShow.size(), "elements");
 
         main.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -536,25 +536,25 @@ public class ElementListActivity extends Activity {
         if (loadingInProgress || /*!loadingInProgress &&*/ estatesToShowSize == 0) {
             switch (language) {
                 case german:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.category_name_de));
+                    titleText.setText(ContextCompat.getString(ctx, R.string.element_name_de));
                     break;
                 case croatian:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.category_name_hr));
+                    titleText.setText(ContextCompat.getString(ctx, R.string.element_name_hr));
                     break;
                 default:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.category_name_en));
+                    titleText.setText(ContextCompat.getString(ctx, R.string.element_name_en));
             }
         } else if (overallIndex < estatesToShowSize) {
             if (!title.isEmpty()) titleText.setText(title);
             else switch (language) {
                 case german:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.category_name_de));
+                    titleText.setText(ContextCompat.getString(ctx, R.string.element_name_de));
                     break;
                 case croatian:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.category_name_hr));
+                    titleText.setText(ContextCompat.getString(ctx, R.string.element_name_hr));
                     break;
                 default:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.category_name_en));
+                    titleText.setText(ContextCompat.getString(ctx, R.string.element_name_en));
             }
         }
 
@@ -1010,7 +1010,7 @@ public class ElementListActivity extends Activity {
         // Center text
         TextView centerText = findViewById(R.id.centerText);
 
-        CenterText.setupCenterText(ctx, centerText, language, theme, loadingInProgress, elementsToShow.size());
+        CenterText.setupCenterText(ctx, centerText, language, theme, loadingInProgress, elementsToShow.size(), "elements");
 
         // Background
         ImageButton background = null;
