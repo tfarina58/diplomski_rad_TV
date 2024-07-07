@@ -203,6 +203,9 @@ public class EstateListActivity extends Activity {
                     language = language.next();
                     sharedPreferencesService.setLanguage(language);
 
+                    setupEstatesToShow();
+                    totalPages = estatesToShow.size() == 0 ? 0 : (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+
                     if (grid == GridNavigation.one) {
                         TextView titleText = findViewById(R.id.gridButtonTitle1);
 
@@ -215,6 +218,11 @@ public class EstateListActivity extends Activity {
 
                     SearchView searchbarButton = findViewById(R.id.searchView);
                     setupSearchBarButton(getApplicationContext(), searchbarButton, searchbarText, language);
+
+                    Button pagination = findViewById(R.id.pagination);
+                    EditText pageNumber = findViewById(R.id.pageNumber);
+                    TextView totalPagesNumber = findViewById(R.id.totalPagesNumber);
+                    setupPaginationButton(pagination, pageNumber, totalPagesNumber);
 
                     updateView(0);
                     updateView(1);

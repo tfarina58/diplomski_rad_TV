@@ -260,6 +260,9 @@ public class CategoryListActivity extends Activity {
                     language = language.next();
                     sharedPreferencesService.setLanguage(language);
 
+                    setupCategoriesToShow();
+                    totalPages = categoriesToShow.size() == 0 ? 0 : (categoriesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+
                     if (grid == GridNavigation.one) {
                         TextView titleText = findViewById(R.id.gridButtonTitle1);
                         if (currentPage < categoriesToShow.size()) setMainTitle(getApplicationContext(), titleText, categories[categoriesToShow.get(currentPage)].title, language, theme, loadingInProgress, categoriesToShow.size(), currentPage);
@@ -271,6 +274,11 @@ public class CategoryListActivity extends Activity {
 
                     SearchView searchbarButton = findViewById(R.id.searchView);
                     setupSearchBarButton(getApplicationContext(), searchbarButton, searchbarText, language);
+
+                    Button pagination = findViewById(R.id.pagination);
+                    EditText pageNumber = findViewById(R.id.pageNumber);
+                    TextView totalPagesNumber = findViewById(R.id.totalPagesNumber);
+                    setupPaginationButton(pagination, pageNumber, totalPagesNumber);
 
                     updateView(0);
                     updateView(1);

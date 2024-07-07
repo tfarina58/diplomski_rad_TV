@@ -202,6 +202,9 @@ public class ElementListActivity extends Activity {
                     language = language.next();
                     sharedPreferencesService.setLanguage(language);
 
+                    setupElementsToShow();
+                    totalPages = elementsToShow.size() == 0 ? 0 : (elementsToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
+
                     if (grid == GridNavigation.one) {
                         TextView titleText = findViewById(R.id.gridButtonTitle1);
                         if (currentPage < elementsToShow.size()) setMainTitle(getApplicationContext(), titleText, elements[elementsToShow.get(currentPage)].title, language, theme, loadingInProgress, elementsToShow.size(), currentPage);
@@ -213,6 +216,11 @@ public class ElementListActivity extends Activity {
 
                     SearchView searchbarButton = findViewById(R.id.searchView);
                     setupSearchBarButton(getApplicationContext(), searchbarButton, searchbarText, language);
+
+                    Button pagination = findViewById(R.id.pagination);
+                    EditText pageNumber = findViewById(R.id.pageNumber);
+                    TextView totalPagesNumber = findViewById(R.id.totalPagesNumber);
+                    setupPaginationButton(pagination, pageNumber, totalPagesNumber);
 
                     updateView(0);
                     updateView(1);
