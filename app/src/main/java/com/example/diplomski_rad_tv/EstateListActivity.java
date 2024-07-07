@@ -77,7 +77,7 @@ public class EstateListActivity extends Activity {
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                             String estateId = document.getId();
                             String ownerId = document.getString("ownerId");
-                            String name = document.getString("name");
+                            HashMap<String, String> name = (HashMap<String, String>) document.get("name");
                             String image = document.getString("image");
                             GeoPoint coordinates = document.getGeoPoint("coordinates");
                             HashMap<String, Object> variables = (HashMap<String, Object>) document.get("variables");
@@ -205,11 +205,9 @@ public class EstateListActivity extends Activity {
 
                     if (grid == GridNavigation.one) {
                         TextView titleText = findViewById(R.id.gridButtonTitle1);
-                        if (currentPage < estatesToShow.size()) {
-                            setMainTitle(getApplicationContext(), titleText, estates[estatesToShow.get(currentPage)].name, language, theme, loadingInProgress, estatesToShow.size(), currentPage);
-                        } else {
-                            setMainTitle(getApplicationContext(), titleText, "", language, theme, loadingInProgress, estatesToShow.size(), currentPage);
-                        }
+
+                        if (currentPage < estatesToShow.size()) setMainTitle(getApplicationContext(), titleText, estates[estatesToShow.get(currentPage)].name, language, theme, loadingInProgress, estatesToShow.size(), currentPage);
+                        else setMainTitle(getApplicationContext(), titleText, null, language, theme, loadingInProgress, estatesToShow.size(), currentPage);
                     }
 
                     TextView centerText = findViewById(R.id.centerText);
@@ -257,24 +255,24 @@ public class EstateListActivity extends Activity {
                         imageTitle = findViewById(R.id.gridButtonTitle1);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid);
 
-                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
                         imageButton = findViewById(R.id.gridButton2);
                         imageBackground = findViewById(R.id.gridButtonBackground2);
                         imageTitle = findViewById(R.id.gridButtonTitle2);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 1;
 
-                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
                         imageButton = findViewById(R.id.gridButton3);
                         imageBackground = findViewById(R.id.gridButtonBackground3);
                         imageTitle = findViewById(R.id.gridButtonTitle3);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 2;
 
-                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
                     } else if (grid == GridNavigation.six) {
                         ImageButton background = findViewById(R.id.backgroundGrid6);
 
@@ -290,48 +288,48 @@ public class EstateListActivity extends Activity {
                         imageTitle = findViewById(R.id.gridButtonTitle1);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid);
 
-                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
                         imageButton = findViewById(R.id.gridButton2);
                         imageBackground = findViewById(R.id.gridButtonBackground2);
                         imageTitle = findViewById(R.id.gridButtonTitle2);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 1;
 
-                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
                         imageButton = findViewById(R.id.gridButton3);
                         imageBackground = findViewById(R.id.gridButtonBackground3);
                         imageTitle = findViewById(R.id.gridButtonTitle3);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 2;
 
-                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
                         imageButton = findViewById(R.id.gridButton4);
                         imageBackground = findViewById(R.id.gridButtonBackground4);
                         imageTitle = findViewById(R.id.gridButtonTitle4);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 3;
 
-                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
                         imageButton = findViewById(R.id.gridButton5);
                         imageBackground = findViewById(R.id.gridButtonBackground5);
                         imageTitle = findViewById(R.id.gridButtonTitle5);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 4;
 
-                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
                         imageButton = findViewById(R.id.gridButton6);
                         imageBackground = findViewById(R.id.gridButtonBackground6);
                         imageTitle = findViewById(R.id.gridButtonTitle6);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 5;
 
-                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+                        if (viewIndex < estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
                     } else updateView(6);
                 }
             });
@@ -516,7 +514,7 @@ public class EstateListActivity extends Activity {
             this.setMainTitle(ctx, titleText, this.estates[this.estatesToShow.get(this.currentPage)].name, this.language, this.theme, this.loadingInProgress, this.estatesToShow.size(), this.currentPage);
         } else {
             this.setupMainBackground(ctx, main, this.focusedView, "", this.theme);
-            this.setMainTitle(ctx, titleText, "", this.language, this.theme, this.loadingInProgress, this.estatesToShow.size(), this.currentPage);
+            this.setMainTitle(ctx, titleText, null, this.language, this.theme, this.loadingInProgress, this.estatesToShow.size(), this.currentPage);
         }
 
         ProgressBarLoader.manageProgressBar(ctx, progressBar, this.theme, this.loadingInProgress);
@@ -531,7 +529,7 @@ public class EstateListActivity extends Activity {
     }
 
 
-    void setMainTitle(Context ctx, TextView titleText, String title, Language language, Theme theme, boolean loadingInProgress, int estatesToShowSize, int overallIndex) {
+    void setMainTitle(Context ctx, TextView titleText, HashMap<String, String> title, Language language, Theme theme, boolean loadingInProgress, int estatesToShowSize, int overallIndex) {
         if (titleText == null) return;
 
         if (loadingInProgress || /*!loadingInProgress &&*/ estatesToShowSize == 0) {
@@ -546,16 +544,40 @@ public class EstateListActivity extends Activity {
                     titleText.setText(ContextCompat.getString(ctx, R.string.real_estate_name_en));
             }
         } else if (overallIndex < estatesToShowSize) {
-            if (!title.isEmpty()) titleText.setText(title);
-            else switch (language) {
+            switch (language) {
                 case german:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.real_estate_name_de));
+                    if (title == null) {
+                        titleText.setText(ContextCompat.getString(ctx, R.string.real_estate_name_de));
+                        break;
+                    }
+
+                    String titleDe = title.get("de");
+
+                    if (titleDe != null && !titleDe.isEmpty()) titleText.setText(titleDe);
+                    else titleText.setText(ContextCompat.getString(ctx, R.string.real_estate_name_de));
                     break;
                 case croatian:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.real_estate_name_hr));
+                    if (title == null) {
+                        titleText.setText(ContextCompat.getString(ctx, R.string.real_estate_name_hr));
+                        break;
+                    }
+
+                    String titleHr = title.get("hr");
+
+                    if (titleHr != null && !titleHr.isEmpty()) titleText.setText(titleHr);
+                    else titleText.setText(ContextCompat.getString(ctx, R.string.real_estate_name_hr));
                     break;
                 default:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.real_estate_name_en));
+                    if (title == null) {
+                        titleText.setText(ContextCompat.getString(ctx, R.string.real_estate_name_en));
+                        break;
+                    }
+
+                    String titleEn = title.get("en");
+
+                    if (titleEn != null && !titleEn.isEmpty()) titleText.setText(titleEn);
+                    else titleText.setText(ContextCompat.getString(ctx, R.string.real_estate_name_en));
+                    break;
             }
         }
 
@@ -675,7 +697,7 @@ public class EstateListActivity extends Activity {
                 this.setMainTitle(getApplicationContext(), title, this.estates[this.estatesToShow.get(this.currentPage)].name, this.language, this.theme, this.loadingInProgress, this.estatesToShow.size(), this.currentPage);
             } else {
                 this.setupMainBackground(getApplicationContext(), main, this.focusedView, "", this.theme);
-                this.setMainTitle(getApplicationContext(), title, "", this.language, this.theme, this.loadingInProgress, this.estatesToShow.size(), this.currentPage);
+                this.setMainTitle(getApplicationContext(), title, null, this.language, this.theme, this.loadingInProgress, this.estatesToShow.size(), this.currentPage);
             }
         } else if (row == 6 && (this.grid == GridNavigation.three || this.grid == GridNavigation.six)) {
             ImageButton imageButton = findViewById(R.id.gridButton1);
@@ -683,8 +705,8 @@ public class EstateListActivity extends Activity {
             TextView imageTitle = findViewById(R.id.gridButtonTitle1);
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage;
 
-            if (viewIndex < this.estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
+            if (viewIndex < this.estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
+            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
         } else if (row == 7) {
             ImageButton imageButton = findViewById(R.id.gridButton2);
             Button imageBackground = findViewById(R.id.gridButtonBackground2);
@@ -692,9 +714,9 @@ public class EstateListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 1;
 
             if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
         } else if (row == 8) {
             ImageButton imageButton = findViewById(R.id.gridButton3);
             Button imageBackground = findViewById(R.id.gridButtonBackground3);
@@ -702,9 +724,9 @@ public class EstateListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 2;
 
             if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
         } else if (row == 9) {
             ImageButton imageButton = findViewById(R.id.gridButton4);
             Button imageBackground = findViewById(R.id.gridButtonBackground4);
@@ -712,9 +734,9 @@ public class EstateListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 3;
 
             if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
         } else if (row == 10) {
             ImageButton imageButton = findViewById(R.id.gridButton5);
             Button imageBackground = findViewById(R.id.gridButtonBackground5);
@@ -722,9 +744,9 @@ public class EstateListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 4;
 
             if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
         } else if (row == 11) {
             ImageButton imageButton = findViewById(R.id.gridButton6);
             Button imageBackground = findViewById(R.id.gridButtonBackground6);
@@ -732,17 +754,37 @@ public class EstateListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 5;
 
             if (viewIndex < this.estatesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Estate) null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
         }
     }
 
     void setupEstatesToShow() {
         this.estatesToShow.clear();
         for (int i = 0; i < estates.length; ++i)
-            if ((estates[i].name.toLowerCase()).contains(this.searchbarText.toLowerCase()))
-                this.estatesToShow.add(i);
+            switch (language) {
+                case german:
+                    String titleDe = estates[i].name.get("de");
+                    if (titleDe == null) break;
+
+                    if (titleDe.toLowerCase().contains(this.searchbarText.toLowerCase()))
+                        this.estatesToShow.add(i);
+                    break;
+                case croatian:
+                    String titleHr = estates[i].name.get("hr");
+                    if (titleHr == null) break;
+
+                    if (titleHr.toLowerCase().contains(this.searchbarText.toLowerCase()))
+                        this.estatesToShow.add(i);
+                    break;
+                default:
+                    String titleEn = estates[i].name.get("en");
+                    if (titleEn == null) break;
+
+                    if (titleEn.toLowerCase().contains(this.searchbarText.toLowerCase()))
+                        this.estatesToShow.add(i);
+            }
     }
 
     void navigateToCategoryListActivity() {
@@ -907,7 +949,7 @@ public class EstateListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle1);
 
         if (0 < estates.length && estates[0] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, estates[0]);
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[0]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -915,7 +957,7 @@ public class EstateListActivity extends Activity {
                     navigateToCategoryListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
         // Image button 2
         imageButton = findViewById(R.id.gridButton2);
@@ -923,7 +965,7 @@ public class EstateListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle2);
 
         if (1 < estates.length && estates[1] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, estates[1]);
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[1]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -931,7 +973,7 @@ public class EstateListActivity extends Activity {
                     navigateToCategoryListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
         // Image button 3
         imageButton = findViewById(R.id.gridButton3);
@@ -939,7 +981,7 @@ public class EstateListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle3);
 
         if (2 < estates.length && estates[2] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, estates[2]);
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[2]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -947,7 +989,7 @@ public class EstateListActivity extends Activity {
                     navigateToCategoryListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
         // Image button 4
         imageButton = findViewById(R.id.gridButton4);
@@ -955,7 +997,7 @@ public class EstateListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle4);
 
         if (3 < estates.length && estates[3] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[3]);
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[3]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -963,7 +1005,7 @@ public class EstateListActivity extends Activity {
                     navigateToCategoryListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
         // Image button 5
         imageButton = findViewById(R.id.gridButton5);
@@ -971,7 +1013,7 @@ public class EstateListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle5);
 
         if (4 < estates.length && estates[4] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[4]);
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[4]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -979,7 +1021,7 @@ public class EstateListActivity extends Activity {
                     navigateToCategoryListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
         // Image button 6
         imageButton = findViewById(R.id.gridButton6);
@@ -987,7 +1029,7 @@ public class EstateListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle6);
 
         if (5 < estates.length && estates[5] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, estates[5]);
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[5]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -995,7 +1037,7 @@ public class EstateListActivity extends Activity {
                     navigateToCategoryListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Estate) null);
+        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
 
         // Center text
         TextView centerText = findViewById(R.id.centerText);

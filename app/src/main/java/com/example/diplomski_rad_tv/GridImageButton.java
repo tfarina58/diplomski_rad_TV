@@ -11,11 +11,24 @@ import androidx.core.content.ContextCompat;
 import com.squareup.picasso.Picasso;
 
 public class GridImageButton {
-    public static void setupImageButton(Context ctx, ImageButton imageButton, Button imageBackground, TextView imageTitle, View focusedView, Theme theme, Estate estate) {
+    public static void setupImageButton(Context ctx, ImageButton imageButton, Button imageBackground, TextView imageTitle, View focusedView, Language language, Theme theme, Estate estate) {
         if (imageButton == null || imageBackground == null || imageTitle == null) return;
 
         int visibility = estate == null ? View.INVISIBLE: View.VISIBLE;
-        String titleText = estate == null ? "" : estate.name;
+        String titleText = null;
+        switch (language) {
+            case german:
+                if (estate != null && estate.name != null && estate.name.get("de") != null) titleText = estate.name.get("de");
+                else titleText = "";
+                break;
+            case croatian:
+                if (estate != null && estate.name != null && estate.name.get("hr") != null) titleText = estate.name.get("hr");
+                else titleText = "";
+                break;
+            default:
+                if (estate != null && estate.name != null && estate.name.get("en") != null) titleText = estate.name.get("en");
+                else titleText = "";
+        }
 
         if (focusedView.getId() == imageButton.getId()) {
             if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_light));
@@ -42,11 +55,24 @@ public class GridImageButton {
         }
     }
 
-    public static void setupImageButton(Context ctx, ImageButton imageButton, Button imageBackground, TextView imageTitle, View focusedView, Theme theme, Category category) {
+    public static void setupImageButton(Context ctx, ImageButton imageButton, Button imageBackground, TextView imageTitle, View focusedView, Language language, Theme theme, Category category) {
         if (imageButton == null || imageBackground == null || imageTitle == null) return;
 
         int visibility = category == null ? View.INVISIBLE: View.VISIBLE;
-        String titleText = category == null ? "" : category.title;
+        String titleText = null;
+        switch (language) {
+            case german:
+                if (category != null && category.title != null && category.title.get("de") != null) titleText = category.title.get("de");
+                else titleText = "";
+                break;
+            case croatian:
+                if (category != null && category.title != null && category.title.get("hr") != null) titleText = category.title.get("hr");
+                else titleText = "";
+                break;
+            default:
+                if (category != null && category.title != null && category.title.get("en") != null) titleText = category.title.get("en");
+                else titleText = "";
+        }
 
         if (focusedView.getId() == imageButton.getId()) {
             if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_light));
@@ -73,11 +99,24 @@ public class GridImageButton {
         }
     }
 
-    public static void setupImageButton(Context ctx, ImageButton imageButton, Button imageBackground, TextView imageTitle, View focusedView, Theme theme, Element element) {
+    public static void setupImageButton(Context ctx, ImageButton imageButton, Button imageBackground, TextView imageTitle, View focusedView, Language language, Theme theme, Element element) {
         if (imageButton == null || imageBackground == null || imageTitle == null) return;
 
         int visibility = element == null ? View.INVISIBLE: View.VISIBLE;
-        String titleText = element == null ? "" : element.title;
+        String titleText = null;
+        switch (language) {
+            case german:
+                if (element != null && element.title != null && element.title.get("de") != null) titleText = element.title.get("de");
+                else titleText = "";
+                break;
+            case croatian:
+                if (element != null && element.title != null && element.title.get("hr") != null) titleText = element.title.get("hr");
+                else titleText = "";
+                break;
+            default:
+                if (element != null && element.title != null && element.title.get("en") != null) titleText = element.title.get("en");
+                else titleText = "";
+        }
 
         if (focusedView.getId() == imageButton.getId()) {
             if (theme == Theme.light) imageBackground.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_light));

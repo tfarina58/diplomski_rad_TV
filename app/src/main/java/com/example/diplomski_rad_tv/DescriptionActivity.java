@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.TextView;
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import com.squareup.picasso.Picasso;
 
 import android.text.SpannableString;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
+
+import java.util.HashMap;
 
 public class DescriptionActivity extends Activity {
     SharedPreferencesService sharedPreferencesService;
@@ -66,7 +69,7 @@ public class DescriptionActivity extends Activity {
             TextView description = findViewById(R.id.descriptionContent);
             this.focusedView = description;
 
-            this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.theme);
+            this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
 
             description.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -93,6 +96,14 @@ public class DescriptionActivity extends Activity {
                     updateView(0);
                     updateView(1);
                     updateView(2);
+
+                    TextView title = findViewById(R.id.descriptionTitle);
+                    setupTitle(getApplicationContext(), title, element.title, language, theme);
+
+                    TextView content = findViewById(R.id.descriptionContent);
+                    setupDescription(getApplicationContext(), content, element.description, focusedView, language, theme);
+
+                    setupLinks();
                 }
             });
         }
@@ -226,9 +237,9 @@ public class DescriptionActivity extends Activity {
         if (focusedViewId == R.id.descriptionImage7) return this.element.images.size() > 6 && !this.element.images.get(6).isEmpty();
         if (focusedViewId == R.id.descriptionImage8) return this.element.images.size() > 7 && !this.element.images.get(7).isEmpty();
         if (focusedViewId == R.id.descriptionImage9) return this.element.images.size() > 8 && !this.element.images.get(8).isEmpty();
-        if (focusedViewId == R.id.descriptionLink1) return this.element.links.size() > 0 && !this.element.links.get(0).get("url").isEmpty() && !this.element.links.get(0).get("title").isEmpty();
-        if (focusedViewId == R.id.descriptionLink2) return this.element.links.size() > 1 && !this.element.links.get(1).get("url").isEmpty() && !this.element.links.get(1).get("title").isEmpty();
-        if (focusedViewId == R.id.descriptionLink3) return this.element.links.size() > 2 && !this.element.links.get(2).get("url").isEmpty() && !this.element.links.get(2).get("title").isEmpty();
+        if (focusedViewId == R.id.descriptionLink1) return this.checkLinkExistence(0);
+        if (focusedViewId == R.id.descriptionLink2) return this.checkLinkExistence(1);
+        if (focusedViewId == R.id.descriptionLink3) return this.checkLinkExistence(2);
         return false;
     }
 
@@ -239,34 +250,73 @@ public class DescriptionActivity extends Activity {
         else background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
     }
 
-    void setupTitle(Context ctx, TextView titleText, String title, Language language, Theme theme) {
+    void setupTitle(Context ctx, TextView titleText, HashMap<String, String> title, Language language, Theme theme) {
         if (titleText == null) return;
 
-        if (!title.isEmpty()) titleText.setText(title);
-        else {
-            switch(language) {
-                case german:
+        switch (language) {
+            case german:
+                if (title == null) {
                     titleText.setText(ContextCompat.getString(ctx, R.string.element_name_de));
                     break;
-                case croatian:
+                }
+
+                String titleDe = title.get("de");
+
+                if (titleDe != null && !titleDe.isEmpty()) titleText.setText(titleDe);
+                else titleText.setText(ContextCompat.getString(ctx, R.string.element_name_de));
+                break;
+            case croatian:
+                if (title == null) {
                     titleText.setText(ContextCompat.getString(ctx, R.string.element_name_hr));
                     break;
-                default:
+                }
+
+                String titleHr = title.get("hr");
+
+                if (titleHr != null && !titleHr.isEmpty()) titleText.setText(titleHr);
+                else titleText.setText(ContextCompat.getString(ctx, R.string.element_name_hr));
+                break;
+            default:
+                if (title == null) {
                     titleText.setText(ContextCompat.getString(ctx, R.string.element_name_en));
-            }
+                    break;
+                }
+
+                String titleEn = title.get("en");
+
+                if (titleEn != null && !titleEn.isEmpty()) titleText.setText(titleEn);
+                else titleText.setText(ContextCompat.getString(ctx, R.string.category_name_en));
+                break;
         }
 
         if (theme == Theme.light) titleText.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
         else titleText.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
     }
 
-    void setupDescription(Context ctx, TextView descriptionView, String description, View focusedView, Theme theme) {
+    void setupDescription(Context ctx, TextView descriptionView, HashMap<String, String> description, View focusedView, Language language, Theme theme) {
         if (descriptionView == null) return;
 
-        if (!description.isEmpty()) descriptionView.setText(description);
-        else {
-            descriptionView.setText("");
-            descriptionView.setVisibility(View.INVISIBLE);
+        switch (language) {
+            case german:
+                String descriptionDe = description.get("de");
+                if (descriptionDe == null || descriptionDe.isEmpty()) {
+                    descriptionView.setText("");
+                    descriptionView.setVisibility(View.INVISIBLE);
+                } else descriptionView.setText(descriptionDe);
+                break;
+            case croatian:
+                String descriptionHr = description.get("hr");
+                if (descriptionHr == null || descriptionHr.isEmpty()) {
+                    descriptionView.setText("");
+                    descriptionView.setVisibility(View.INVISIBLE);
+                } else descriptionView.setText(descriptionHr);
+                break;
+            default:
+                String descriptionEn = description.get("en");
+                if (descriptionEn == null || descriptionEn.isEmpty()) {
+                    descriptionView.setText("");
+                    descriptionView.setVisibility(View.INVISIBLE);
+                } else descriptionView.setText(descriptionEn);
         }
 
         if (focusedView.getId() == descriptionView.getId()) {
@@ -424,8 +474,8 @@ public class DescriptionActivity extends Activity {
         Button button;
 
         button = findViewById(R.id.descriptionLink1);
-        if (0 < linksLength) this.setupLink(getApplicationContext(), button, this.element.links.get(0).get("title"), this.element.links.get(0).get("url"), this.focusedView, this.theme);
-        else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+        if (0 < linksLength) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+        else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -435,15 +485,15 @@ public class DescriptionActivity extends Activity {
 
                 if (linkIndex >= element.links.size()) return;
 
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(element.links.get(linkIndex).get("url")));
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse((String)element.links.get(linkIndex).get("url")));
                 if (intent.resolveActivity(getPackageManager()) != null)
                     startActivity(intent);
             }
         });
 
         button = findViewById(R.id.descriptionLink2);
-        if (1 < linksLength) this.setupLink(getApplicationContext(), button, this.element.links.get(1).get("title"), this.element.links.get(1).get("url"), this.focusedView, this.theme);
-        else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+        if (1 < linksLength) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+        else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -453,15 +503,15 @@ public class DescriptionActivity extends Activity {
 
                 if (linkIndex >= element.links.size()) return;
 
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(element.links.get(linkIndex).get("url")));
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse((String)element.links.get(linkIndex).get("url")));
                 if (intent.resolveActivity(getPackageManager()) != null)
                     startActivity(intent);
             }
         });
 
         button = findViewById(R.id.descriptionLink3);
-        if (2 < linksLength) this.setupLink(getApplicationContext(), button, this.element.links.get(2).get("title"), this.element.links.get(2).get("url"), this.focusedView, this.theme);
-        else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+        if (2 < linksLength) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>)this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+        else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -471,15 +521,31 @@ public class DescriptionActivity extends Activity {
 
                 if (linkIndex >= element.links.size()) return;
 
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(element.links.get(linkIndex).get("url")));
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse((String)element.links.get(linkIndex).get("url")));
                 if (intent.resolveActivity(getPackageManager()) != null)
                     startActivity(intent);
             }
         });
     }
 
-    void setupLink(Context ctx, Button button, String linkTitle, String linkUrl, View focusedView, Theme theme) {
-        if (linkTitle == null || linkTitle.isEmpty() || linkUrl == null || linkUrl.isEmpty()) {
+    void setupLink(Context ctx, Button button, LinkedTreeMap<String, String> linkTitles, String linkUrl, View focusedView, Language language, Theme theme) {
+        if (button == null) return;
+
+        String title = null;
+        if (linkTitles != null) {
+            switch (language) {
+                case german:
+                    title = linkTitles.get("de");
+                    break;
+                case croatian:
+                    title = linkTitles.get("hr");
+                    break;
+                default:
+                    title = linkTitles.get("en");
+            }
+        }
+
+        if (title == null || title.isEmpty() || linkUrl == null || linkUrl.isEmpty()) {
             button.setVisibility(View.GONE);
             return;
         }
@@ -498,7 +564,7 @@ public class DescriptionActivity extends Activity {
             else button.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
         }
 
-        SpannableString content = new SpannableString(linkTitle);
+        SpannableString content = new SpannableString(title);
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 
         button.setText(content);
@@ -527,7 +593,7 @@ public class DescriptionActivity extends Activity {
         else if (row == 3) {
             TextView description = findViewById(R.id.descriptionContent);
 
-            this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.theme);
+            this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
         }
         else if (row == 4) {
             ImageView image = findViewById(R.id.descriptionImage1);
@@ -586,20 +652,20 @@ public class DescriptionActivity extends Activity {
         else if (row == 13) {
             Button button = findViewById(R.id.descriptionLink1);
 
-            if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, this.element.links.get(0).get("title"), this.element.links.get(0).get("url"), this.focusedView, this.theme);
-            else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+            if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+            else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
         }
         else if (row == 14) {
             Button button = findViewById(R.id.descriptionLink2);
 
-            if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, this.element.links.get(1).get("title"), this.element.links.get(1).get("url"), this.focusedView, this.theme);
-            else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+            if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+            else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
         }
         else if (row == 15) {
             Button button = findViewById(R.id.descriptionLink3);
 
-            if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, this.element.links.get(2).get("title"), this.element.links.get(2).get("url"), this.focusedView, this.theme);
-            else this.setupLink(getApplicationContext(), button, "", "", this.focusedView, this.theme);
+            if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+            else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
         }
     }
 
@@ -625,5 +691,26 @@ public class DescriptionActivity extends Activity {
         CustomScrollView scrollView = findViewById(R.id.scrollView);
 
         this.scrollToCenterView(scrollView, viewPager);
+    }
+
+    boolean checkLinkExistence(int index) {
+        if (this.element.links.size() <= index) return false;
+
+        HashMap<String, Object> tmpMap = (HashMap<String, Object>) this.element.links.get(index);
+        if (tmpMap == null) return false;
+
+        String targetUrl = (String) tmpMap.get("url");
+        if (targetUrl == null || targetUrl.isEmpty()) return false;
+
+        LinkedTreeMap<String, String> tmpTitles = (LinkedTreeMap<String, String>) tmpMap.get("title");
+        if (tmpTitles == null) return false;
+
+        String targetTitle = null;
+        if (this.language == Language.german) targetTitle = tmpTitles.get("de");
+        else if (this.language == Language.croatian) targetTitle = tmpTitles.get("hr");
+        else targetTitle = tmpTitles.get("en");
+        if (targetTitle == null || targetTitle.isEmpty()) return false;
+
+        return true;
     }
 }

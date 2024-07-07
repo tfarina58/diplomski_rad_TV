@@ -8,11 +8,11 @@ public class Element {
     String categoryId;
     String background;
     ArrayList<String> images;
-    String description;
-    ArrayList<HashMap<String, String>> links;
-    String title;
+    HashMap<String, String> description;
+    ArrayList<HashMap<String, Object>> links;
+    HashMap<String, String> title;
 
-    public Element(String id, String categoryId, String background, String title, String description, ArrayList<String> images, ArrayList<HashMap<String, String>> links) {
+    public Element(String id, String categoryId, String background, HashMap<String, String> title, HashMap<String, String> description, ArrayList<String> images, ArrayList<HashMap<String, Object>> links) {
         this.id = id;
         this.categoryId = categoryId;
         this.background = background;

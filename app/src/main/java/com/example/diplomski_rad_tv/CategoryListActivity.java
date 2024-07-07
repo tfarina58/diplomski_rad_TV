@@ -84,7 +84,7 @@ public class CategoryListActivity extends Activity {
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                             String categoryId = document.getId();
                             String estateId = document.getString("estateId");
-                            String title = document.getString("title");
+                            HashMap<String, String> title = (HashMap<String, String>) document.get("title");
                             String image = document.getString("image");
                             categories[i] = new Category(categoryId, estateId, title, image);
                             i++;
@@ -262,11 +262,8 @@ public class CategoryListActivity extends Activity {
 
                     if (grid == GridNavigation.one) {
                         TextView titleText = findViewById(R.id.gridButtonTitle1);
-                        if (currentPage < categoriesToShow.size()) {
-                            setMainTitle(getApplicationContext(), titleText, categories[categoriesToShow.get(currentPage)].title, language, theme, loadingInProgress, categoriesToShow.size(), currentPage);
-                        } else {
-                            setMainTitle(getApplicationContext(), titleText, "", language, theme, loadingInProgress, categoriesToShow.size(), currentPage);
-                        }
+                        if (currentPage < categoriesToShow.size()) setMainTitle(getApplicationContext(), titleText, categories[categoriesToShow.get(currentPage)].title, language, theme, loadingInProgress, categoriesToShow.size(), currentPage);
+                        else setMainTitle(getApplicationContext(), titleText, null, language, theme, loadingInProgress, categoriesToShow.size(), currentPage);
                     }
 
                     TextView centerText = findViewById(R.id.centerText);
@@ -314,24 +311,24 @@ public class CategoryListActivity extends Activity {
                         imageTitle = findViewById(R.id.gridButtonTitle1);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid);
 
-                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
                         imageButton = findViewById(R.id.gridButton2);
                         imageBackground = findViewById(R.id.gridButtonBackground2);
                         imageTitle = findViewById(R.id.gridButtonTitle2);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 1;
 
-                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
                         imageButton = findViewById(R.id.gridButton3);
                         imageBackground = findViewById(R.id.gridButtonBackground3);
                         imageTitle = findViewById(R.id.gridButtonTitle3);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 2;
 
-                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
                     } else if (grid == GridNavigation.six) {
                         ImageButton background = findViewById(R.id.backgroundGrid6);
 
@@ -347,48 +344,48 @@ public class CategoryListActivity extends Activity {
                         imageTitle = findViewById(R.id.gridButtonTitle1);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid);
 
-                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
                         imageButton = findViewById(R.id.gridButton2);
                         imageBackground = findViewById(R.id.gridButtonBackground2);
                         imageTitle = findViewById(R.id.gridButtonTitle2);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 1;
 
-                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
                         imageButton = findViewById(R.id.gridButton3);
                         imageBackground = findViewById(R.id.gridButtonBackground3);
                         imageTitle = findViewById(R.id.gridButtonTitle3);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 2;
 
-                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
                         imageButton = findViewById(R.id.gridButton4);
                         imageBackground = findViewById(R.id.gridButtonBackground4);
                         imageTitle = findViewById(R.id.gridButtonTitle4);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 3;
 
-                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
                         imageButton = findViewById(R.id.gridButton5);
                         imageBackground = findViewById(R.id.gridButtonBackground5);
                         imageTitle = findViewById(R.id.gridButtonTitle5);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 4;
 
-                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
                         imageButton = findViewById(R.id.gridButton6);
                         imageBackground = findViewById(R.id.gridButtonBackground6);
                         imageTitle = findViewById(R.id.gridButtonTitle6);
                         viewIndex = currentPage * GridNavigation.getGridTypeAsInt(grid) + 5;
 
-                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[viewIndex]);
-                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+                        if (viewIndex < categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[viewIndex]);
+                        else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
                     } else updateView(6);
                 }
             });
@@ -583,7 +580,7 @@ public class CategoryListActivity extends Activity {
             this.setMainTitle(ctx, titleText, this.categories[this.categoriesToShow.get(this.currentPage)].title, this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
         } else {
             this.setupMainBackground(ctx, main, this.focusedView, "", this.theme);
-            this.setMainTitle(ctx, titleText, "", this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
+            this.setMainTitle(ctx, titleText, null, this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
         }
 
         ProgressBarLoader.manageProgressBar(ctx, progressBar, this.theme, this.loadingInProgress);
@@ -598,7 +595,7 @@ public class CategoryListActivity extends Activity {
     }
 
 
-    void setMainTitle(Context ctx, TextView titleText, String title, Language language, Theme theme, boolean loadingInProgress, int categoriesToShowSize, int overallIndex) {
+    void setMainTitle(Context ctx, TextView titleText, HashMap<String, String> title, Language language, Theme theme, boolean loadingInProgress, int categoriesToShowSize, int overallIndex) {
         if (titleText == null) return;
 
         if (loadingInProgress || /*!loadingInProgress &&*/ categoriesToShowSize == 0) {
@@ -613,16 +610,40 @@ public class CategoryListActivity extends Activity {
                     titleText.setText(ContextCompat.getString(ctx, R.string.category_name_en));
             }
         } else if (overallIndex < categoriesToShowSize) {
-            if (!title.isEmpty()) titleText.setText(title);
-            else switch (language) {
+            switch (language) {
                 case german:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.category_name_de));
+                    if (title == null) {
+                        titleText.setText(ContextCompat.getString(ctx, R.string.category_name_de));
+                        break;
+                    }
+
+                    String titleDe = title.get("de");
+
+                    if (titleDe != null && !titleDe.isEmpty()) titleText.setText(titleDe);
+                    else titleText.setText(ContextCompat.getString(ctx, R.string.category_name_de));
                     break;
                 case croatian:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.category_name_hr));
+                    if (title == null) {
+                        titleText.setText(ContextCompat.getString(ctx, R.string.category_name_hr));
+                        break;
+                    }
+
+                    String titleHr = title.get("hr");
+
+                    if (titleHr != null && !titleHr.isEmpty()) titleText.setText(titleHr);
+                    else titleText.setText(ContextCompat.getString(ctx, R.string.category_name_hr));
                     break;
                 default:
-                    titleText.setText(ContextCompat.getString(ctx, R.string.category_name_en));
+                    if (title == null) {
+                        titleText.setText(ContextCompat.getString(ctx, R.string.category_name_en));
+                        break;
+                    }
+
+                    String titleEn = title.get("en");
+
+                    if (titleEn != null && !titleEn.isEmpty()) titleText.setText(titleEn);
+                    else titleText.setText(ContextCompat.getString(ctx, R.string.category_name_en));
+                    break;
             }
         }
 
@@ -742,7 +763,7 @@ public class CategoryListActivity extends Activity {
                 this.setMainTitle(getApplicationContext(), title, this.categories[this.categoriesToShow.get(this.currentPage)].title, this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
             } else {
                 this.setupMainBackground(getApplicationContext(), main, this.focusedView, "", this.theme);
-                this.setMainTitle(getApplicationContext(), title, "", this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
+                this.setMainTitle(getApplicationContext(), title, null, this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
             }
         } else if (row == 6 && (this.grid == GridNavigation.three || this.grid == GridNavigation.six)) {
             ImageButton imageButton = findViewById(R.id.gridButton1);
@@ -750,8 +771,8 @@ public class CategoryListActivity extends Activity {
             TextView imageTitle = findViewById(R.id.gridButtonTitle1);
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage;
 
-            if (viewIndex < this.categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
-            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Category) null);
+            if (viewIndex < this.categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
         } else if (row == 7) {
             ImageButton imageButton = findViewById(R.id.gridButton2);
             Button imageBackground = findViewById(R.id.gridButtonBackground2);
@@ -759,9 +780,9 @@ public class CategoryListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 1;
 
             if (viewIndex < this.categoriesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Category) null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
         } else if (row == 8) {
             ImageButton imageButton = findViewById(R.id.gridButton3);
             Button imageBackground = findViewById(R.id.gridButtonBackground3);
@@ -769,9 +790,9 @@ public class CategoryListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 2;
 
             if (viewIndex < this.categoriesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Category) null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
         } else if (row == 9) {
             ImageButton imageButton = findViewById(R.id.gridButton4);
             Button imageBackground = findViewById(R.id.gridButtonBackground4);
@@ -779,9 +800,9 @@ public class CategoryListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 3;
 
             if (viewIndex < this.categoriesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Category) null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
         } else if (row == 10) {
             ImageButton imageButton = findViewById(R.id.gridButton5);
             Button imageBackground = findViewById(R.id.gridButtonBackground5);
@@ -789,9 +810,9 @@ public class CategoryListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 4;
 
             if (viewIndex < this.categoriesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Category) null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
         } else if (row == 11) {
             ImageButton imageButton = findViewById(R.id.gridButton6);
             Button imageBackground = findViewById(R.id.gridButtonBackground6);
@@ -799,9 +820,9 @@ public class CategoryListActivity extends Activity {
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 5;
 
             if (viewIndex < this.categoriesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
             else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.theme, (Category) null);
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
         }
     }
 
@@ -829,8 +850,28 @@ public class CategoryListActivity extends Activity {
     void setupCategoriesToShow() {
         this.categoriesToShow.clear();
         for (int i = 0; i < categories.length; ++i)
-            if ((categories[i].title.toLowerCase()).contains(this.searchbarText.toLowerCase()))
-                this.categoriesToShow.add(i);
+            switch (language) {
+                case german:
+                    String titleDe = categories[i].title.get("de");
+                    if (titleDe == null) break;
+
+                    if (titleDe.toLowerCase().contains(this.searchbarText.toLowerCase()))
+                        this.categoriesToShow.add(i);
+                    break;
+                case croatian:
+                    String titleHr = categories[i].title.get("hr");
+                    if (titleHr == null) break;
+
+                    if (titleHr.toLowerCase().contains(this.searchbarText.toLowerCase()))
+                        this.categoriesToShow.add(i);
+                    break;
+                default:
+                    String titleEn = categories[i].title.get("en");
+                    if (titleEn == null) break;
+
+                    if (titleEn.toLowerCase().contains(this.searchbarText.toLowerCase()))
+                        this.categoriesToShow.add(i);
+            }
     }
 
     void navigateToElementListActivity() {
@@ -995,7 +1036,7 @@ public class CategoryListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle1);
 
         if (0 < categories.length && categories[0] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, categories[0]);
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[0]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1003,7 +1044,7 @@ public class CategoryListActivity extends Activity {
                     navigateToElementListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
         // Image button 2
         imageButton = findViewById(R.id.gridButton2);
@@ -1011,7 +1052,7 @@ public class CategoryListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle2);
 
         if (1 < categories.length && categories[1] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, categories[1]);
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[1]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1019,7 +1060,7 @@ public class CategoryListActivity extends Activity {
                     navigateToElementListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
         // Image button 3
         imageButton = findViewById(R.id.gridButton3);
@@ -1027,7 +1068,7 @@ public class CategoryListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle3);
 
         if (2 < categories.length && categories[2] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, categories[2]);
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[2]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1035,7 +1076,7 @@ public class CategoryListActivity extends Activity {
                     navigateToElementListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+        } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
         // Image button 4
         imageButton = findViewById(R.id.gridButton4);
@@ -1043,7 +1084,7 @@ public class CategoryListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle4);
 
         if (3 < categories.length && categories[3] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[3]);
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[3]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1051,7 +1092,7 @@ public class CategoryListActivity extends Activity {
                     navigateToElementListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
         // Image button 5
         imageButton = findViewById(R.id.gridButton5);
@@ -1059,7 +1100,7 @@ public class CategoryListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle5);
 
         if (4 < categories.length && categories[4] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[4]);
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[4]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1067,7 +1108,7 @@ public class CategoryListActivity extends Activity {
                     navigateToElementListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
         // Image button 6
         imageButton = findViewById(R.id.gridButton6);
@@ -1075,7 +1116,7 @@ public class CategoryListActivity extends Activity {
         imageTitle = findViewById(R.id.gridButtonTitle6);
 
         if (5 < categories.length && categories[5] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, categories[5]);
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[5]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1083,7 +1124,7 @@ public class CategoryListActivity extends Activity {
                     navigateToElementListActivity();
                 }
             });
-        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, theme, (Category) null);
+        } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
 
         // Center text
         TextView centerText = findViewById(R.id.centerText);

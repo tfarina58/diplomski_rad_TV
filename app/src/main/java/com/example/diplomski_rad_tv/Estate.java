@@ -8,12 +8,12 @@ public class Estate {
     String image;
     double latitude;
     double longitude;
-    String name;
+    HashMap<String, String> name;
     String ownerId;
     String phone;
     Map<String, Object> variables;
 
-    public Estate(String id, String ownerId, String image, double latitude, double longitude, String name, Map<String, Object> variables) {
+    public Estate(String id, String ownerId, String image, double latitude, double longitude, HashMap<String, String> name, Map<String, Object> variables) {
         this.id = id;
         this.ownerId = ownerId;
         this.image = image;
