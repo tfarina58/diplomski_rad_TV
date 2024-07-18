@@ -15,7 +15,7 @@
         android:theme="@android:style/Theme.DeviceDefault">
 
         <activity
-            android:name=".ElementListActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
@@ -34,7 +34,7 @@
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".ElementListActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity

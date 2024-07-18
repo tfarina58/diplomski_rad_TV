@@ -158,4 +158,9 @@ public class SharedPreferencesService {
         editor.putString("lastRatingDate", Long.toString(dateTime));
         editor.apply();
     }
+
+    public void clearUserAndEstateInfo() {
+        setUserId("");
+        setEstateId("");
+    }
 }

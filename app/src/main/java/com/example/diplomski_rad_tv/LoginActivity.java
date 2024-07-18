@@ -27,6 +27,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.List;
 import java.util.Locale;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class LoginActivity extends Activity {
     FirebaseFirestore firestore;
     SharedPreferencesService sharedPreferencesService;
@@ -42,6 +45,8 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
 
         this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
+
+        // this.sharedPreferencesService.clearUserAndEstateInfo();
 
         String userId = sharedPreferencesService.getUserId();
         String estateId = sharedPreferencesService.getEstateId();
@@ -141,29 +146,57 @@ public class LoginActivity extends Activity {
                             String email = "tfarina58@gmail.com"; // ((EditText) findViewById(R.id.emailAddress)).getText().toString();
                             String password = "password"; // ((EditText) findViewById(R.id.password)).getText().toString();
 
-                            String emptyEmailFeedback, emptyPasswordFeedback, incorrectEmailOrPasswordFeedback, firebaseError;
+                            try {
+                                // Create a MessageDigest instance for SHA-256
+                                MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+
+                                // Convert input string to bytes and update the digest
+                                byte[] hashBytes = messageDigest.digest(password.getBytes());
+
+                                // Convert the hash bytes to a hex string
+                                StringBuilder hexString = new StringBuilder();
+                                for (byte b : hashBytes) {
+                                    String hex = Integer.toHexString(0xff & b);
+                                    if (hex.length() == 1) {
+                                        hexString.append('0');
+                                    }
+                                    hexString.append(hex);
+                                }
+
+                                password = hexString.toString();
+                            } catch (NoSuchAlgorithmException e) {
+                                return; // throw new RuntimeException("SHA-256 algorithm not found", e);
+                            }
+
+                            String emptyEmailFeedback, emptyPasswordFeedback, incorrectEmailOrPasswordFeedback, firebaseError, blockedStatus, bannedStatus;
                             switch (language) {
                                 case german:
                                     emptyEmailFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_empty_de);
                                     emptyPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.password_empty_de);
                                     incorrectEmailOrPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_or_password_incorrect_de);
                                     firebaseError = ContextCompat.getString(getApplicationContext(), R.string.firebase_error_de);
+                                    blockedStatus = ContextCompat.getString(getApplicationContext(), R.string.blocked_status_de);
+                                    bannedStatus = ContextCompat.getString(getApplicationContext(), R.string.banned_status_de);
                                     break;
                                 case croatian:
                                     emptyEmailFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_empty_hr);
                                     emptyPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.password_empty_hr);
                                     incorrectEmailOrPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_or_password_incorrect_hr);
                                     firebaseError = ContextCompat.getString(getApplicationContext(), R.string.firebase_error_hr);
+                                    blockedStatus = ContextCompat.getString(getApplicationContext(), R.string.blocked_status_hr);
+                                    bannedStatus = ContextCompat.getString(getApplicationContext(), R.string.banned_status_hr);
                                     break;
                                 default:
                                     emptyEmailFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_empty_en);
                                     emptyPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.password_empty_en);
                                     incorrectEmailOrPasswordFeedback = ContextCompat.getString(getApplicationContext(), R.string.email_or_password_incorrect_en);
                                     firebaseError = ContextCompat.getString(getApplicationContext(), R.string.firebase_error_en);
+                                    blockedStatus = ContextCompat.getString(getApplicationContext(), R.string.blocked_status_en);
+                                    bannedStatus = ContextCompat.getString(getApplicationContext(), R.string.banned_status_en);
                                     break;
                             }
 
-                            firestoreLogin(getApplicationContext(), email, password, emptyEmailFeedback, emptyPasswordFeedback, incorrectEmailOrPasswordFeedback, firebaseError, sharedPreferencesService.sharedPreferences);
+                            firestoreLogin(getApplicationContext(), email, password, emptyEmailFeedback, emptyPasswordFeedback, incorrectEmailOrPasswordFeedback, firebaseError, blockedStatus, bannedStatus, sharedPreferencesService.sharedPreferences);
                         }
                     });
                 }
@@ -171,7 +204,7 @@ public class LoginActivity extends Activity {
         }
     }
 
-    public void firestoreLogin(Context ctx, String email, String password, String emptyEmailFeedback, String emptyPasswordFeedback, String incorrectEmailOrPasswordFeedback, String firebaseError, SharedPreferences sharedPreferences) {
+    public void firestoreLogin(Context ctx, String email, String password, String emptyEmailFeedback, String emptyPasswordFeedback, String incorrectEmailOrPasswordFeedback, String firebaseError, String blockedStatus, String bannedStatus, SharedPreferences sharedPreferences) {
         if (email.isEmpty()) Toast.makeText(ctx, emptyEmailFeedback, Toast.LENGTH_LONG).show();
         if (password.isEmpty()) Toast.makeText(ctx, emptyPasswordFeedback, Toast.LENGTH_LONG).show();
 
@@ -186,6 +219,17 @@ public class LoginActivity extends Activity {
                         List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
                         if (documents.size() != 1) {
                             Toast.makeText(ctx, incorrectEmailOrPasswordFeedback, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        boolean blocked = documents.get(0).getBoolean("blocked");
+                        boolean banned = documents.get(0).getBoolean("banned");
+
+                        if (blocked) {
+                            Toast.makeText(ctx, blockedStatus, Toast.LENGTH_LONG).show();
+                            return;
+                        } else if (banned) {
+                            Toast.makeText(ctx, bannedStatus, Toast.LENGTH_LONG).show();
                             return;
                         }
 

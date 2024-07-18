@@ -120,6 +120,14 @@
     <string name="submit_password_de">Passwort einreichen</string>
     <string name="submit_password_hr">Pošalji lozinku</string>
 
+    <string name="blocked_status_en">You have been currently blocked from accessing your account.</string>
+    <string name="blocked_status_de">Der Zugriff auf Ihr Konto ist derzeit gesperrt.</string>
+    <string name="blocked_status_hr">Trenutno vam je blokiran pristup vašem računu.</string>
+
+    <string name="banned_status_en">You account has been permanently banned.</string>
+    <string name="banned_status_de">Ihr Konto wurde dauerhaft gesperrt.</string>
+    <string name="banned_status_hr">Vaš račun je trajno zabranjen.</string>
+
     <string name="empty_string"> </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
