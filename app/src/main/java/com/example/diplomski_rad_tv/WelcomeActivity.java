@@ -3,7 +3,6 @@ package com.example.diplomski_rad_tv;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Window;
@@ -17,12 +16,8 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.type.DateTime;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 public class WelcomeActivity extends Activity {
@@ -173,7 +168,7 @@ public class WelcomeActivity extends Activity {
         long endRatingInEpoch = to.getSeconds() * 1000; // (to - 1 day) in milliseconds;
         long lastRatingDate = sharedPreferencesService.getLastRatingDate();
 
-        if (startRatingInEpoch <= now && now < endRatingInEpoch && (lastRatingDate == -1 || !(startRatingInEpoch <= lastRatingDate && lastRatingDate < endRatingInEpoch))) startActivity(new Intent(getApplicationContext(), RatingActivity.class));
+        if (startRatingInEpoch <= now && now < endRatingInEpoch && (lastRatingDate == -1 || !(startRatingInEpoch <= lastRatingDate && lastRatingDate < endRatingInEpoch))) startActivity(new Intent(getApplicationContext(), MyRatingActivity.class));
         else startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
     }
 }

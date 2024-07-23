@@ -1,25 +1,22 @@
 package com.example.diplomski_rad_tv;
 
 import android.content.Context;
-import android.os.Build;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RatingBar;
-import android.widget.TextClock;
 
 import androidx.core.content.ContextCompat;
 
-public class RatingNavigation {
+public class MyRatingNavigation {
     private static final int[][] navigationRating = {
-            {0,                   R.id.ratingContent, 0,                   R.id.themeButton},  // languageButton
-            {0,                   R.id.ratingContent, R.id.languageButton, R.id.textClock},    // themeButton
-            {0,                   R.id.ratingContent, R.id.themeButton,    0},                 // textClock
-            {R.id.languageButton, R.id.ratingBar,     0,                   0},                 // ratingContent
-            {R.id.ratingContent,  R.id.cancelButton,  0,                   0},                 // ratingBar
-            {R.id.ratingBar,      0,                  0,                   R.id.ratingButton}, // cancelButton
-            {R.id.ratingBar,      0,                  R.id.cancelButton,   0},                 // ratingButton
+            {0,                   R.id.ratingContent, 0,                   R.id.themeButton},        // languageButton
+            {0,                   R.id.ratingContent, R.id.languageButton, R.id.textClock},          // themeButton
+            {0,                   R.id.ratingContent, R.id.themeButton,    0},                       // textClock
+            {R.id.languageButton, R.id.ratingBar,     0,                   0},                       // ratingContent
+            {R.id.ratingContent,  R.id.cancelButton,  0,                   0},                       // ratingBar
+            {R.id.ratingBar,      0,                  0,                   R.id.ratingSubmitButton}, // cancelButton
+            {R.id.ratingBar,      0,                  R.id.cancelButton,   0},                       // ratingSubmitButton
     };
     public static int navigateOverActivity(int currentViewId, int direction) {
         return navigationRating[getRowWithId(currentViewId)][direction];
@@ -31,7 +28,7 @@ public class RatingNavigation {
         if (currentViewId == R.id.ratingContent) return 3;
         if (currentViewId == R.id.ratingBar) return 4;
         if (currentViewId == R.id.cancelButton) return 5;
-        if (currentViewId == R.id.ratingButton) return 6;
+        if (currentViewId == R.id.ratingSubmitButton) return 6;
         return -1;
     }
 
@@ -40,7 +37,7 @@ public class RatingNavigation {
     }
 
     public static boolean isLowerButtons(int viewId) {
-        return viewId == R.id.ratingBar || viewId == R.id.cancelButton || viewId == R.id.ratingButton;
+        return viewId == R.id.ratingBar || viewId == R.id.cancelButton || viewId == R.id.ratingSubmitButton;
     }
 
     public static void setupRatingContentField(Context ctx, EditText ratingContent, View focusedView, Language language, Theme theme) {
@@ -111,7 +108,7 @@ public class RatingNavigation {
         else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design));
     }
 
-    public static void setupRatingButton(Context ctx, Button button, View focusedView, Language language) {
+    public static void setupRatingSubmitButton(Context ctx, Button button, View focusedView, Language language) {
         if (button == null) return;
 
         switch (language) {
@@ -125,7 +122,7 @@ public class RatingNavigation {
                 button.setText(R.string.send_rating_en);
         }
 
-        if (focusedView.getId() == R.id.ratingButton) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design_focused));
+        if (focusedView.getId() == R.id.ratingSubmitButton) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design_focused));
         else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design));
     }
 }

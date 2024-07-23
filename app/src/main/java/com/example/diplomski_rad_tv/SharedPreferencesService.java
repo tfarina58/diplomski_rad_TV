@@ -2,13 +2,6 @@ package com.example.diplomski_rad_tv;
 
 import android.content.SharedPreferences;
 
-import com.google.type.DateTime;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.Locale;
-
 public class SharedPreferencesService {
     SharedPreferences sharedPreferences;
     public SharedPreferencesService(SharedPreferences sharedPreferences) {
@@ -116,17 +109,17 @@ public class SharedPreferencesService {
     public GridNavigation getGrid() {
         String grid = sharedPreferences.getString("grid", "");
 
-        if (grid.equals("three")) return GridNavigation.three;
-        else if (grid.equals("six")) return GridNavigation.six;
-        return GridNavigation.one;
+        if (grid.equals("one")) return GridNavigation.one;
+        else if (grid.equals("three")) return GridNavigation.three;
+        return GridNavigation.six;
     }
 
     public void setGrid(GridNavigation grid) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        if (grid == GridNavigation.three) editor.putString("grid", "three");
-        else if (grid == GridNavigation.six) editor.putString("grid", "six");
-        else editor.putString("grid", "one");
+        if (grid == GridNavigation.one) editor.putString("grid", "one");
+        else if (grid == GridNavigation.three) editor.putString("grid", "three");
+        else editor.putString("grid", "six");
 
         editor.apply();
     }

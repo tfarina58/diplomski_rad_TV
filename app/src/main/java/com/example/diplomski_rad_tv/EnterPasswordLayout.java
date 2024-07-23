@@ -61,7 +61,7 @@ public class EnterPasswordLayout {
                 button.setText(R.string.cancel_en);
         }
 
-        if (focusedView.getId() == R.id.cancelButton) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design_focused));
+        if (focusedView.getId() == R.id.cancelButtonPassword) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design_focused));
         else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design));
     }
 

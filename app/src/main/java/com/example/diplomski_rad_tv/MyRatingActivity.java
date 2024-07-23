@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextClock;
@@ -27,13 +28,14 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class RatingActivity extends Activity {
+public class MyRatingActivity extends Activity {
     SharedPreferencesService sharedPreferencesService;
     Language language;
     Theme theme;
@@ -41,6 +43,8 @@ public class RatingActivity extends Activity {
     View focusedView;
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     ArrayList<HashMap<String, Object>> ratings = new ArrayList<>();
+    boolean anonymousCheckbox = true;
+    String username = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +57,7 @@ public class RatingActivity extends Activity {
         this.theme = sharedPreferencesService.getTheme();
         this.format = sharedPreferencesService.getClockFormat();
 
-        this.focusedView = findViewById(R.id.ratingButton);
+        this.focusedView = findViewById(R.id.ratingSubmitButton);
         this.focusedView.requestFocus();
 
         {
@@ -67,7 +71,7 @@ public class RatingActivity extends Activity {
         }
 
         this.setupContent();
-        this.getRatings();
+        this.getCurrentUserName();
     }
 
     @Override
@@ -79,18 +83,18 @@ public class RatingActivity extends Activity {
         if (keyCode == 4) {
             // startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
         } else if (keyCode >= 19 && keyCode <= 22) {
-            int newFocusedViewId = RatingNavigation.navigateOverActivity(focusedView.getId(), keyCode - 19);
+            int newFocusedViewId = MyRatingNavigation.navigateOverActivity(focusedView.getId(), keyCode - 19);
             if (newFocusedViewId == 0) return false;
 
             this.focusedView = findViewById(newFocusedViewId);
             this.focusedView.requestFocus();
 
             // Remove focus from old View
-            int row = RatingNavigation.getRowWithId(oldFocusedViewId);
+            int row = MyRatingNavigation.getRowWithId(oldFocusedViewId);
             this.updateView(row);
 
             // Add focus to new View
-            row = RatingNavigation.getRowWithId(newFocusedViewId);
+            row = MyRatingNavigation.getRowWithId(newFocusedViewId);
             this.updateView(row);
 
         }
@@ -194,14 +198,14 @@ public class RatingActivity extends Activity {
                 break;
             case 3:
                 EditText ratingContent = findViewById(R.id.ratingContent);
-                RatingNavigation.setupRatingContentField(getApplicationContext(), ratingContent, this.focusedView, this.language, this.theme);
+                MyRatingNavigation.setupRatingContentField(getApplicationContext(), ratingContent, this.focusedView, this.language, this.theme);
                 break;
             case 4:
                 RatingBar ratingBar = findViewById(R.id.ratingBar);
-                RatingNavigation.setupRatingBarField(getApplicationContext(), ratingBar, this.focusedView, this.theme);
+                MyRatingNavigation.setupRatingBarField(getApplicationContext(), ratingBar, this.focusedView, this.theme);
             case 5:
                 Button cancelButton = findViewById(R.id.cancelButton);
-                RatingNavigation.setupCancelButton(getApplicationContext(), cancelButton, this.focusedView, this.language);
+                MyRatingNavigation.setupCancelButton(getApplicationContext(), cancelButton, this.focusedView, this.language);
 
                 if (!cancelButton.hasOnClickListeners()) {
                     cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -213,11 +217,11 @@ public class RatingActivity extends Activity {
                 }
                 break;
             case 6:
-                Button ratingButton = findViewById(R.id.ratingButton);
-                RatingNavigation.setupRatingButton(getApplicationContext(), ratingButton, this.focusedView, this.language);
+                Button ratingSubmitButton = findViewById(R.id.ratingSubmitButton);
+                MyRatingNavigation.setupRatingSubmitButton(getApplicationContext(), ratingSubmitButton, this.focusedView, this.language);
 
-                if (!ratingButton.hasOnClickListeners()) {
-                    ratingButton.setOnClickListener(new View.OnClickListener() {
+                if (!ratingSubmitButton.hasOnClickListeners()) {
+                    ratingSubmitButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             EditText content = findViewById(R.id.ratingContent);
@@ -235,34 +239,6 @@ public class RatingActivity extends Activity {
         for (int i = 0; i <= 6; ++i) this.updateView(i);
     }
 
-    void getRatings() {
-        DocumentReference docRef = firestore.collection("estates").document(this.sharedPreferencesService.getEstateId());
-
-        docRef.get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot docSnap = task.getResult();
-                        ratings = (ArrayList<HashMap<String, Object>>)docSnap.get("ratings");
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        switch (language) {
-                            case german:
-                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_de), Toast.LENGTH_LONG).show();
-                                break;
-                            case croatian:
-                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_hr), Toast.LENGTH_LONG).show();
-                                break;
-                            default:
-                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_en), Toast.LENGTH_LONG).show();
-                                break;
-                        }
-                    }
-                });
-    }
-
     void saveRatings(EditText content, RatingBar grade) {
         if (content == null || grade == null) return;
 
@@ -272,36 +248,63 @@ public class RatingActivity extends Activity {
         Timestamp created =  new Timestamp(Instant.ofEpochSecond(now));
 
         HashMap<String, Object> currentRating = new HashMap<>();
-        currentRating.put("content", ratingContent);
-        currentRating.put("grade", ratingBar);
+        currentRating.put("comment", ratingContent);
+        currentRating.put("rating", ratingBar);
         currentRating.put("created", created);
+        currentRating.put("estateId", this.sharedPreferencesService.getEstateId());
+        currentRating.put("username",  this.anonymousCheckbox ? "" : username);
 
-        ratings.add(currentRating);
-
-        DocumentReference docRef = firestore.collection("estates").document(this.sharedPreferencesService.getEstateId());
-
-        docRef.update("ratings", this.ratings)
-                .addOnSuccessListener(new OnSuccessListener() {
-                    @Override
-                    public void onSuccess(Object o) {
-                        sharedPreferencesService.setLastRatingDate(now);
-                        startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
+        firestore.collection("ratings").add(currentRating)
+            .addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    sharedPreferencesService.setLastRatingDate(now);
+                    startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    switch (language) {
+                        case german:
+                            Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_de), Toast.LENGTH_LONG).show();
+                            break;
+                        case croatian:
+                            Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_hr), Toast.LENGTH_LONG).show();
+                            break;
+                        default:
+                            Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_en), Toast.LENGTH_LONG).show();
+                            break;
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        switch (language) {
-                            case german:
-                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_de), Toast.LENGTH_LONG).show();
-                                break;
-                            case croatian:
-                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_hr), Toast.LENGTH_LONG).show();
-                                break;
-                            default:
-                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_en), Toast.LENGTH_LONG).show();
-                                break;
+                }
+            });
+    }
+
+    void getCurrentUserName() {
+        DocumentReference ref = firestore.collection("estates").document(this.sharedPreferencesService.getEstateId());
+
+        ref.get()
+            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
+                    ArrayList<HashMap<String, Object>> guests = (ArrayList<HashMap<String, Object>>)queryDocumentSnapshots.get("guests");
+                    if (guests == null || guests.size() == 0) return;
+
+                    int guestsLength = guests.size();
+                    for (int i = 0; i < guestsLength; ++i) {
+                        Timestamp fromStamp = (Timestamp)(guests.get(i).getOrDefault("from", null));
+                        Timestamp toStamp = (Timestamp)(guests.get(i).getOrDefault("to", null));
+                        if (fromStamp == null || toStamp == null) continue;
+
+                        long epochFrom = fromStamp.getSeconds();
+                        long epochNow = System.currentTimeMillis() / 1000;
+                        long epochTo = toStamp.getSeconds();
+
+                        if (epochNow - epochFrom >= 0 && epochTo - epochNow > 0) {
+                            username = (String)(guests.get(i).getOrDefault("name", ""));
+                            break;
                         }
                     }
-                });
+                }
+            });
     }
 }
