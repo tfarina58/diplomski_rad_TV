@@ -128,6 +128,22 @@
     <string name="banned_status_de">Ihr Konto wurde dauerhaft gesperrt.</string>
     <string name="banned_status_hr">Vaš račun je trajno zabranjen.</string>
 
+    <string name="choose_rating_page_en">Choose next page</string>
+    <string name="choose_rating_page_de">Nächste Seite auswählen</string>
+    <string name="choose_rating_page_hr">Odaberite sljedeću stranicu</string>
+
+    <string name="my_rating_en">My rating</string>
+    <string name="my_rating_de">Meine Bewertung</string>
+    <string name="my_rating_hr">Moja ocjena</string>
+
+    <string name="show_ratings_en">Show ratings</string>
+    <string name="show_ratings_de">Bewertungen anzeigen</string>
+    <string name="show_ratings_hr">Prikaži ocjene</string>
+
+    <string name="no_ratings_en">There are no ratings to display!</string>
+    <string name="no_ratings_de">Es sind keine Bewertungen vorhanden!</string>
+    <string name="no_ratings_hr">Nema ocjena za prikaz!</string>
+
     <string name="empty_string"> </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
