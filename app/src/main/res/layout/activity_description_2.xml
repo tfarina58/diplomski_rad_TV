@@ -1,0 +1,259 @@
+<com.example.diplomski_rad_tv.CustomScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:layout_editor_absoluteX="1dp"
+    tools:layout_editor_absoluteY="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dark_theme"
+        android:focusable="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/descriptionTitle"
+            android:layout_width="265dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:focusable="false"
+            android:text="@string/element_name_en"
+            android:textAlignment="textStart"
+            android:textColor="#ffffff"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/ratingButton"
+            android:layout_width="118dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/header_button"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:text="@string/rating_en"
+            android:paddingLeft="26dp"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:focusable="true"
+            app:layout_constraintEnd_toStartOf="@+id/languageButton"
+            app:layout_constraintTop_toTopOf="parent">
+        </Button>
+
+        <ImageView
+            android:id="@+id/ratingIcon"
+            android:layout_width="24dp"
+            android:layout_height="22dp"
+            android:translationZ="20dp"
+            app:srcCompat="@drawable/rating"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton"
+            app:layout_constraintHorizontal_bias="0.109"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton" />
+
+        <Button
+            android:id="@+id/languageButton"
+            android:layout_width="118dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/header_button"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:text="@string/language_hr"
+            android:paddingLeft="26dp"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:focusable="true"
+            app:layout_constraintEnd_toStartOf="@+id/themeButton"
+            app:layout_constraintTop_toTopOf="parent">
+        </Button>
+
+        <ImageView
+            android:id="@+id/languageIcon"
+            android:layout_width="24dp"
+            android:layout_height="22dp"
+            android:translationZ="20dp"
+            app:srcCompat="@drawable/croatian"
+            app:layout_constraintBottom_toBottomOf="@+id/languageButton"
+            app:layout_constraintEnd_toEndOf="@+id/languageButton"
+            app:layout_constraintHorizontal_bias="0.109"
+            app:layout_constraintStart_toStartOf="@+id/languageButton"
+            app:layout_constraintTop_toTopOf="@+id/languageButton" />
+
+        <Button
+            android:id="@+id/themeButton"
+            android:layout_width="118dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/header_button"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:text="@string/light_theme_hr"
+            android:paddingLeft="26dp"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/textClock"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/themeIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:translationZ="20dp"
+            app:srcCompat="@drawable/moon"
+            app:layout_constraintBottom_toBottomOf="@+id/themeButton"
+            app:layout_constraintEnd_toEndOf="@+id/themeButton"
+            app:layout_constraintHorizontal_bias="0.184"
+            app:layout_constraintStart_toStartOf="@+id/themeButton"
+            app:layout_constraintTop_toTopOf="@+id/themeButton" />
+
+        <TextClock
+            android:id="@+id/textClock"
+            android:layout_width="128dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:text="12:45:00 AM"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:background="@drawable/header_button"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/descriptionContent"
+            android:layout_width="400dp"
+            android:layout_height="350dp"
+            android:layout_marginTop="88dp"
+            android:gravity="start"
+            android:maxLines="16"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:singleLine="false"
+            android:text="@string/lorem_ipsum"
+            android:textAlignment="textStart"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/descriptionImage1"
+            android:layout_width="400dp"
+            android:layout_height="350dp"
+            android:background="@drawable/highlighted_image_button_dark"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.908"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.41"
+            app:srcCompat="@drawable/logo" />
+
+        <Button
+            android:id="@+id/descriptionLink1"
+            android:layout_width="266dp"
+            android:layout_height="42dp"
+            android:layout_marginTop="28dp"
+            android:layout_marginStart="14dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/highlighted_image_button_dark"
+            android:gravity="center"
+            android:maxLength="40"
+            android:paddingHorizontal="8dp"
+            android:text="English"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.08"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/descriptionContent" />
+
+        <Button
+            android:id="@+id/descriptionLink2"
+            android:layout_width="266dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/highlighted_image_button_dark"
+            android:gravity="center"
+            android:maxLength="72"
+            android:paddingHorizontal="8dp"
+            android:text="English"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/descriptionLink1"
+            app:layout_constraintEnd_toStartOf="@+id/descriptionLink3"
+            app:layout_constraintHorizontal_bias="0.333"
+            app:layout_constraintStart_toEndOf="@+id/descriptionLink1"
+            app:layout_constraintTop_toTopOf="@+id/descriptionLink1" />
+
+        <Button
+            android:id="@+id/descriptionLink3"
+            android:layout_width="266dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/highlighted_image_button_dark"
+            android:gravity="center"
+            android:maxLength="72"
+            android:paddingHorizontal="8dp"
+            android:text="English"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/descriptionLink2"
+            app:layout_constraintStart_toEndOf="@+id/descriptionLink2"
+            app:layout_constraintTop_toTopOf="@+id/descriptionLink2" />
+
+        <Space
+            android:id="@+id/space"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/descriptionLink1" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:visibility="invisible"
+            android:layout_width="900dp"
+            android:layout_height="506dp"
+            android:layout_marginTop="64dp"
+            android:background="@color/dark_theme"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </androidx.viewpager2.widget.ViewPager2>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.example.diplomski_rad_tv.CustomScrollView>

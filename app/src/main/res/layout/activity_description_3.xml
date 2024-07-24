@@ -110,7 +110,7 @@
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@+id/gridButton"
+            app:layout_constraintEnd_toStartOf="@+id/textClock"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
@@ -124,36 +124,6 @@
             app:layout_constraintHorizontal_bias="0.184"
             app:layout_constraintStart_toStartOf="@+id/themeButton"
             app:layout_constraintTop_toTopOf="@+id/themeButton" />
-
-        <Button
-            android:id="@+id/gridButton"
-            android:layout_width="138dp"
-            android:layout_height="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:adjustViewBounds="true"
-            android:background="@drawable/header_button"
-            android:gravity="center"
-            android:scaleType="fitCenter"
-            android:text="@string/grid_en"
-            android:paddingLeft="26dp"
-            android:textAlignment="center"
-            android:textAllCaps="false"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@+id/textClock"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/gridIcon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            app:srcCompat="@drawable/grid"
-            android:translationZ="20dp"
-            app:layout_constraintBottom_toBottomOf="@+id/gridButton"
-            app:layout_constraintEnd_toEndOf="@+id/gridButton"
-            app:layout_constraintHorizontal_bias="0.17"
-            app:layout_constraintStart_toStartOf="@+id/gridButton"
-            app:layout_constraintTop_toTopOf="@+id/gridButton" />
 
         <TextClock
             android:id="@+id/textClock"
@@ -170,137 +140,26 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/descriptionContent"
-            android:layout_width="820dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="88dp"
-            android:gravity="start"
-            android:maxLines="16"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp"
-            android:singleLine="false"
-            android:text="@string/lorem_ipsum"
-            android:textAlignment="textStart"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.503"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/descriptionImage1"
-            android:layout_width="266dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="30dp"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="900dp"
+            android:layout_height="506dp"
+            android:layout_marginTop="64dp"
             android:background="@drawable/highlighted_image_button_dark"
-            android:padding="12dp"
+            android:paddingHorizontal="50dp"
+            android:paddingVertical="28dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.094"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionContent"
-            app:srcCompat="@drawable/logo" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/descriptionImage2"
-            android:layout_width="266dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="30dp"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionContent"
-            app:srcCompat="@drawable/logo" />
-
-        <ImageView
-            android:id="@+id/descriptionImage3"
-            android:layout_width="266dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="30dp"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.908"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionContent"
-            app:srcCompat="@drawable/logo" />
-
-        <ImageView
-            android:id="@+id/descriptionImage4"
-            android:layout_width="266dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.094"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionImage1"
-            app:srcCompat="@drawable/logo" />
-
-        <ImageView
-            android:id="@+id/descriptionImage5"
-            android:layout_width="266dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionImage2"
-            app:srcCompat="@drawable/logo" />
-
-        <ImageView
-            android:id="@+id/descriptionImage6"
-            android:layout_width="266dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.908"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionImage3"
-            app:srcCompat="@drawable/logo" />
-
-        <ImageView
-            android:id="@+id/descriptionImage7"
-            android:layout_width="266dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.094"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionImage4"
-            app:srcCompat="@drawable/logo" />
-
-        <ImageView
-            android:id="@+id/descriptionImage8"
-            android:layout_width="266dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionImage5"
-            app:srcCompat="@drawable/logo" />
-
-        <ImageView
-            android:id="@+id/descriptionImage9"
-            android:layout_width="266dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.908"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionImage6"
-            app:srcCompat="@drawable/logo" />
+        </androidx.viewpager2.widget.ViewPager2>
 
         <Button
             android:id="@+id/descriptionLink1"
             android:layout_width="266dp"
             android:layout_height="42dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="16dp"
             android:adjustViewBounds="true"
             android:background="@drawable/highlighted_image_button_dark"
             android:gravity="center"
@@ -311,9 +170,9 @@
             android:textAllCaps="false"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.086"
+            app:layout_constraintHorizontal_bias="0.08"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionImage7" />
+            app:layout_constraintTop_toBottomOf="@+id/viewPager" />
 
         <Button
             android:id="@+id/descriptionLink2"
@@ -335,50 +194,35 @@
             app:layout_constraintEnd_toStartOf="@+id/descriptionLink3"
             app:layout_constraintHorizontal_bias="0.333"
             app:layout_constraintStart_toEndOf="@+id/descriptionLink1"
-            app:layout_constraintTop_toTopOf="@+id/descriptionLink1"
-            app:layout_constraintVertical_bias="0.333" />
+            app:layout_constraintTop_toTopOf="@+id/descriptionLink1" />
 
         <Button
             android:id="@+id/descriptionLink3"
             android:layout_width="266dp"
             android:layout_height="42dp"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:adjustViewBounds="true"
             android:background="@drawable/highlighted_image_button_dark"
+            android:gravity="center"
             android:maxLength="72"
             android:paddingHorizontal="8dp"
             android:text="English"
             android:textAlignment="center"
-            android:gravity="center"
             android:textAllCaps="false"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/descriptionLink2"
             app:layout_constraintStart_toEndOf="@+id/descriptionLink2"
-            app:layout_constraintTop_toTopOf="@+id/descriptionLink2"
-            app:layout_constraintVertical_bias="0.305" />
+            app:layout_constraintTop_toTopOf="@+id/descriptionLink2" />
 
         <Space
+            android:id="@+id/space"
             android:layout_width="match_parent"
             android:layout_height="38dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionLink1"
-            tools:layout_editor_absoluteY="317dp" />
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager"
-            android:visibility="invisible"
-            android:layout_width="900dp"
-            android:layout_height="506dp"
-            android:layout_marginTop="64dp"
-            android:background="@color/dark_theme"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-        </androidx.viewpager2.widget.ViewPager2>
+            app:layout_constraintTop_toBottomOf="@+id/descriptionLink1" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.example.diplomski_rad_tv.CustomScrollView>
