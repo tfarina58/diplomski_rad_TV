@@ -1,7 +1,7 @@
 package com.example.diplomski_rad_tv;
 
 public class DescriptionNavigation {
-    private static final int[][] navigationDescription = {
+    private static final int[][] navigationDescription1 = {
             {0,                       R.id.descriptionContent, 0,                      R.id.themeButton},       // languageButton
             {0,                       R.id.descriptionContent, R.id.languageButton,    R.id.textClock},         // themeButton
             {0,                       R.id.descriptionContent, R.id.themeButton,       0},                      // textClock
@@ -20,7 +20,7 @@ public class DescriptionNavigation {
             {R.id.descriptionImage9,  0,                       R.id.descriptionLink2,  0}                       // link3
     };
     public static int navigateOverActivity(int oldFocusedViewId, int direction) {
-        return navigationDescription[getRowWithId(oldFocusedViewId)][direction];
+        return navigationDescription1[getRowWithId(oldFocusedViewId)][direction];
     }
     public static int getRowWithId(int currentViewId) {
         if (currentViewId == R.id.languageButton) return 0;

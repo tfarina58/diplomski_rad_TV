@@ -39,7 +39,7 @@ public class DescriptionActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_description);
+        setContentView(R.layout.activity_description_1);
 
         this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
         this.language = this.sharedPreferencesService.getLanguage();
