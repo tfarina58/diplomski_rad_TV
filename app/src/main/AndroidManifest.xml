@@ -15,12 +15,11 @@
         android:theme="@android:style/Theme.DeviceDefault">
 
         <activity
-            android:name=".EstateListActivity"
+            android:name=".LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -30,15 +29,15 @@
             android:exported="false"
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
         <activity
+            android:name=".EstateListActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
             android:name=".CategoryListActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".LoginActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustNothing" />
-        <activity
-            android:name=".MyRatingActivity"
+            android:name=".ElementListActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity
@@ -46,7 +45,11 @@
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".ElementListActivity"
+            android:name=".RatingListActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
+            android:name=".MyRatingActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing" />
     </application>

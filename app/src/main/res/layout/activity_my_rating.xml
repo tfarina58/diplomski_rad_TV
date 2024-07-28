@@ -14,9 +14,9 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="14dp"
         android:focusable="false"
-        android:text="@string/rating_en"
+        android:text="@string/your_rating_en"
         android:textAlignment="textStart"
-        android:textColor="#ffffff"
+        android:textColor="@color/text_color_dark_mode"
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,7 +101,7 @@
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textSize="14sp"
-        app:layout_constraintEnd_toStartOf="@+id/gridButton"
+        app:layout_constraintEnd_toStartOf="@+id/textClock"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
@@ -115,36 +115,6 @@
         app:layout_constraintHorizontal_bias="0.184"
         app:layout_constraintStart_toStartOf="@+id/themeButton"
         app:layout_constraintTop_toTopOf="@+id/themeButton" />
-
-    <Button
-        android:id="@+id/gridButton"
-        android:layout_width="138dp"
-        android:layout_height="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:adjustViewBounds="true"
-        android:background="@drawable/header_button"
-        android:gravity="center"
-        android:scaleType="fitCenter"
-        android:text="@string/grid_en"
-        android:paddingLeft="26dp"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toStartOf="@+id/textClock"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/gridIcon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        app:srcCompat="@drawable/grid"
-        android:translationZ="20dp"
-        app:layout_constraintBottom_toBottomOf="@+id/gridButton"
-        app:layout_constraintEnd_toEndOf="@+id/gridButton"
-        app:layout_constraintHorizontal_bias="0.17"
-        app:layout_constraintStart_toStartOf="@+id/gridButton"
-        app:layout_constraintTop_toTopOf="@+id/gridButton" />
 
     <TextClock
         android:id="@+id/textClock"
@@ -218,5 +188,85 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.697"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/chooseRatingLayout"
+        android:layout_width="500dp"
+        android:layout_height="250dp"
+        android:visibility="invisible"
+        android:translationZ="20dp"
+        android:background="@color/dark_theme"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ratingMain"
+            android:background="@drawable/main_border_dark"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/chooseRatingTitle"
+                android:layout_width="400dp"
+                android:layout_height="50dp"
+                android:text="@string/choose_rating_page_en"
+                android:textAlignment="center"
+                android:textColor="#ffffff"
+                android:textFontWeight="@android:integer/config_longAnimTime"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.31" />
+
+            <Button
+                android:id="@+id/showRatingsButton"
+                android:layout_width="112dp"
+                android:layout_height="50dp"
+                android:layout_marginBottom="60dp"
+                android:background="@drawable/button_design"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:text="@string/show_ratings_en"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.12"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Button
+                android:id="@+id/cancelButtonRating"
+                android:layout_width="112dp"
+                android:layout_height="50dp"
+                android:layout_marginBottom="60dp"
+                android:background="@drawable/button_design"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:text="@string/cancel_en"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Button
+                android:id="@+id/submitRatingButton"
+                android:layout_width="112dp"
+                android:layout_height="50dp"
+                android:layout_marginBottom="60dp"
+                android:background="@drawable/button_design"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:text="@string/my_rating_en"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.88"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

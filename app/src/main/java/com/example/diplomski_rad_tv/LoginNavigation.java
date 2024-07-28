@@ -41,20 +41,24 @@ public class LoginNavigation {
         if (focusedView.getId() == R.id.emailAddress) {
             if (theme == Theme.light) {
                 emailField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.edittext_design_focused_light));
+                emailField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
                 emailFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
                 emailFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             } else {
                 emailField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.edittext_design_focused_dark));
+                emailField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
                 emailFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
                 emailFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
             }
         } else {
             if (theme == Theme.light) {
                 emailField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+                emailField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
                 emailFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
                 emailFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             } else {
                 emailField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+                emailField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
                 emailFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
                 emailFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
             }
@@ -78,20 +82,24 @@ public class LoginNavigation {
         if (focusedView.getId() == R.id.password) {
             if (theme == Theme.light) {
                 passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.edittext_design_focused_light));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
                 passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
                 passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             } else {
                 passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.edittext_design_focused_dark));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
                 passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
                 passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
             }
         } else {
             if (theme == Theme.light) {
                 passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
                 passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
                 passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             } else {
                 passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
                 passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
                 passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
             }

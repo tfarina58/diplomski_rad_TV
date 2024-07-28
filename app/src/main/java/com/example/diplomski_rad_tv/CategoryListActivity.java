@@ -35,6 +35,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -105,6 +107,7 @@ public class CategoryListActivity extends Activity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         categories = new Category[0];
+                        loadingInProgress = false;
                         setupCategoriesToShow();
                         setNewContentView();
                     }
@@ -175,11 +178,11 @@ public class CategoryListActivity extends Activity {
 
                 // Remove focus from old View
                 int row = EnterPasswordLayoutNavigation.getRowWithId(oldFocusedViewId);
-                updateLayoutView(row);
+                updateLayoutView(this.focusedLayout, row);
 
                 // Add focus to new View
                 row = EnterPasswordLayoutNavigation.getRowWithId(newFocusedViewId);
-                updateLayoutView(row);
+                updateLayoutView(this.focusedLayout, row);
 
             } else if (keyCode == 4) {
                 FrameLayout enterPasswordLayout = findViewById(R.id.enterPasswordLayout);
@@ -194,7 +197,7 @@ public class CategoryListActivity extends Activity {
                 this.layoutFocusedView = null;
                 this.focusedView.requestFocus();
 
-                this.setupPasswordLayout(getApplicationContext(), enterPasswordLayout, background, enterPasswordTitle, passwordField, passwordFieldTitle, cancelButton, submitButton, true, this.layoutFocusedView, this.language, this.theme);
+                this.setupPasswordLayout(getApplicationContext(), enterPasswordLayout, background, enterPasswordTitle, passwordField, passwordFieldTitle, cancelButton, submitButton, false, this.layoutFocusedView, this.language, this.theme);
             }
             // Enter button
             else if (keyCode == 23) this.layoutFocusedView.callOnClick();
@@ -209,12 +212,12 @@ public class CategoryListActivity extends Activity {
         if (keyCode >= 19 && keyCode <= 22) {
             if (specialCaseNavigation(oldFocusedViewId, keyCode - 19)) return true;
 
-            int newFocusedViewId = GridNavigation.navigateOverActivity(this.grid, oldFocusedViewId, keyCode - 19);
+            int newFocusedViewId = GridNavigation.navigateOverActivity(false, this.grid, oldFocusedViewId, keyCode - 19);
 
             // If navigating up or down
             if (keyCode == 19 || keyCode == 20)
                 while (!checkViewExistence(newFocusedViewId) && newFocusedViewId != 0)
-                    newFocusedViewId = GridNavigation.navigateOverActivity(this.grid, newFocusedViewId, keyCode - 19);
+                    newFocusedViewId = GridNavigation.navigateOverActivity(false, this.grid, newFocusedViewId, keyCode - 19);
 
             if (newFocusedViewId == 0 || !checkViewExistence(newFocusedViewId)) return false;
 
@@ -222,11 +225,11 @@ public class CategoryListActivity extends Activity {
             this.focusedView.requestFocus();
 
             // Remove focus from old View
-            int row = GridNavigation.getRowWithId(oldFocusedViewId);
+            int row = GridNavigation.getNormalRowWithId(oldFocusedViewId);
             updateView(row);
 
             // Add focus to new View
-            row = GridNavigation.getRowWithId(newFocusedViewId);
+            row = GridNavigation.getNormalRowWithId(newFocusedViewId);
             updateView(row);
 
             if (newFocusedViewId == R.id.searchView || newFocusedViewId == R.id.pagination) {
@@ -295,7 +298,7 @@ public class CategoryListActivity extends Activity {
             button = findViewById(R.id.ratingButton);
             icon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), button, icon, this.focusedView, this.language);
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), button, icon, true, this.focusedView, this.language);
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -832,7 +835,7 @@ public class CategoryListActivity extends Activity {
             Button ratingButton = findViewById(R.id.ratingButton);
             ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, this.focusedView, this.language);
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
         } else if (row == 1) {
             Button languageButton = findViewById(R.id.languageButton);
             ImageView languageIcon = findViewById(R.id.languageIcon);
@@ -931,27 +934,6 @@ public class CategoryListActivity extends Activity {
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
             else
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
-        }
-    }
-
-    public void updateLayoutView(int row) {
-        switch (row) {
-            case 0:
-                EditText passwordField = findViewById(R.id.password);
-                TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
-
-                EnterPasswordLayout.setupPasswordField(getApplicationContext(), passwordField, passwordFieldTitle, this.layoutFocusedView, this.language, this.theme);
-                break;
-            case 1:
-                Button cancelButton = findViewById(R.id.cancelButtonPassword);
-
-                EnterPasswordLayout.setupCancelButton(getApplicationContext(), cancelButton, this.layoutFocusedView, this.language);
-                break;
-            case 2:
-                Button submitButton = findViewById(R.id.submitButton);
-
-                EnterPasswordLayout.setupSubmitButton(getApplicationContext(), submitButton, this.layoutFocusedView, this.language);
-                break;
         }
     }
 
@@ -1076,7 +1058,7 @@ public class CategoryListActivity extends Activity {
                     this.currentPage--;
                     if (this.grid == GridNavigation.one) {
                         backgroundAlreadySet = false;
-                        this.updateView(6);
+                        this.updateView(7);
                     } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton3);
                         this.updateView(7);
@@ -1265,17 +1247,50 @@ public class CategoryListActivity extends Activity {
     void checkPasswordMatching(String password) {
         if (password == null || password.isEmpty()) return;
 
-        // password =
+        try {
+            // Create a MessageDigest instance for SHA-256
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+
+            // Convert input string to bytes and update the digest
+            byte[] hashBytes = messageDigest.digest(password.getBytes());
+
+            // Convert the hash bytes to a hex string
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+
+            password = hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            return; // throw new RuntimeException("SHA-256 algorithm not found", e);
+        }
 
         DocumentReference query = firestore.collection("users").document(sharedPreferencesService.getUserId());
+
+        String finalPassword = password;
 
         query.get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
                         String firestorePassword = queryDocumentSnapshots.getString("password");
-                        // if (!password.equals(firestorePassword)) return;
-                        if (!"password".equals(firestorePassword)) return; // TODO: remove predefined value!!!
+                        if (!finalPassword.equals(firestorePassword)) {
+                            switch (language) {
+                                case german:
+                                    Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.incorrect_password_de), Toast.LENGTH_LONG).show();
+                                    break;
+                                case croatian:
+                                    Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.incorrect_password_hr), Toast.LENGTH_LONG).show();
+                                    break;
+                                default:
+                                    Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.incorrect_password_en), Toast.LENGTH_LONG).show();
+                            }
+                            return;
+                        }
 
                         FrameLayout enterPasswordLayout = findViewById(R.id.enterPasswordLayout);
                         enterPasswordLayout.setVisibility(View.INVISIBLE);
@@ -1369,7 +1384,6 @@ public class CategoryListActivity extends Activity {
                 // layoutFocusedView = null;
 
                 setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, false, layoutFocusedView, language, theme);
-
             }
         });
 

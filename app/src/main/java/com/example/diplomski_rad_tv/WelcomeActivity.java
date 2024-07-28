@@ -49,7 +49,7 @@ public class WelcomeActivity extends Activity {
         // Enter button
         if (keyCode == 23) {
             skipFunction = true;
-            navigateToNextPage();
+            startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
             return true;
         }
         return false;
@@ -150,25 +150,10 @@ public class WelcomeActivity extends Activity {
                 @Override
                 public void run() {
                     if (skipFunction) return;
-                    navigateToNextPage();
+                    startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
                 }
             },
             6000
         );
-    }
-
-    void navigateToNextPage() {
-        if (from == null || to == null) {
-            startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
-            return;
-        }
-
-        long now = System.currentTimeMillis();
-        long startRatingInEpoch = (to.getSeconds() - 86400) * 1000; // (to - 1 day) in milliseconds;
-        long endRatingInEpoch = to.getSeconds() * 1000; // (to - 1 day) in milliseconds;
-        long lastRatingDate = sharedPreferencesService.getLastRatingDate();
-
-        if (startRatingInEpoch <= now && now < endRatingInEpoch && (lastRatingDate == -1 || !(startRatingInEpoch <= lastRatingDate && lastRatingDate < endRatingInEpoch))) startActivity(new Intent(getApplicationContext(), MyRatingActivity.class));
-        else startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
     }
 }

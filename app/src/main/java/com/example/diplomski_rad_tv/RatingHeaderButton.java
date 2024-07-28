@@ -8,8 +8,14 @@ import android.widget.ImageView;
 import androidx.core.content.ContextCompat;
 
 public class RatingHeaderButton {
-    public static void setupRatingButton(Context ctx, Button ratingButton, ImageView ratingIcon, View focusedView, Language language) {
+    public static void setupRatingButton(Context ctx, Button ratingButton, ImageView ratingIcon, boolean visible, View focusedView, Language language) {
         if (ratingButton == null || ratingIcon == null) return;
+
+        if (!visible) {
+            ratingButton.setVisibility(View.INVISIBLE);
+            ratingIcon.setVisibility(View.INVISIBLE);
+            return;
+        }
 
         switch (language) {
             case german:

@@ -1,0 +1,944 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:layout_editor_absoluteX="1dp"
+    tools:layout_editor_absoluteY="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dark_theme"
+        android:focusable="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/ratingTitle"
+            android:layout_width="265dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:focusable="false"
+            android:text="@string/ratings_en"
+            android:textAlignment="textStart"
+            android:textColor="@color/text_color_dark_mode"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/ratingButton"
+            android:layout_width="128dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/header_button"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:text="@string/rating_en"
+            android:paddingLeft="26dp"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:focusable="true"
+            app:layout_constraintEnd_toStartOf="@+id/languageButton"
+            app:layout_constraintTop_toTopOf="parent">
+        </Button>
+
+        <ImageView
+            android:id="@+id/ratingIcon"
+            android:layout_width="24dp"
+            android:layout_height="22dp"
+            android:translationZ="20dp"
+            app:srcCompat="@drawable/rating"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton"
+            app:layout_constraintHorizontal_bias="0.109"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton" />
+
+        <Button
+            android:id="@+id/languageButton"
+            android:layout_width="118dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/header_button"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:text="@string/language_hr"
+            android:paddingLeft="26dp"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:focusable="true"
+            app:layout_constraintEnd_toStartOf="@+id/themeButton"
+            app:layout_constraintTop_toTopOf="parent">
+        </Button>
+
+        <ImageView
+            android:id="@+id/languageIcon"
+            android:layout_width="24dp"
+            android:layout_height="22dp"
+            android:translationZ="20dp"
+            app:srcCompat="@drawable/croatian"
+            app:layout_constraintBottom_toBottomOf="@+id/languageButton"
+            app:layout_constraintEnd_toEndOf="@+id/languageButton"
+            app:layout_constraintHorizontal_bias="0.109"
+            app:layout_constraintStart_toStartOf="@+id/languageButton"
+            app:layout_constraintTop_toTopOf="@+id/languageButton" />
+
+        <Button
+            android:id="@+id/themeButton"
+            android:layout_width="118dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/header_button"
+            android:gravity="center"
+            android:scaleType="fitCenter"
+            android:text="@string/light_theme_hr"
+            android:paddingLeft="26dp"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/textClock"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/themeIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:translationZ="20dp"
+            app:srcCompat="@drawable/moon"
+            app:layout_constraintBottom_toBottomOf="@+id/themeButton"
+            app:layout_constraintEnd_toEndOf="@+id/themeButton"
+            app:layout_constraintHorizontal_bias="0.184"
+            app:layout_constraintStart_toStartOf="@+id/themeButton"
+            app:layout_constraintTop_toTopOf="@+id/themeButton" />
+
+        <TextClock
+            android:id="@+id/textClock"
+            android:layout_width="128dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:text="12:45:00 AM"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:background="@drawable/header_button"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/centerText"
+            android:visibility="invisible"
+            android:layout_width="330dp"
+            android:layout_height="100dp"
+            android:text="@string/no_ratings_en"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:textSize="22sp"
+            android:translationZ="10dp"
+            android:layout_marginTop="220dp"
+            android:textColor="@color/text_color_dark_mode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:visibility="invisible"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:indeterminate="true"
+            android:translationZ="20dp"
+            android:layout_marginTop="146dp"
+            android:indeterminateTint="@color/loader_color_dark_mode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/ratingButton1"
+            android:layout_width="820dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="100dp"
+            android:background="@drawable/purple_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/ratingUsername1"
+            android:layout_width="360dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="@string/anonymous_en"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:translationZ="2dp"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton1"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton1" />
+
+        <RatingBar
+            android:id="@+id/ratingBar1"
+            android:layout_width="264dp"
+            android:layout_height="70dp"
+            android:rating="5"
+            android:stepSize="1"
+            android:padding="12dp"
+            android:theme="@style/RatingBar"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="20dp"
+            android:translationZ="2dp"
+            android:focusable="false"
+            android:isIndicator="true"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton1"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton1" />
+
+        <Button
+            android:id="@+id/centerLine1"
+            android:layout_width="780dp"
+            android:layout_height="2dp"
+            android:background="@color/purple_secondary"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton1"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton1"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton1"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton1"
+            app:layout_constraintVertical_bias="0.33" />
+
+        <TextView
+            android:id="@+id/ratingComment1"
+            android:layout_width="780dp"
+            android:layout_height="162dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/lorem_ipsum"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton1"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton1"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton1" />
+
+        <Button
+            android:id="@+id/ratingButton2"
+            android:layout_width="820dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/purple_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ratingButton1" />
+
+        <TextView
+            android:id="@+id/ratingUsername2"
+            android:layout_width="360dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="@string/anonymous_en"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:translationZ="2dp"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton2"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton2" />
+
+        <RatingBar
+            android:id="@+id/ratingBar2"
+            android:layout_width="264dp"
+            android:layout_height="70dp"
+            android:rating="5"
+            android:stepSize="1"
+            android:padding="12dp"
+            android:theme="@style/RatingBar"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="20dp"
+            android:translationZ="2dp"
+            android:focusable="false"
+            android:isIndicator="true"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton2"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton2" />
+
+        <Button
+            android:id="@+id/centerLine2"
+            android:layout_width="780dp"
+            android:layout_height="2dp"
+            android:background="@color/purple_secondary"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton2"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton2"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton2"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton2"
+            app:layout_constraintVertical_bias="0.33"/>
+
+        <TextView
+            android:id="@+id/ratingComment2"
+            android:layout_width="780dp"
+            android:layout_height="162dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/lorem_ipsum"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton2"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton2"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton2" />
+
+        <Button
+            android:id="@+id/ratingButton3"
+            android:layout_width="820dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/purple_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ratingButton2" />
+
+        <TextView
+            android:id="@+id/ratingUsername3"
+            android:layout_width="360dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="@string/anonymous_en"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:translationZ="2dp"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton3"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton3" />
+
+        <RatingBar
+            android:id="@+id/ratingBar3"
+            android:layout_width="264dp"
+            android:layout_height="70dp"
+            android:rating="5"
+            android:stepSize="1"
+            android:padding="12dp"
+            android:theme="@style/RatingBar"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="20dp"
+            android:translationZ="2dp"
+            android:focusable="false"
+            android:isIndicator="true"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton3"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton3" />
+
+        <Button
+            android:id="@+id/centerLine3"
+            android:layout_width="780dp"
+            android:layout_height="2dp"
+            android:background="@color/purple_secondary"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton3"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton3"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton3"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton3"
+            app:layout_constraintVertical_bias="0.33"/>
+
+        <TextView
+            android:id="@+id/ratingComment3"
+            android:layout_width="780dp"
+            android:layout_height="162dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/lorem_ipsum"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton3"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton3"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton3" />
+
+        <Button
+            android:id="@+id/ratingButton4"
+            android:layout_width="820dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/purple_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ratingButton3" />
+
+        <TextView
+            android:id="@+id/ratingUsername4"
+            android:layout_width="360dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="@string/anonymous_en"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:translationZ="2dp"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton4"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton4" />
+
+        <RatingBar
+            android:id="@+id/ratingBar4"
+            android:layout_width="264dp"
+            android:layout_height="70dp"
+            android:rating="5"
+            android:stepSize="1"
+            android:padding="12dp"
+            android:theme="@style/RatingBar"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="20dp"
+            android:translationZ="2dp"
+            android:focusable="false"
+            android:isIndicator="true"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton4"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton4" />
+
+        <Button
+            android:id="@+id/centerLine4"
+            android:layout_width="780dp"
+            android:layout_height="2dp"
+            android:background="@color/purple_secondary"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton4"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton4"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton4"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton4"
+            app:layout_constraintVertical_bias="0.33"/>
+
+        <TextView
+            android:id="@+id/ratingComment4"
+            android:layout_width="780dp"
+            android:layout_height="162dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/lorem_ipsum"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton4"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton4"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton4" />
+
+        <Button
+            android:id="@+id/ratingButton5"
+            android:layout_width="820dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/purple_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ratingButton4" />
+
+        <TextView
+            android:id="@+id/ratingUsername5"
+            android:layout_width="360dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="@string/anonymous_en"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:translationZ="2dp"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton5"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton5" />
+
+        <RatingBar
+            android:id="@+id/ratingBar5"
+            android:layout_width="264dp"
+            android:layout_height="70dp"
+            android:rating="5"
+            android:stepSize="1"
+            android:padding="12dp"
+            android:theme="@style/RatingBar"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="20dp"
+            android:translationZ="2dp"
+            android:focusable="false"
+            android:isIndicator="true"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton5"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton5" />
+
+        <Button
+            android:id="@+id/centerLine5"
+            android:layout_width="780dp"
+            android:layout_height="2dp"
+            android:background="@color/purple_secondary"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton5"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton5"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton5"
+            app:layout_constraintVertical_bias="0.33"/>
+
+        <TextView
+            android:id="@+id/ratingComment5"
+            android:layout_width="780dp"
+            android:layout_height="162dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/lorem_ipsum"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton5"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton5"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton5" />
+
+        <Button
+            android:id="@+id/ratingButton6"
+            android:layout_width="820dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="100dp"
+            android:background="@drawable/purple_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ratingButton5" />
+
+        <TextView
+            android:id="@+id/ratingUsername6"
+            android:layout_width="360dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="@string/anonymous_en"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:translationZ="2dp"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton6"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton6" />
+
+        <RatingBar
+            android:id="@+id/ratingBar6"
+            android:layout_width="264dp"
+            android:layout_height="70dp"
+            android:rating="5"
+            android:stepSize="1"
+            android:padding="12dp"
+            android:theme="@style/RatingBar"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="20dp"
+            android:translationZ="2dp"
+            android:focusable="false"
+            android:isIndicator="true"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton6"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton6" />
+
+        <Button
+            android:id="@+id/centerLine6"
+            android:layout_width="780dp"
+            android:layout_height="2dp"
+            android:background="@color/purple_secondary"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton6"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton6"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton6"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton6"
+            app:layout_constraintVertical_bias="0.33" />
+
+        <TextView
+            android:id="@+id/ratingComment6"
+            android:layout_width="780dp"
+            android:layout_height="162dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/lorem_ipsum"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton6"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton6"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton6" />
+
+        <Button
+            android:id="@+id/ratingButton7"
+            android:layout_width="820dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/purple_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ratingButton6" />
+
+        <TextView
+            android:id="@+id/ratingUsername7"
+            android:layout_width="360dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="@string/anonymous_en"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:translationZ="2dp"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton7"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton7" />
+
+        <RatingBar
+            android:id="@+id/ratingBar7"
+            android:layout_width="264dp"
+            android:layout_height="70dp"
+            android:rating="5"
+            android:stepSize="1"
+            android:padding="12dp"
+            android:theme="@style/RatingBar"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="20dp"
+            android:translationZ="2dp"
+            android:focusable="false"
+            android:isIndicator="true"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton7"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton7" />
+
+        <Button
+            android:id="@+id/centerLine7"
+            android:layout_width="780dp"
+            android:layout_height="2dp"
+            android:background="@color/purple_secondary"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton7"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton7"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton7"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton7"
+            app:layout_constraintVertical_bias="0.33"/>
+
+        <TextView
+            android:id="@+id/ratingComment7"
+            android:layout_width="780dp"
+            android:layout_height="162dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/lorem_ipsum"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton7"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton7"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton7" />
+
+        <Button
+            android:id="@+id/ratingButton8"
+            android:layout_width="820dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/purple_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ratingButton7" />
+
+        <TextView
+            android:id="@+id/ratingUsername8"
+            android:layout_width="360dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="@string/anonymous_en"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:translationZ="2dp"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton8"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton8" />
+
+        <RatingBar
+            android:id="@+id/ratingBar8"
+            android:layout_width="264dp"
+            android:layout_height="70dp"
+            android:rating="5"
+            android:stepSize="1"
+            android:padding="12dp"
+            android:theme="@style/RatingBar"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="20dp"
+            android:translationZ="2dp"
+            android:focusable="false"
+            android:isIndicator="true"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton8"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton8" />
+
+        <Button
+            android:id="@+id/centerLine8"
+            android:layout_width="780dp"
+            android:layout_height="2dp"
+            android:background="@color/purple_secondary"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton8"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton8"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton8"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton8"
+            app:layout_constraintVertical_bias="0.33"/>
+
+        <TextView
+            android:id="@+id/ratingComment8"
+            android:layout_width="780dp"
+            android:layout_height="162dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/lorem_ipsum"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton8"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton8"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton8" />
+
+        <Button
+            android:id="@+id/ratingButton9"
+            android:layout_width="820dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/purple_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ratingButton8" />
+
+        <TextView
+            android:id="@+id/ratingUsername9"
+            android:layout_width="360dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="@string/anonymous_en"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:translationZ="2dp"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton9"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton9" />
+
+        <RatingBar
+            android:id="@+id/ratingBar9"
+            android:layout_width="264dp"
+            android:layout_height="70dp"
+            android:rating="5"
+            android:stepSize="1"
+            android:padding="12dp"
+            android:theme="@style/RatingBar"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="20dp"
+            android:translationZ="2dp"
+            android:focusable="false"
+            android:isIndicator="true"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton9"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton9" />
+
+        <Button
+            android:id="@+id/centerLine9"
+            android:layout_width="780dp"
+            android:layout_height="2dp"
+            android:background="@color/purple_secondary"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton9"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton9"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton9"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton9"
+            app:layout_constraintVertical_bias="0.33"/>
+
+        <TextView
+            android:id="@+id/ratingComment9"
+            android:layout_width="780dp"
+            android:layout_height="162dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/lorem_ipsum"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton9"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton9"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton9" />
+
+        <Button
+            android:id="@+id/ratingButton10"
+            android:layout_width="820dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/purple_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ratingButton9" />
+
+        <TextView
+            android:id="@+id/ratingUsername10"
+            android:layout_width="360dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:text="@string/anonymous_en"
+            android:textFontWeight="@android:integer/config_longAnimTime"
+            android:translationZ="2dp"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton10"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton10" />
+
+        <RatingBar
+            android:id="@+id/ratingBar10"
+            android:layout_width="264dp"
+            android:layout_height="70dp"
+            android:rating="5"
+            android:stepSize="1"
+            android:padding="12dp"
+            android:theme="@style/RatingBar"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="20dp"
+            android:translationZ="2dp"
+            android:focusable="false"
+            android:isIndicator="true"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton10"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton10" />
+
+        <Button
+            android:id="@+id/centerLine10"
+            android:layout_width="780dp"
+            android:layout_height="2dp"
+            android:background="@color/purple_secondary"
+            app:layout_constraintTop_toTopOf="@+id/ratingButton10"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton10"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton10"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton10"
+            app:layout_constraintVertical_bias="0.33"/>
+
+        <TextView
+            android:id="@+id/ratingComment10"
+            android:layout_width="780dp"
+            android:layout_height="162dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/lorem_ipsum"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton10"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton10"
+            app:layout_constraintStart_toStartOf="@+id/ratingButton10" />
+
+        <Space
+            android:id="@+id/space"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ratingButton10" />
+
+        <FrameLayout
+            android:id="@+id/chooseRatingLayout"
+            android:layout_width="500dp"
+            android:layout_height="250dp"
+            android:visibility="invisible"
+            android:translationZ="20dp"
+            android:background="@color/dark_theme"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="0.05"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/ratingMain"
+                android:background="@drawable/main_border_dark"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/chooseRatingTitle"
+                    android:layout_width="400dp"
+                    android:layout_height="50dp"
+                    android:text="@string/choose_rating_page_en"
+                    android:textAlignment="center"
+                    android:textColor="#ffffff"
+                    android:textFontWeight="@android:integer/config_longAnimTime"
+                    android:textSize="30sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.31" />
+
+                <Button
+                    android:id="@+id/showRatingsButton"
+                    android:layout_width="112dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="60dp"
+                    android:background="@drawable/button_design"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:text="@string/show_ratings_en"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.12"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <Button
+                    android:id="@+id/cancelButtonRating"
+                    android:layout_width="112dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="60dp"
+                    android:background="@drawable/button_design"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:text="@string/cancel_en"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.498"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <Button
+                    android:id="@+id/submitRatingButton"
+                    android:layout_width="112dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="60dp"
+                    android:background="@drawable/button_design"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:text="@string/my_rating_en"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.88"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

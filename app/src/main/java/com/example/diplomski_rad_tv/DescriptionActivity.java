@@ -10,6 +10,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DescriptionActivity extends Activity {
@@ -34,12 +36,13 @@ public class DescriptionActivity extends Activity {
     Clock format;
     View focusedView;
     boolean fullscreenMode = false;
+    String focusedLayout = ""; // "rating", "bigWorkingHours" or ""
+    View layoutFocusedView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_description_1);
 
         this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
         this.language = this.sharedPreferencesService.getLanguage();
@@ -53,6 +56,9 @@ public class DescriptionActivity extends Activity {
         Element element = gson.fromJson(jsonElement, Element.class);
 
         this.element = element;
+        if (this.element.template == 1) setContentView(R.layout.activity_description_1);
+        else if (this.element.template == 2) setContentView(R.layout.activity_description_2);
+        else setContentView(R.layout.activity_description_3);
 
         {
             TextView title = findViewById(R.id.descriptionTitle);
@@ -65,18 +71,33 @@ public class DescriptionActivity extends Activity {
             setupBackground(getApplicationContext(), background, theme);
         }
 
+        if (this.element.template == 1) this.setupDescriptionActivity1();
+        else if (this.element.template == 2) this.setupDescriptionActivity2();
+        else this.setupDescriptionActivity3();
+
         {
-            TextView description = findViewById(R.id.descriptionContent);
-            this.focusedView = description;
+            Button ratingButton = findViewById(R.id.ratingButton);
+            ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-            this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
 
-            description.setOnClickListener(new View.OnClickListener() {
+            ratingButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Change amount of lines displayed on descriptionText
-                    if (description.getMaxLines() == 16) description.setMaxLines(32);
-                    else if (description.getMaxLines() == 32) description.setMaxLines(16);
+                    focusedLayout = "rating";
+
+                    FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
+                    ConstraintLayout background = findViewById(R.id.ratingMain);
+                    TextView chooseRatingTitle = findViewById(R.id.chooseRatingTitle);
+                    Button showRatingsButton = findViewById(R.id.showRatingsButton);
+                    Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
+                    Button submitRatingButton = findViewById(R.id.submitRatingButton);
+
+                    layoutFocusedView = showRatingsButton;
+                    layoutFocusedView.requestFocus();
+
+                    setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, true, layoutFocusedView, language, theme);
+
                 }
             });
         }
@@ -93,9 +114,9 @@ public class DescriptionActivity extends Activity {
                     language = language.next();
                     sharedPreferencesService.setLanguage(language);
 
-                    updateView(0);
-                    updateView(1);
-                    updateView(2);
+                    updateView(element.template, 0);
+                    updateView(element.template, 1);
+                    updateView(element.template, 2);
 
                     TextView title = findViewById(R.id.descriptionTitle);
                     setupTitle(getApplicationContext(), title, element.title, language, theme);
@@ -120,16 +141,25 @@ public class DescriptionActivity extends Activity {
                     theme = theme.next();
                     sharedPreferencesService.setTheme(theme);
 
-                    updateView(1);
-                    updateView(3);
+                    updateView(element.template, 2);
 
                     ConstraintLayout background = findViewById(R.id.background);
                     setupBackground(getApplicationContext(), background, theme);
 
-                    TextView titleDescription = findViewById(R.id.descriptionTitle);
-                    setupTitle(getApplicationContext(), titleDescription, element.title, language, theme);
+                    TextView descriptionTitle = findViewById(R.id.descriptionTitle);
+                    setupTitle(getApplicationContext(), descriptionTitle, element.title, language, theme);
+
+                    TextView descriptionContent = findViewById(R.id.descriptionContent);
+                    setupDescription(getApplicationContext(), descriptionContent, element.description, focusedView, language, theme);
 
                     setupLinks();
+
+                    Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+                    TextView workingHours = findViewById(R.id.workingHours);
+                    TextView entryFee = findViewById(R.id.entryFee);
+                    TextView minimalAge = findViewById(R.id.minimalAge);
+
+                    SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, element, focusedView, language, theme);
                 }
             });
         }
@@ -157,7 +187,59 @@ public class DescriptionActivity extends Activity {
             });
         }
 
-        this.setupImages();
+        {
+            Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+            TextView workingHours = findViewById(R.id.workingHours);
+            TextView entryFee = findViewById(R.id.entryFee);
+            TextView minimalAge = findViewById(R.id.minimalAge);
+
+            SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
+
+            smallWorkingHours.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    focusedLayout = "bigWorkingHours";
+
+                    FrameLayout bigWorkingHoursLayout = findViewById(R.id.bigWorkingHoursLayout);
+                    ConstraintLayout background = findViewById(R.id.bigWorkingHoursMain);
+                    TextView bigWorkingHoursTitle = findViewById(R.id.bigWorkingHoursTitle);
+                    TextView mondayTitle = findViewById(R.id.mondayTitle);
+                    TextView mondayContent = findViewById(R.id.mondayContent);
+                    TextView tuesdayTitle = findViewById(R.id.tuesdayTitle);
+                    TextView tuesdayContent = findViewById(R.id.tuesdayContent);
+                    TextView wednesdayTitle = findViewById(R.id.wednesdayTitle);
+                    TextView wednesdayContent = findViewById(R.id.wednesdayContent);
+                    TextView thursdayTitle = findViewById(R.id.thursdayTitle);
+                    TextView thursdayContent = findViewById(R.id.thursdayContent);
+                    TextView fridayTitle = findViewById(R.id.fridayTitle);
+                    TextView fridayContent = findViewById(R.id.fridayContent);
+                    TextView saturdayTitle = findViewById(R.id.saturdayTitle);
+                    TextView saturdayContent = findViewById(R.id.saturdayContent);
+                    TextView sundayTitle = findViewById(R.id.sundayTitle);
+                    TextView sundayContent = findViewById(R.id.sundayContent);
+
+                    BigWorkingHoursLayout.setupBigWorkingHoursButton(
+                        getApplicationContext(), bigWorkingHoursLayout,
+                        background, bigWorkingHoursTitle,
+                        mondayTitle, mondayContent,
+                        tuesdayTitle, tuesdayContent,
+                        wednesdayTitle, wednesdayContent,
+                        thursdayTitle, thursdayContent,
+                        fridayTitle, fridayContent,
+                        saturdayTitle, saturdayContent,
+                        sundayTitle, sundayContent,
+                        true, element.workingHours,
+                        language, theme
+                    );
+
+
+                    CustomScrollView scrollView = findViewById(R.id.scrollView);
+
+                    scrollToCenterView(scrollView, findViewById(R.id.bigWorkingHoursLayout));
+                }
+            });
+        }
+
         this.setupLinks();
     }
 
@@ -179,7 +261,6 @@ public class DescriptionActivity extends Activity {
                 this.fullscreenMode = false;
 
                 CustomScrollView scrollView = findViewById(R.id.scrollView);
-
                 this.scrollToCenterView(scrollView, this.focusedView);
 
                 return false;
@@ -188,13 +269,106 @@ public class DescriptionActivity extends Activity {
             return true;
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        else if (this.focusedLayout.equals("bigWorkingHours")) {
+            if (keyCode == 4) {
+                focusedLayout = "";
+
+                FrameLayout bigWorkingHoursLayout = findViewById(R.id.bigWorkingHoursLayout);
+                ConstraintLayout background = findViewById(R.id.bigWorkingHoursMain);
+                TextView bigWorkingHoursTitle = findViewById(R.id.bigWorkingHoursTitle);
+                TextView mondayTitle = findViewById(R.id.mondayTitle);
+                TextView mondayContent = findViewById(R.id.mondayContent);
+                TextView tuesdayTitle = findViewById(R.id.tuesdayTitle);
+                TextView tuesdayContent = findViewById(R.id.tuesdayContent);
+                TextView wednesdayTitle = findViewById(R.id.wednesdayTitle);
+                TextView wednesdayContent = findViewById(R.id.wednesdayContent);
+                TextView thursdayTitle = findViewById(R.id.thursdayTitle);
+                TextView thursdayContent = findViewById(R.id.thursdayContent);
+                TextView fridayTitle = findViewById(R.id.fridayTitle);
+                TextView fridayContent = findViewById(R.id.fridayContent);
+                TextView saturdayTitle = findViewById(R.id.saturdayTitle);
+                TextView saturdayContent = findViewById(R.id.saturdayContent);
+                TextView sundayTitle = findViewById(R.id.sundayTitle);
+                TextView sundayContent = findViewById(R.id.sundayContent);
+
+                BigWorkingHoursLayout.setupBigWorkingHoursButton(
+                    getApplicationContext(), bigWorkingHoursLayout,
+                    background, bigWorkingHoursTitle,
+                    mondayTitle, mondayContent,
+                    tuesdayTitle, tuesdayContent,
+                    wednesdayTitle, wednesdayContent,
+                    thursdayTitle, thursdayContent,
+                    fridayTitle, fridayContent,
+                    saturdayTitle, saturdayContent,
+                    sundayTitle, sundayContent,
+                    false, element.workingHours,
+                    language, theme
+                );
+
+                CustomScrollView scrollView = findViewById(R.id.scrollView);
+                this.scrollToCenterView(scrollView, this.focusedView);
+
+                return false;
+            }
+            return true;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        if (this.focusedLayout.equals("rating")) {
+            int oldFocusedViewId = this.layoutFocusedView.getId();
+
+            if (keyCode >= 19 && keyCode <= 22) {
+                int newFocusedViewId = ChooseRatingLayoutNavigation.navigateOverLayout(oldFocusedViewId, keyCode - 19);
+
+                if (newFocusedViewId == 0) return true;
+
+                this.layoutFocusedView = findViewById(newFocusedViewId);
+                this.layoutFocusedView.requestFocus();
+
+                // Remove focus from old View
+                int row = ChooseRatingLayoutNavigation.getRowWithId(oldFocusedViewId);
+                updateLayoutView(row);
+
+                // Add focus to new View
+                row = ChooseRatingLayoutNavigation.getRowWithId(newFocusedViewId);
+                updateLayoutView(row);
+
+            } else if (keyCode == 4) {
+                FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
+                ConstraintLayout background = findViewById(R.id.ratingMain);
+                TextView chooseRatingTitle = findViewById(R.id.chooseRatingTitle);
+                Button showRatingsButton = findViewById(R.id.showRatingsButton);
+                Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
+                Button submitRatingButton = findViewById(R.id.submitRatingButton);
+
+                this.focusedLayout = "";
+                this.layoutFocusedView = null;
+                this.focusedView.requestFocus();
+
+                this.setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, false, this.layoutFocusedView, this.language, this.theme);
+
+                return false;
+            }
+            // Enter button
+            else if (keyCode == 23) this.layoutFocusedView.callOnClick();
+
+            return true;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         int oldFocusedViewId = focusedView.getId();
 
         // Up, down, left, right navigation button
         if (keyCode >= 19 && keyCode <= 22) {
-            int newFocusedViewId = DescriptionNavigation.navigateOverActivity(oldFocusedViewId, keyCode - 19);
+            if (specialCaseNavigation(oldFocusedViewId, keyCode - 19)) return true;
+
+            int newFocusedViewId = DescriptionNavigation.navigateOverActivity(this.element.template, oldFocusedViewId, keyCode - 19);
             while (!checkViewExistence(newFocusedViewId) && newFocusedViewId != 0)
-                newFocusedViewId = DescriptionNavigation.navigateOverActivity(newFocusedViewId, keyCode - 19);
+                newFocusedViewId = DescriptionNavigation.navigateOverActivity(this.element.template, newFocusedViewId, keyCode - 19);
 
             // If == 0, focusedView will stay the same
             if (newFocusedViewId == 0) return true;
@@ -204,15 +378,14 @@ public class DescriptionActivity extends Activity {
             this.focusedView.requestFocus();
 
             // Remove focus from old View
-            int row = DescriptionNavigation.getRowWithId(oldFocusedViewId);
-            updateView(row);
+            int row = DescriptionNavigation.getRowWithId(this.element.template, oldFocusedViewId);
+            updateView(this.element.template, row);
 
             // Add focus to new View
-            row = DescriptionNavigation.getRowWithId(newFocusedViewId);
-            updateView(row);
+            row = DescriptionNavigation.getRowWithId(this.element.template, newFocusedViewId);
+            updateView(this.element.template, row);
 
             CustomScrollView scrollView = findViewById(R.id.scrollView);
-
             this.scrollToCenterView(scrollView, this.focusedView);
         } else if (keyCode == 4) {
             sharedPreferencesService.setElementId("");
@@ -223,7 +396,9 @@ public class DescriptionActivity extends Activity {
         return true;
     }
 
+    // TODO!
     boolean checkViewExistence(int focusedViewId) {
+        if (focusedViewId == R.id.ratingButton) return true;
         if (focusedViewId == R.id.languageButton) return true;
         if (focusedViewId == R.id.themeButton) return true;
         if (focusedViewId == R.id.textClock) return true;
@@ -237,6 +412,8 @@ public class DescriptionActivity extends Activity {
         if (focusedViewId == R.id.descriptionImage7) return this.element.images.size() > 6 && !this.element.images.get(6).isEmpty();
         if (focusedViewId == R.id.descriptionImage8) return this.element.images.size() > 7 && !this.element.images.get(7).isEmpty();
         if (focusedViewId == R.id.descriptionImage9) return this.element.images.size() > 8 && !this.element.images.get(8).isEmpty();
+        if (focusedViewId == R.id.viewPager) return this.element.images.size() > 0 && !this.element.images.get(0).isEmpty();
+        if (focusedViewId == R.id.smallWorkingHours) return this.element.workingHours.size() > 0;
         if (focusedViewId == R.id.descriptionLink1) return this.checkLinkExistence(0);
         if (focusedViewId == R.id.descriptionLink2) return this.checkLinkExistence(1);
         if (focusedViewId == R.id.descriptionLink3) return this.checkLinkExistence(2);
@@ -572,100 +749,232 @@ public class DescriptionActivity extends Activity {
         else button.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
     }
 
-    void updateView(int row) {
-        if (row == 0) {
-            Button languageButton = findViewById(R.id.languageButton);
-            ImageView languageIcon = findViewById(R.id.languageIcon);
+    void updateView(long template, int row) {
+        if (template == 1) {
+            if (row == 0) {
+                Button ratingButton = findViewById(R.id.ratingButton);
+                ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
-        }
-        else if (row == 1) {
-            Button themeButton = findViewById(R.id.themeButton);
-            ImageView themeIcon = findViewById(R.id.themeIcon);
+                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
+            }
+            else if (row == 1) {
+                Button languageButton = findViewById(R.id.languageButton);
+                ImageView languageIcon = findViewById(R.id.languageIcon);
 
-            ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
-        }
-        else if (row == 2) {
-            TextClock textClock = findViewById(R.id.textClock);
+                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+            }
+            else if (row == 2) {
+                Button themeButton = findViewById(R.id.themeButton);
+                ImageView themeIcon = findViewById(R.id.themeIcon);
 
-            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
-        }
-        else if (row == 3) {
-            TextView description = findViewById(R.id.descriptionContent);
+                ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+            }
+            else if (row == 3) {
+                TextClock textClock = findViewById(R.id.textClock);
 
-            this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
-        }
-        else if (row == 4) {
-            ImageView image = findViewById(R.id.descriptionImage1);
+                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+            }
+            else if (row == 4) {
+                TextView description = findViewById(R.id.descriptionContent);
 
-            if (0 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
-            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-        }
-        else if (row == 5) {
-            ImageView image = findViewById(R.id.descriptionImage2);
+                this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
+            }
+            else if (row == 5) {
+                ImageView image = findViewById(R.id.descriptionImage1);
 
-            if (1 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(1), this.focusedView, this.theme);
-            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-        }
-        else if (row == 6) {
-            ImageView image = findViewById(R.id.descriptionImage3);
+                if (0 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
+                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+            }
+            else if (row == 6) {
+                ImageView image = findViewById(R.id.descriptionImage2);
 
-            if (2 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(2), this.focusedView, this.theme);
-            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-        }
-        else if (row == 7) {
-            ImageView image = findViewById(R.id.descriptionImage4);
+                if (1 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(1), this.focusedView, this.theme);
+                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+            }
+            else if (row == 7) {
+                ImageView image = findViewById(R.id.descriptionImage3);
 
-            if (3 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(3), this.focusedView, this.theme);
-            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-        }
-        else if (row == 8) {
-            ImageView image = findViewById(R.id.descriptionImage5);
+                if (2 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(2), this.focusedView, this.theme);
+                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+            }
+            else if (row == 8) {
+                ImageView image = findViewById(R.id.descriptionImage4);
 
-            if (4 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(4), this.focusedView, this.theme);
-            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-        }
-        else if (row == 9) {
-            ImageView image = findViewById(R.id.descriptionImage6);
+                if (3 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(3), this.focusedView, this.theme);
+                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+            }
+            else if (row == 9) {
+                ImageView image = findViewById(R.id.descriptionImage5);
 
-            if (5 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(5), this.focusedView, this.theme);
-            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-        }
-        else if (row == 10) {
-            ImageView image = findViewById(R.id.descriptionImage7);
+                if (4 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(4), this.focusedView, this.theme);
+                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+            }
+            else if (row == 10) {
+                ImageView image = findViewById(R.id.descriptionImage6);
 
-            if (6 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(6), this.focusedView, this.theme);
-            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-        }
-        else if (row == 11) {
-            ImageView image = findViewById(R.id.descriptionImage8);
+                if (5 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(5), this.focusedView, this.theme);
+                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+            }
+            else if (row == 11) {
+                ImageView image = findViewById(R.id.descriptionImage7);
 
-            if (7 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(7), this.focusedView, this.theme);
-            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-        }
-        else if (row == 12) {
-            ImageView image = findViewById(R.id.descriptionImage9);
+                if (6 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(6), this.focusedView, this.theme);
+                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+            }
+            else if (row == 12) {
+                ImageView image = findViewById(R.id.descriptionImage8);
 
-            if (8 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(8), this.focusedView, this.theme);
-            else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-        }
-        else if (row == 13) {
-            Button button = findViewById(R.id.descriptionLink1);
+                if (7 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(7), this.focusedView, this.theme);
+                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+            }
+            else if (row == 13) {
+                ImageView image = findViewById(R.id.descriptionImage9);
 
-            if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
-            else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
-        }
-        else if (row == 14) {
-            Button button = findViewById(R.id.descriptionLink2);
+                if (8 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(8), this.focusedView, this.theme);
+                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+            }
+            else if (row == 14) {
+                Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+                TextView workingHours = findViewById(R.id.workingHours);
+                TextView entryFee = findViewById(R.id.entryFee);
+                TextView minimalAge = findViewById(R.id.minimalAge);
 
-            if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
-            else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
-        }
-        else if (row == 15) {
-            Button button = findViewById(R.id.descriptionLink3);
+                SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
+            }
+            else if (row == 15) {
+                Button button = findViewById(R.id.descriptionLink1);
 
-            if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
-            else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+            }
+            else if (row == 16) {
+                Button button = findViewById(R.id.descriptionLink2);
+
+                if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+            }
+            else if (row == 17) {
+                Button button = findViewById(R.id.descriptionLink3);
+
+                if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+            }
+        } else if (template == 2) {
+            if (row == 0) {
+                Button ratingButton = findViewById(R.id.ratingButton);
+                ImageView ratingIcon = findViewById(R.id.ratingIcon);
+
+                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
+            }
+            else if (row == 1) {
+                Button languageButton = findViewById(R.id.languageButton);
+                ImageView languageIcon = findViewById(R.id.languageIcon);
+
+                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+            }
+            else if (row == 2) {
+                Button themeButton = findViewById(R.id.themeButton);
+                ImageView themeIcon = findViewById(R.id.themeIcon);
+
+                ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+            }
+            else if (row == 3) {
+                TextClock textClock = findViewById(R.id.textClock);
+
+                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+            }
+            else if (row == 4) {
+                TextView description = findViewById(R.id.descriptionContent);
+
+                this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
+            }
+            else if (row == 5) {
+                ImageView image = findViewById(R.id.descriptionImage1);
+
+                if (0 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
+                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+            }
+            else if (row == 6) {
+                Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+                TextView workingHours = findViewById(R.id.workingHours);
+                TextView entryFee = findViewById(R.id.entryFee);
+                TextView minimalAge = findViewById(R.id.minimalAge);
+
+                SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
+            }
+            else if (row == 7) {
+                Button button = findViewById(R.id.descriptionLink1);
+
+                if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+            }
+            else if (row == 8) {
+                Button button = findViewById(R.id.descriptionLink2);
+
+                if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+            }
+            else if (row == 9) {
+                Button button = findViewById(R.id.descriptionLink3);
+
+                if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+            }
+        } else {
+            if (row == 0) {
+                Button ratingButton = findViewById(R.id.ratingButton);
+                ImageView ratingIcon = findViewById(R.id.ratingIcon);
+
+                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
+            }
+            else if (row == 1) {
+                Button languageButton = findViewById(R.id.languageButton);
+                ImageView languageIcon = findViewById(R.id.languageIcon);
+
+                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+            }
+            else if (row == 2) {
+                Button themeButton = findViewById(R.id.themeButton);
+                ImageView themeIcon = findViewById(R.id.themeIcon);
+
+                ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+            }
+            else if (row == 3) {
+                TextClock textClock = findViewById(R.id.textClock);
+
+                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+            }
+            else if (row == 4) {
+                ViewPager2 viewPager = findViewById(R.id.viewPager);
+
+                this.setupViewPager(getApplicationContext(), viewPager, this.element.images, this.focusedView, this.theme);
+            }
+            else if (row == 5) {
+                Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+                TextView workingHours = findViewById(R.id.workingHours);
+                TextView entryFee = findViewById(R.id.entryFee);
+                TextView minimalAge = findViewById(R.id.minimalAge);
+
+                SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
+            }
+            else if (row == 6) {
+                Button button = findViewById(R.id.descriptionLink1);
+
+                if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+            }
+            else if (row == 7) {
+                Button button = findViewById(R.id.descriptionLink2);
+
+                if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+            }
+            else if (row == 8) {
+                Button button = findViewById(R.id.descriptionLink3);
+
+                if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+            }
         }
     }
 
@@ -713,4 +1022,163 @@ public class DescriptionActivity extends Activity {
 
         return true;
     }
+
+    void setupDescriptionActivity1() {
+        TextView description = findViewById(R.id.descriptionContent);
+        this.focusedView = description;
+
+        this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
+
+        description.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Change amount of lines displayed on descriptionText
+                if (description.getMaxLines() == 16) description.setMaxLines(32);
+                else if (description.getMaxLines() == 32) description.setMaxLines(16);
+            }
+        });
+
+        this.setupImages();
+    }
+
+    void setupDescriptionActivity2() {
+        TextView description = findViewById(R.id.descriptionContent);
+        this.focusedView = description;
+
+        this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
+
+        description.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        ImageView descriptionImage1 = findViewById(R.id.descriptionImage1);
+        if (this.element.images.size() > 0) this.setupImage(getApplicationContext(), descriptionImage1, this.element.images.get(0), this.focusedView, this.theme);
+        else this.setupImage(getApplicationContext(), descriptionImage1, "", this.focusedView, this.theme);
+
+        descriptionImage1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "0", Toast.LENGTH_LONG).show();
+                showViewPager(0);
+            }
+        });
+    }
+
+    void setupDescriptionActivity3() {
+        ViewPager2 viewPager = findViewById(R.id.viewPager);
+        if (viewPager != null) this.focusedView = viewPager;
+
+        Adapter adapter = new Adapter(this.element.images);
+        viewPager = findViewById(R.id.viewPager);
+        viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(0);
+
+        this.setupViewPager(getApplicationContext(), viewPager, element.images, focusedView, theme);
+    }
+
+    void setupViewPager(Context ctx, ViewPager2 viewPager, ArrayList<String> images, View focusedView, Theme theme) {
+        if (viewPager == null) return;
+
+        if (focusedView.getId() == R.id.viewPager) {
+            if (theme == Theme.light) viewPager.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_light));
+            else viewPager.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_dark));
+        } else viewPager.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+    }
+
+    void setupChooseRatingLayout(Context ctx, FrameLayout chooseRatingLayout, ConstraintLayout background, TextView chooseRatingTitle, Button showRatingsButton, Button cancelButtonRating, Button submitRatingButton, boolean visible, View layoutFocusedView, Language language, Theme theme) {
+        if (chooseRatingLayout == null || background == null || chooseRatingTitle == null || showRatingsButton == null || cancelButtonRating == null || submitRatingButton == null) return;
+
+        if (!visible) {
+            chooseRatingLayout.setVisibility(View.INVISIBLE);
+            return;
+        }
+        chooseRatingLayout.setVisibility(View.VISIBLE);
+
+        ChooseRatingLayout.setupLayoutTitle(ctx, chooseRatingTitle, language, theme);
+        ChooseRatingLayout.setupLayoutBackground(ctx, background, theme);
+        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language);
+        showRatingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), RatingListActivity.class));
+            }
+        });
+
+        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language);
+        cancelButtonRating.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                focusedLayout = "";
+
+                FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
+                ConstraintLayout background = findViewById(R.id.ratingMain);
+                TextView chooseRatingTitle = findViewById(R.id.chooseRatingTitle);
+                Button showRatingsButton = findViewById(R.id.showRatingsButton);
+                Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
+                Button submitRatingButton = findViewById(R.id.submitRatingButton);
+
+                // layoutFocusedView = null;
+                focusedLayout = "";
+                focusedView.requestFocus();
+
+                setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, false, layoutFocusedView, language, theme);
+
+            }
+        });
+
+        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language);
+        submitRatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), MyRatingActivity.class));
+            }
+        });
+    }
+
+    void updateLayoutView(int row) {
+        switch (row) {
+            case 0:
+                Button showRatingsButton = findViewById(R.id.showRatingsButton);
+
+                ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language);
+                break;
+            case 1:
+                Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
+
+                ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language);
+                break;
+            case 2:
+                Button submitRatingButton = findViewById(R.id.submitRatingButton);
+
+                ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language);
+                break;
+        }
+    }
+    boolean specialCaseNavigation(int oldFocusedViewId, int direction) {
+        if (this.element.template != 3) return false;
+        if (oldFocusedViewId != R.id.viewPager) return false;
+
+        ViewPager2 viewPager = findViewById(oldFocusedViewId);
+        int currentItem = viewPager.getCurrentItem();
+
+        // Direction left
+        if (direction == 2) {
+            if (currentItem > 0) {
+                viewPager.setCurrentItem(currentItem - 1);
+                return true;
+            }
+        }
+        // Direction right
+        else if (direction == 3) {
+            if (currentItem < this.element.images.size() - 1) {
+                viewPager.setCurrentItem(currentItem + 1);
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

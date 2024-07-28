@@ -140,20 +140,47 @@ public class SharedPreferencesService {
         editor.apply();
     }
 
-    public long getLastRatingDate() {
-        String lastRatingDateString = sharedPreferences.getString("lastRatingDate", "");
-        if (lastRatingDateString.isEmpty()) return -1;
-        return Long.parseLong(lastRatingDateString);
+    public String getRatingId() {
+        return sharedPreferences.getString("ratingId", "");
     }
 
-    public void setLastRatingDate(long dateTime) {
+    public void setRatingId(String ratingId) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("lastRatingDate", Long.toString(dateTime));
+
+        if (ratingId == null) return;
+
+        editor.putString("ratingId", ratingId);
+        editor.apply();
+    }
+
+    public String getGuestId() {
+        return sharedPreferences.getString("guestId", "");
+    }
+
+    public void setGuestId(String ratingId) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        if (ratingId == null) return;
+
+        editor.putString("guestId", ratingId);
         editor.apply();
     }
 
     public void clearUserAndEstateInfo() {
         setUserId("");
         setEstateId("");
+    }
+
+    public void clearAllInfo() {
+        setUserId("");
+        setEstateId("");
+        setCategoryId("");
+        setElementId("");
+        setLanguage(Language.english);
+        setTheme(Theme.dark);
+        setGrid(GridNavigation.six);
+        setClockFormat(Clock.h24);
+        setGuestId("");
+        setRatingId("");
     }
 }

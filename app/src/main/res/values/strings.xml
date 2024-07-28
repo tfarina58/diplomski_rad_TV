@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Diplomski_rad_TV</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  Ut etiam sit amet nisl purus. Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Pulvinar pellentesque habitant morbi tristique senectus et. A erat nam at lectus urna duis convallis convallis tellus. Ac orci phasellus egestas tellus rutrum tellus pellentesque eu tincidunt. Commodo sed egestas egestas fringilla phasellus faucibus scelerisque. Sit amet porttitor eget dolor morbi non arcu risus. Suspendisse ultrices gravida dictum fusce. Odio tempor orci dapibus ultrices in iaculis nunc sed augue. A diam maecenas sed enim ut sem viverra aliquet. Velit sed ullamcorper morbi tincidunt. Morbi quis commodo odio aenean sed. Nulla malesuada pellentesque elit eget gravida cum sociis natoque. Blandit aliquam etiam erat velit. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  Ut etiam sit amet nisl purus. Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Pulvinar pellentesque habitant morbi tristique senectus et. A erat nam at lectus urna duis convallis convallis tellus. Ac orci phasellus egestas tellus rutrum tellus pellentesque eu tincidunt. Commodo sed egestas egestas fringilla phasellus faucibus scelerisque. Sit amet porttitor eget dolor morbi non arcu risus. Suspendisse ultrices gravida dictum fusce. Odio tempor orci dapibus ultrices in iaculis nunc sed augue. A diam maecenas sed enim ut sem viverra aliquet. Velit sed ullamcorper morbi tincidunt. Morbi quis commodo odio aenean sed. Nulla malesuada pellentesque elit eget gravida cum sociis natoque. Blandit aliquam etiam erat velit. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  Ut etiam sit amet nisl purus. Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Pulvinar pellentesque habitant morbi tristique senectus et. A erat nam at lectus urna duis convallis convallis tellus. Ac orci phasellus egestas tellus rutrum tellus pellentesque eu tincidunt. Commodo sed egestas egestas fringilla phasellus faucibus scelerisque. Sit amet porttitor eget dolor morbi non arcu risus. Suspendisse ultrices gravida dictum fusce. Odio tempor orci dapibus ultrices in iaculis nunc sed augue. A diam maecenas sed enim ut sem viverra aliquet. Velit sed ullamcorper morbi tincidunt. Morbi quis commodo odio aenean sed. Nulla malesuada pellentesque elit eget gravida cum sociis natoque. Blandit aliquam etiam erat velit.</string>
+    <string name="empty_string" />
 
     <string name="language_en">English</string>
     <string name="language_de">Deutsche</string>
@@ -84,7 +85,7 @@
     <string name="send_rating_de">Bewertung senden</string>
     <string name="send_rating_hr">Pošalji ocjenu</string>
 
-    <string name="rating_content_en">Please write down any praise and remarks </string>
+    <string name="rating_content_en">Please write down any praise and remarks</string>
     <string name="rating_content_de">Bitte schreiben Sie Lob und Bemerkungen auf</string>
     <string name="rating_content_hr">Zapišite sve pohvale i primjedbe</string>
 
@@ -144,7 +145,78 @@
     <string name="no_ratings_de">Es sind keine Bewertungen vorhanden!</string>
     <string name="no_ratings_hr">Nema ocjena za prikaz!</string>
 
-    <string name="empty_string"> </string>
+    <string name="incorrect_password_en">The password is incorrect.</string>
+    <string name="incorrect_password_de">Das Passwort ist inkorrekt.</string>
+    <string name="incorrect_password_hr">Lozinka je netočna.</string>
+
+    <string name="send_rating_anonymously_en">Send rating anonymously</string>
+    <string name="send_rating_anonymously_de">Bewertung anonym absenden</string>
+    <string name="send_rating_anonymously_hr">Pošaljite ocjenu anonimno</string>
+
+    <string name="successfully_updated_rating_en">Your rating has been successfully updated.</string>
+    <string name="successfully_updated_rating_de">Ihre Bewertung wurde erfolgreich aktualisiert.</string>
+    <string name="successfully_updated_rating_hr">Vaša ocjena je uspješno ažurirana.</string>
+
+    <string name="error_while_updating_rating_en">There was an error while updating your rating.</string>
+    <string name="error_while_updating_rating_de">Beim Aktualisieren Ihrer Bewertung ist ein Fehler aufgetreten.</string>
+    <string name="error_while_updating_rating_hr">Došlo je do pogreške prilikom ažuriranja vaše ocjene.</string>
+
+    <string name="successfully_created_rating_en">Your rating has been successfully saved.</string>
+    <string name="successfully_created_rating_de">Ihre Bewertung wurde erfolgreich gespeichert.</string>
+    <string name="successfully_created_rating_hr">Vaša ocjena je uspješno spremljena.</string>
+
+    <string name="ratings_en">Ratings</string>
+    <string name="ratings_de">Bewertungen</string>
+    <string name="ratings_hr">Ocjene</string>
+
+    <string name="your_rating_en">Your rating</string>
+    <string name="your_rating_de">Deine Bewertung</string>
+    <string name="your_rating_hr">Vaša ocjena</string>
+
+    <string name="working_hours_en">Working hours</string>
+    <string name="working_hours_de">Arbeitszeit</string>
+    <string name="working_hours_hr">Radni sati</string>
+
+    <string name="entry_fee_en">Entrance fee</string>
+    <string name="entry_fee_de">Eintrittspreis</string>
+    <string name="entry_fee_hr">Ulaznica</string>
+
+    <string name="minimal_age_en">Minimal age</string>
+    <string name="minimal_age_de">Mindestalter</string>
+    <string name="minimal_age_hr">Minimalna dob</string>
+
+    <string name="monday_en">Monday</string>
+    <string name="monday_de">Montag</string>
+    <string name="monday_hr">Ponedjeljak</string>
+
+    <string name="tuesday_en">Tuesday</string>
+    <string name="tuesday_de">Dienstag</string>
+    <string name="tuesday_hr">Utorak</string>
+
+    <string name="wednesday_en">Wednesday</string>
+    <string name="wednesday_de">Mittwoch</string>
+    <string name="wednesday_hr">Srijeda</string>
+
+    <string name="thursday_en">Thursday</string>
+    <string name="thursday_de">Donnerstag</string>
+    <string name="thursday_hr">Četvrtak</string>
+
+    <string name="friday_en">Friday</string>
+    <string name="friday_de">Freitag</string>
+    <string name="friday_hr">Petak</string>
+
+    <string name="saturday_en">Saturday</string>
+    <string name="saturday_de">Samstag</string>
+    <string name="saturday_hr">Subota</string>
+
+    <string name="sunday_en">Sunday</string>
+    <string name="sunday_de">Sonntag</string>
+    <string name="sunday_hr">Nedjelja</string>
+
+    <string name="anonymous_en">Anonymous</string>
+    <string name="anonymous_de">Anonym</string>
+    <string name="anonymous_hr">Anoniman</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

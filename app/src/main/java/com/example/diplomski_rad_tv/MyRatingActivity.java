@@ -20,19 +20,17 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class MyRatingActivity extends Activity {
@@ -42,22 +40,24 @@ public class MyRatingActivity extends Activity {
     Clock format;
     View focusedView;
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-    ArrayList<HashMap<String, Object>> ratings = new ArrayList<>();
-    boolean anonymousCheckbox = true;
     String username = "";
+    String ratingId = "";
+    String focusedLayout = ""; // "rating" or ""
+    View layoutFocusedView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_rating);
+        setContentView(R.layout.activity_my_rating);
 
         this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
         this.language = sharedPreferencesService.getLanguage();
         this.theme = sharedPreferencesService.getTheme();
         this.format = sharedPreferencesService.getClockFormat();
+        this.ratingId = sharedPreferencesService.getRatingId();
 
-        this.focusedView = findViewById(R.id.ratingSubmitButton);
+        this.focusedView = findViewById(R.id.ratingContent);
         this.focusedView.requestFocus();
 
         {
@@ -71,17 +71,73 @@ public class MyRatingActivity extends Activity {
         }
 
         this.setupContent();
-        this.getCurrentUserName();
+        this.getRatingFromFirebase();
+        if (username.isEmpty()) this.getCurrentUserName();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // super.onKeyDown(keyCode, event);
+
+        if (this.focusedLayout.equals("rating")) {
+            int oldFocusedViewId = this.layoutFocusedView.getId();
+
+            if (keyCode >= 19 && keyCode <= 22) {
+                int newFocusedViewId = ChooseRatingLayoutNavigation.navigateOverLayout(oldFocusedViewId, keyCode - 19);
+
+                if (newFocusedViewId == 0) return true;
+
+                this.layoutFocusedView = findViewById(newFocusedViewId);
+                this.layoutFocusedView.requestFocus();
+
+                // Remove focus from old View
+                int row = ChooseRatingLayoutNavigation.getRowWithId(oldFocusedViewId);
+                updateLayoutView(row);
+
+                // Add focus to new View
+                row = ChooseRatingLayoutNavigation.getRowWithId(newFocusedViewId);
+                updateLayoutView(row);
+
+            } else if (keyCode == 4) {
+                FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
+                ConstraintLayout background = findViewById(R.id.ratingMain);
+                TextView chooseRatingTitle = findViewById(R.id.chooseRatingTitle);
+                Button showRatingsButton = findViewById(R.id.showRatingsButton);
+                Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
+                Button submitRatingButton = findViewById(R.id.submitRatingButton);
+
+                this.focusedLayout = "";
+                this.layoutFocusedView = null;
+                this.focusedView.requestFocus();
+
+                this.setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, false, this.layoutFocusedView, this.language, this.theme);
+            }
+            // Enter button
+            else if (keyCode == 23) this.layoutFocusedView.callOnClick();
+
+            return true;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         int oldFocusedViewId = focusedView.getId();
 
         // Up, down, left, right navigation button
         if (keyCode == 4) {
-            // startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
+            /*if (!id.isEmpty()) {
+                startActivity(new Intent(getApplicationContext(), DescriptionActivity.class));
+                return true;
+            }*/
+
+            String id = this.sharedPreferencesService.getCategoryId();
+            if (!id.isEmpty()) {
+                startActivity(new Intent(getApplicationContext(), ElementListActivity.class));
+                return true;
+            }
+
+            startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
+
+
         } else if (keyCode >= 19 && keyCode <= 22) {
             int newFocusedViewId = MyRatingNavigation.navigateOverActivity(focusedView.getId(), keyCode - 19);
             if (newFocusedViewId == 0) return false;
@@ -114,13 +170,13 @@ public class MyRatingActivity extends Activity {
 
         switch (language) {
             case german:
-                title.setText(R.string.rating_de);
+                title.setText(R.string.your_rating_de);
                 break;
             case croatian:
-                title.setText(R.string.rating_hr);
+                title.setText(R.string.your_rating_hr);
                 break;
             default:
-                title.setText(R.string.rating_en);
+                title.setText(R.string.your_rating_en);
         }
 
         if (theme == Theme.dark) title.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
@@ -130,6 +186,30 @@ public class MyRatingActivity extends Activity {
     void updateView(int row) {
         switch (row) {
             case 0:
+                Button headerButton = findViewById(R.id.ratingButton);
+                ImageView headerIcon = findViewById(R.id.ratingIcon);
+
+                RatingHeaderButton.setupRatingButton(getApplicationContext(), headerButton, headerIcon, true, this.focusedView, this.language);
+
+                headerButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        focusedLayout = "rating";
+
+                        FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
+                        ConstraintLayout background = findViewById(R.id.ratingMain);
+                        TextView chooseRatingTitle = findViewById(R.id.chooseRatingTitle);
+                        Button showRatingsButton = findViewById(R.id.showRatingsButton);
+                        Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
+                        Button submitRatingButton = findViewById(R.id.submitRatingButton);
+
+                        layoutFocusedView = showRatingsButton;
+
+                        setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, true, layoutFocusedView, language, theme);
+                    }
+                });
+                break;
+            case 1:
                 Button languageButton = findViewById(R.id.languageButton);
                 ImageView languageIcon = findViewById(R.id.languageIcon);
                 LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
@@ -147,13 +227,14 @@ public class MyRatingActivity extends Activity {
 
                         updateView(0);
                         updateView(1);
-                        updateView(3);
-                        updateView(5);
+                        updateView(2);
+                        updateView(4);
                         updateView(6);
+                        updateView(7);
                     }
                 });
                 break;
-            case 1:
+            case 2:
                 Button themeButton = findViewById(R.id.themeButton);
                 ImageView themeIcon = findViewById(R.id.themeIcon);
                 ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
@@ -175,13 +256,13 @@ public class MyRatingActivity extends Activity {
                                 setupTitle(getApplicationContext(), titleView, language, theme);
                             }
 
-                            updateView(3);
                             updateView(4);
+                            updateView(5);
                         }
                     });
                 }
                 break;
-            case 2:
+            case 3:
                 TextClock textClock = findViewById(R.id.textClock);
                 ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
 
@@ -196,14 +277,14 @@ public class MyRatingActivity extends Activity {
                     }
                 });
                 break;
-            case 3:
+            case 4:
                 EditText ratingContent = findViewById(R.id.ratingContent);
                 MyRatingNavigation.setupRatingContentField(getApplicationContext(), ratingContent, this.focusedView, this.language, this.theme);
                 break;
-            case 4:
-                RatingBar ratingBar = findViewById(R.id.ratingBar);
-                MyRatingNavigation.setupRatingBarField(getApplicationContext(), ratingBar, this.focusedView, this.theme);
             case 5:
+                RatingBar ratingBar = findViewById(R.id.ratingBar);
+                MyRatingNavigation.setupRatingBarField(getApplicationContext(), ratingBar, this.focusedView, this.theme, ratingBar.getRating());
+            case 6:
                 Button cancelButton = findViewById(R.id.cancelButton);
                 MyRatingNavigation.setupCancelButton(getApplicationContext(), cancelButton, this.focusedView, this.language);
 
@@ -216,7 +297,7 @@ public class MyRatingActivity extends Activity {
                     });
                 }
                 break;
-            case 6:
+            case 7:
                 Button ratingSubmitButton = findViewById(R.id.ratingSubmitButton);
                 MyRatingNavigation.setupRatingSubmitButton(getApplicationContext(), ratingSubmitButton, this.focusedView, this.language);
 
@@ -236,47 +317,123 @@ public class MyRatingActivity extends Activity {
     }
 
     void setupContent() {
-        for (int i = 0; i <= 6; ++i) this.updateView(i);
+        for (int i = 0; i <= 7; ++i) this.updateView(i);
     }
 
     void saveRatings(EditText content, RatingBar grade) {
         if (content == null || grade == null) return;
 
         String ratingContent = content.getText().toString();
-        int ratingBar = (int)grade.getRating();
+        int rating = (int)grade.getRating();
         long now = System.currentTimeMillis() / 1000;
         Timestamp created =  new Timestamp(Instant.ofEpochSecond(now));
 
-        HashMap<String, Object> currentRating = new HashMap<>();
+        Map<String, Object> currentRating = new HashMap<>();
         currentRating.put("comment", ratingContent);
-        currentRating.put("rating", ratingBar);
+        currentRating.put("rating", rating);
         currentRating.put("created", created);
         currentRating.put("estateId", this.sharedPreferencesService.getEstateId());
-        currentRating.put("username",  this.anonymousCheckbox ? "" : username);
+        currentRating.put("username", username);
 
-        firestore.collection("ratings").add(currentRating)
-            .addOnSuccessListener(new OnSuccessListener() {
-                @Override
-                public void onSuccess(Object o) {
-                    sharedPreferencesService.setLastRatingDate(now);
-                    startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    switch (language) {
-                        case german:
-                            Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_de), Toast.LENGTH_LONG).show();
-                            break;
-                        case croatian:
-                            Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_hr), Toast.LENGTH_LONG).show();
-                            break;
-                        default:
-                            Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_en), Toast.LENGTH_LONG).show();
-                            break;
+        if (ratingId.isEmpty()) {
+            firestore.collection("ratings").add(currentRating)
+                .addOnSuccessListener(new OnSuccessListener() {
+                    @Override
+                    public void onSuccess(Object o) {
+                        DocumentReference ref = (DocumentReference)o;
+                        String ratingId = ref.getId();
+
+                        sharedPreferencesService.setRatingId(ratingId);
+
+                        switch (language) {
+                            case german:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.successfully_created_rating_de), Toast.LENGTH_LONG).show();
+                                break;
+                            case croatian:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.successfully_created_rating_hr), Toast.LENGTH_LONG).show();
+                                break;
+                            default:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.successfully_created_rating_en), Toast.LENGTH_LONG).show();
+                                break;
+                        }
+
+                        startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
                     }
-                }
-            });
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        switch (language) {
+                            case german:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_de), Toast.LENGTH_LONG).show();
+                                break;
+                            case croatian:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_hr), Toast.LENGTH_LONG).show();
+                                break;
+                            default:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.cannot_uploading_rating_en), Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+        } else {
+            firestore.collection("ratings").document(ratingId).update(currentRating)
+                .addOnSuccessListener(new OnSuccessListener() {
+                    @Override
+                    public void onSuccess(Object o) {
+                        switch (language) {
+                            case german:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.successfully_updated_rating_de), Toast.LENGTH_LONG).show();
+                                break;
+                            case croatian:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.successfully_updated_rating_hr), Toast.LENGTH_LONG).show();;
+                                break;
+                            default:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.successfully_updated_rating_en), Toast.LENGTH_LONG).show();;
+                        }
+
+                        startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        switch (language) {
+                            case german:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.error_while_updating_rating_de), Toast.LENGTH_LONG).show();
+                                break;
+                            case croatian:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.error_while_updating_rating_hr), Toast.LENGTH_LONG).show();
+                                break;
+                            default:
+                                Toast.makeText(getApplicationContext(), ContextCompat.getString(getApplicationContext(), R.string.error_while_updating_rating_en), Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+        }
+    }
+
+    void getRatingFromFirebase() {
+        if (ratingId.isEmpty()) return;
+
+        DocumentReference ref = firestore.collection("ratings").document(ratingId);
+
+        ref.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
+                        String comment = queryDocumentSnapshots.getString("comment");
+                        long rating = (long)queryDocumentSnapshots.get("rating");
+                        String tmpUsername = queryDocumentSnapshots.getString("username");
+
+                        EditText ratingContent = findViewById(R.id.ratingContent);
+                        ratingContent.setText(comment);
+
+                        RatingBar ratingBar = findViewById(R.id.ratingBar);
+                        ratingBar.setRating(rating);
+
+                        username = tmpUsername;
+                    }
+                });
     }
 
     void getCurrentUserName() {
@@ -304,7 +461,78 @@ public class MyRatingActivity extends Activity {
                             break;
                         }
                     }
+
+                    // if (username == null || username.isEmpty()) startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
                 }
             });
+    }
+
+    public void updateLayoutView(int row) {
+        switch (row) {
+            case 0:
+                Button showRatingsButton = findViewById(R.id.showRatingsButton);
+
+                ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language);
+                break;
+            case 1:
+                Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
+
+                ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language);
+                break;
+            case 2:
+                Button submitRatingButton = findViewById(R.id.submitRatingButton);
+
+                ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language);
+                break;
+        }
+
+    }
+
+    void setupChooseRatingLayout(Context ctx, FrameLayout chooseRatingLayout, ConstraintLayout background, TextView chooseRatingTitle, Button showRatingsButton, Button cancelButtonRating, Button submitRatingButton, boolean visible, View layoutFocusedView, Language language, Theme theme) {
+        if (chooseRatingLayout == null || background == null || chooseRatingTitle == null || showRatingsButton == null || cancelButtonRating == null || submitRatingButton == null) return;
+
+        if (!visible) {
+            chooseRatingLayout.setVisibility(View.INVISIBLE);
+            return;
+        }
+        chooseRatingLayout.setVisibility(View.VISIBLE);
+
+        ChooseRatingLayout.setupLayoutTitle(ctx, chooseRatingTitle, language, theme);
+        ChooseRatingLayout.setupLayoutBackground(ctx, background, theme);
+        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language);
+        showRatingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), RatingListActivity.class));
+            }
+        });
+
+        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language);
+        cancelButtonRating.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                focusedLayout = "";
+
+                FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
+                ConstraintLayout background = findViewById(R.id.ratingMain);
+                TextView chooseRatingTitle = findViewById(R.id.chooseRatingTitle);
+                Button showRatingsButton = findViewById(R.id.showRatingsButton);
+                Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
+                Button submitRatingButton = findViewById(R.id.submitRatingButton);
+
+                // layoutFocusedView = null;
+
+                setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, false, layoutFocusedView, language, theme);
+
+            }
+        });
+
+        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language);
+        submitRatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), MyRatingActivity.class));
+            }
+        });
     }
 }

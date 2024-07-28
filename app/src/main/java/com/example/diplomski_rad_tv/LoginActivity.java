@@ -46,13 +46,13 @@ public class LoginActivity extends Activity {
 
         this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
 
-        // this.sharedPreferencesService.clearUserAndEstateInfo();
+        // this.sharedPreferencesService.clearAllInfo();
 
         String userId = sharedPreferencesService.getUserId();
         String estateId = sharedPreferencesService.getEstateId();
 
         if (!userId.isEmpty()) {
-            if (!estateId.isEmpty()) startActivity(new Intent(getApplicationContext(), WelcomeActivity.class));
+            if (!estateId.isEmpty()) startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
             else startActivity(new Intent(getApplicationContext(), EstateListActivity.class));
             return;
         }
@@ -61,6 +61,7 @@ public class LoginActivity extends Activity {
 
         this.language = sharedPreferencesService.getLanguage();
         // if (this.language == null) this.getDeviceLanguage(); // Default set to Language.english, so no need for this functionality (for now).
+        this.theme = sharedPreferencesService.getTheme();
 
         ConstraintLayout background = findViewById(R.id.main);
         this.setupBackground(getApplicationContext(), background, this.theme);
@@ -143,8 +144,8 @@ public class LoginActivity extends Activity {
                     loginButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            String email = "tfarina58@gmail.com"; // ((EditText) findViewById(R.id.emailAddress)).getText().toString();
-                            String password = "password"; // ((EditText) findViewById(R.id.password)).getText().toString();
+                            String email = ((EditText) findViewById(R.id.emailAddress)).getText().toString();
+                            String password = ((EditText) findViewById(R.id.password)).getText().toString();
 
                             try {
                                 // Create a MessageDigest instance for SHA-256

@@ -27,20 +27,24 @@ public class EnterPasswordLayout {
         if (focusedView.getId() == R.id.password) {
             if (theme == Theme.light) {
                 passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.edittext_design_focused_light));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
                 passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
                 passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             } else {
                 passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.edittext_design_focused_dark));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
                 passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
                 passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
             }
         } else {
             if (theme == Theme.light) {
                 passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
                 passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
                 passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             } else {
                 passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
                 passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
                 passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
             }
@@ -50,6 +54,7 @@ public class EnterPasswordLayout {
     public static void setupCancelButton(Context ctx, Button button, View focusedView, Language language) {
         if (button == null) return;
 
+        button.setAllCaps(false);
         switch (language) {
             case german:
                 button.setText(R.string.cancel_de);
@@ -68,6 +73,7 @@ public class EnterPasswordLayout {
     public static void setupSubmitButton(Context ctx, Button button, View focusedView, Language language) {
         if (button == null) return;
 
+        button.setAllCaps(false);
         switch (language) {
             case german:
                 button.setText(R.string.submit_password_de);

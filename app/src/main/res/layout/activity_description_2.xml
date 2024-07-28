@@ -25,7 +25,7 @@
             android:focusable="false"
             android:text="@string/element_name_en"
             android:textAlignment="textStart"
-            android:textColor="#ffffff"
+            android:textColor="@color/text_color_dark_mode"
             android:textFontWeight="@android:integer/config_longAnimTime"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +33,7 @@
 
         <Button
             android:id="@+id/ratingButton"
-            android:layout_width="118dp"
+            android:layout_width="128dp"
             android:layout_height="32dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
@@ -146,7 +146,7 @@
             android:layout_height="350dp"
             android:layout_marginTop="88dp"
             android:gravity="start"
-            android:maxLines="16"
+            android:maxLines="20"
             android:paddingHorizontal="12dp"
             android:paddingVertical="8dp"
             android:singleLine="false"
@@ -164,13 +164,82 @@
             android:layout_height="350dp"
             android:background="@drawable/highlighted_image_button_dark"
             android:padding="12dp"
+            android:adjustViewBounds="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.908"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.41"
+            app:layout_constraintVertical_bias="0.272"
             app:srcCompat="@drawable/logo" />
+
+        <Button
+            android:id="@+id/smallWorkingHours"
+            android:layout_width="550dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="28dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/highlighted_image_button_dark"
+            android:gravity="center"
+            android:maxLength="40"
+            android:paddingHorizontal="8dp"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/descriptionContent" />
+
+        <TextView
+            android:id="@+id/workingHours"
+            android:layout_width="168dp"
+            android:layout_height="75dp"
+            android:text="Working hours\n09:00 - 17:00"
+            android:textSize="22sp"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textColor="@color/text_color_dark_mode"
+            android:translationZ="20dp"
+            app:layout_constraintEnd_toEndOf="@+id/smallWorkingHours"
+            app:layout_constraintStart_toStartOf="@+id/smallWorkingHours"
+            app:layout_constraintTop_toTopOf="@+id/smallWorkingHours"
+            app:layout_constraintBottom_toBottomOf="@+id/smallWorkingHours"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.05" />
+
+        <TextView
+            android:id="@+id/entryFee"
+            android:layout_width="168dp"
+            android:layout_height="75dp"
+            android:text="Eintrittspreis\n3€"
+            android:textSize="22sp"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textColor="@color/text_color_dark_mode"
+            android:translationZ="20dp"
+            app:layout_constraintEnd_toEndOf="@+id/smallWorkingHours"
+            app:layout_constraintStart_toStartOf="@+id/smallWorkingHours"
+            app:layout_constraintTop_toTopOf="@+id/smallWorkingHours"
+            app:layout_constraintBottom_toBottomOf="@+id/smallWorkingHours"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.5" />
+
+        <TextView
+            android:id="@+id/minimalAge"
+            android:layout_width="168dp"
+            android:layout_height="75dp"
+            android:text="Minimalna dob\n3"
+            android:textSize="22sp"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textColor="@color/text_color_dark_mode"
+            android:translationZ="20dp"
+            app:layout_constraintEnd_toEndOf="@+id/smallWorkingHours"
+            app:layout_constraintStart_toStartOf="@+id/smallWorkingHours"
+            app:layout_constraintTop_toTopOf="@+id/smallWorkingHours"
+            app:layout_constraintBottom_toBottomOf="@+id/smallWorkingHours"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintHorizontal_bias="0.95" />
 
         <Button
             android:id="@+id/descriptionLink1"
@@ -190,7 +259,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.08"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionContent" />
+            app:layout_constraintTop_toBottomOf="@+id/smallWorkingHours" />
 
         <Button
             android:id="@+id/descriptionLink2"
@@ -247,13 +316,358 @@
             android:visibility="invisible"
             android:layout_width="900dp"
             android:layout_height="506dp"
-            android:layout_marginTop="64dp"
+            android:layout_marginTop="16dp"
             android:background="@color/dark_theme"
+            android:translationZ="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
         </androidx.viewpager2.widget.ViewPager2>
+
+        <FrameLayout
+            android:id="@+id/bigWorkingHoursLayout"
+            android:layout_width="500dp"
+            android:layout_height="400dp"
+            android:visibility="invisible"
+            android:translationZ="20dp"
+            android:background="@drawable/edittext_design_focused_dark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="0.145"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bigWorkingHoursMain"
+                android:background="@drawable/main_border_dark"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/bigWorkingHoursTitle"
+                    android:layout_width="400dp"
+                    android:layout_height="50dp"
+                    android:text="@string/working_hours_en"
+                    android:textAlignment="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textFontWeight="@android:integer/config_longAnimTime"
+                    android:textSize="30sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.08" />
+
+                <TextView
+                    android:id="@+id/mondayTitle"
+                    android:layout_width="150dp"
+                    android:layout_height="40dp"
+                    android:text="@string/monday_en"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.15"
+                    app:layout_constraintVertical_bias="0.25" />
+
+                <TextView
+                    android:id="@+id/mondayContent"
+                    android:layout_width="250dp"
+                    android:layout_height="40dp"
+                    android:text="09:00 - 17:00"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.9"
+                    app:layout_constraintVertical_bias="0.25" />
+
+                <TextView
+                    android:id="@+id/tuesdayTitle"
+                    android:layout_width="150dp"
+                    android:layout_height="40dp"
+                    android:text="@string/tuesday_en"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.15"
+                    app:layout_constraintVertical_bias="0.35" />
+
+                <TextView
+                    android:id="@+id/tuesdayContent"
+                    android:layout_width="250dp"
+                    android:layout_height="40dp"
+                    android:text="09:00 - 17:00"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.9"
+                    app:layout_constraintVertical_bias="0.35" />
+
+                <TextView
+                    android:id="@+id/wednesdayTitle"
+                    android:layout_width="150dp"
+                    android:layout_height="40dp"
+                    android:text="@string/wednesday_en"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.15"
+                    app:layout_constraintVertical_bias="0.45" />
+
+                <TextView
+                    android:id="@+id/wednesdayContent"
+                    android:layout_width="250dp"
+                    android:layout_height="40dp"
+                    android:text="09:00 - 17:00"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.9"
+                    app:layout_constraintVertical_bias="0.45" />
+
+                <TextView
+                    android:id="@+id/thursdayTitle"
+                    android:layout_width="150dp"
+                    android:layout_height="40dp"
+                    android:text="@string/thursday_en"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.15"
+                    app:layout_constraintVertical_bias="0.55" />
+
+                <TextView
+                    android:id="@+id/thursdayContent"
+                    android:layout_width="250dp"
+                    android:layout_height="40dp"
+                    android:text="09:00 - 17:00"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.9"
+                    app:layout_constraintVertical_bias="0.55" />
+
+                <TextView
+                    android:id="@+id/fridayTitle"
+                    android:layout_width="150dp"
+                    android:layout_height="40dp"
+                    android:text="@string/friday_en"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.15"
+                    app:layout_constraintVertical_bias="0.65" />
+
+                <TextView
+                    android:id="@+id/fridayContent"
+                    android:layout_width="250dp"
+                    android:layout_height="40dp"
+                    android:text="09:00 - 17:00"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.9"
+                    app:layout_constraintVertical_bias="0.65" />
+
+                <TextView
+                    android:id="@+id/saturdayTitle"
+                    android:layout_width="150dp"
+                    android:layout_height="40dp"
+                    android:text="@string/saturday_en"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.15"
+                    app:layout_constraintVertical_bias="0.75" />
+
+                <TextView
+                    android:id="@+id/saturdayContent"
+                    android:layout_width="250dp"
+                    android:layout_height="40dp"
+                    android:text="10:00 - 16:00"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.9"
+                    app:layout_constraintVertical_bias="0.75" />
+
+                <TextView
+                    android:id="@+id/sundayTitle"
+                    android:layout_width="150dp"
+                    android:layout_height="40dp"
+                    android:text="@string/sunday_en"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.15"
+                    app:layout_constraintVertical_bias="0.85" />
+
+                <TextView
+                    android:id="@+id/sundayContent"
+                    android:layout_width="250dp"
+                    android:layout_height="40dp"
+                    android:text="10:00 - 16:00"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_dark_mode"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.9"
+                    app:layout_constraintVertical_bias="0.85" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/chooseRatingLayout"
+            android:layout_width="500dp"
+            android:layout_height="250dp"
+            android:visibility="invisible"
+            android:translationZ="20dp"
+            android:background="@color/dark_theme"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="0.325"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/ratingMain"
+                android:background="@drawable/main_border_dark"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/chooseRatingTitle"
+                    android:layout_width="400dp"
+                    android:layout_height="50dp"
+                    android:text="@string/choose_rating_page_en"
+                    android:textAlignment="center"
+                    android:textColor="#ffffff"
+                    android:textFontWeight="@android:integer/config_longAnimTime"
+                    android:textSize="30sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.31" />
+
+                <Button
+                    android:id="@+id/showRatingsButton"
+                    android:layout_width="112dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="60dp"
+                    android:background="@drawable/button_design"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:text="@string/show_ratings_en"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.12"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <Button
+                    android:id="@+id/cancelButtonRating"
+                    android:layout_width="112dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="60dp"
+                    android:background="@drawable/button_design"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:text="@string/cancel_en"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.498"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <Button
+                    android:id="@+id/submitRatingButton"
+                    android:layout_width="112dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="60dp"
+                    android:background="@drawable/button_design"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:text="@string/my_rating_en"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.88"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.example.diplomski_rad_tv.CustomScrollView>

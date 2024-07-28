@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="dark_theme">#181820</color>
-    <color name="light_theme">#c8d9ed</color>
+    <color name="light_theme">#f5f7f8</color>
 
-    <color name="dark_button_background">#003333</color>
-    <color name="light_button_background">#4663ac</color>
+    <color name="dark_button_background">#2e236c</color>
+    <color name="light_button_background">#ffcf99</color>
 
     <color name="text_color_dark_mode">#b3cccc</color>
     <color name="text_color_light_mode">#343343</color>
@@ -14,6 +14,12 @@
 
     <color name="loader_color_dark_mode">#ff9933</color>
     <color name="loader_color_light_mode">#4d4dff</color>
+
+    <color name="purple_primary">#2e236c</color>
+    <color name="purple_secondary">#433d8b</color>
+
+    <color name="cream_primary">#ffe9d0</color>
+    <color name="cream_secondary">#fffed3</color>
 
     <color name="transparent">#00ffffff</color>
 

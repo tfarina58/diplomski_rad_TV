@@ -38,6 +38,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ElementListActivity extends Activity {
     String categoryId;
@@ -92,7 +93,11 @@ public class ElementListActivity extends Activity {
                             HashMap<String, String> description = (HashMap<String, String>) document.get("description");
                             ArrayList<String> images = (ArrayList<String>)document.get("images");
                             ArrayList<HashMap<String, Object>> links = (ArrayList<HashMap<String, Object>>)document.get("links");
-                            elements[i] = new Element(elementId, categoryId, background, title, description, images, links);
+                            long template = document.getLong("template");
+                            ArrayList<Map<String, Object>> workingHours = (ArrayList<Map<String, Object>>)document.get("workingHours");
+                            String entryFee = document.getString("entryFee");
+                            long minimalAge = document.getLong("minimalAge");
+                            elements[i] = new Element(elementId, categoryId, background, title, description, images, links, template, workingHours, entryFee, minimalAge);
                             i++;
                         }
                         loadingInProgress = false;
@@ -109,6 +114,7 @@ public class ElementListActivity extends Activity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         elements = new Element[0];
+                        loadingInProgress = false;
                         setupElementsToShow();
                         setNewContentView();
                     }
@@ -171,12 +177,12 @@ public class ElementListActivity extends Activity {
         if (keyCode >= 19 && keyCode <= 22) {
             if (specialCaseNavigation(oldFocusedViewId, keyCode - 19)) return true;
 
-            int newFocusedViewId = GridNavigation.navigateOverActivity(this.grid, oldFocusedViewId, keyCode - 19);
+            int newFocusedViewId = GridNavigation.navigateOverActivity(false, this.grid, oldFocusedViewId, keyCode - 19);
 
             // If navigating up or down
             if (keyCode == 19 || keyCode == 20)
                 while (!checkViewExistence(newFocusedViewId) && newFocusedViewId != 0)
-                    newFocusedViewId = GridNavigation.navigateOverActivity(this.grid, newFocusedViewId, keyCode - 19);
+                    newFocusedViewId = GridNavigation.navigateOverActivity(false, this.grid, newFocusedViewId, keyCode - 19);
 
             if (newFocusedViewId == 0 || !checkViewExistence(newFocusedViewId)) return false;
 
@@ -184,11 +190,11 @@ public class ElementListActivity extends Activity {
             this.focusedView.requestFocus();
 
             // Remove focus from old View
-            int row = GridNavigation.getRowWithId(oldFocusedViewId);
+            int row = GridNavigation.getNormalRowWithId(oldFocusedViewId);
             updateView(row);
 
             // Add focus to new View
-            row = GridNavigation.getRowWithId(newFocusedViewId);
+            row = GridNavigation.getNormalRowWithId(newFocusedViewId);
             updateView(row);
 
             if (newFocusedViewId == R.id.searchView || newFocusedViewId == R.id.pagination) {
@@ -247,7 +253,7 @@ public class ElementListActivity extends Activity {
             button = findViewById(R.id.ratingButton);
             icon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), button, icon, this.focusedView, this.language);
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), button, icon, true, this.focusedView, this.language);
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -775,7 +781,7 @@ public class ElementListActivity extends Activity {
             Button ratingButton = findViewById(R.id.ratingButton);
             ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, this.focusedView, this.language);
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
         } else if (row == 1) {
             Button languageButton = findViewById(R.id.languageButton);
             ImageView languageIcon = findViewById(R.id.languageIcon);

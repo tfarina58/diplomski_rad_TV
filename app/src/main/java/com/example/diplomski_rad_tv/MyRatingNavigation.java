@@ -10,7 +10,8 @@ import androidx.core.content.ContextCompat;
 
 public class MyRatingNavigation {
     private static final int[][] navigationRating = {
-            {0,                   R.id.ratingContent, 0,                   R.id.themeButton},        // languageButton
+            {0,                   R.id.ratingContent, 0,                   R.id.languageButton},     // ratingButton
+            {0,                   R.id.ratingContent, R.id.ratingButton,   R.id.themeButton},        // languageButton
             {0,                   R.id.ratingContent, R.id.languageButton, R.id.textClock},          // themeButton
             {0,                   R.id.ratingContent, R.id.themeButton,    0},                       // textClock
             {R.id.languageButton, R.id.ratingBar,     0,                   0},                       // ratingContent
@@ -22,13 +23,14 @@ public class MyRatingNavigation {
         return navigationRating[getRowWithId(currentViewId)][direction];
     }
     public static int getRowWithId(int currentViewId) {
-        if (currentViewId == R.id.languageButton) return 0;
-        if (currentViewId == R.id.themeButton) return 1;
-        if (currentViewId == R.id.textClock) return 2;
-        if (currentViewId == R.id.ratingContent) return 3;
-        if (currentViewId == R.id.ratingBar) return 4;
-        if (currentViewId == R.id.cancelButton) return 5;
-        if (currentViewId == R.id.ratingSubmitButton) return 6;
+        if (currentViewId == R.id.ratingButton) return 0;
+        if (currentViewId == R.id.languageButton) return 1;
+        if (currentViewId == R.id.themeButton) return 2;
+        if (currentViewId == R.id.textClock) return 3;
+        if (currentViewId == R.id.ratingContent) return 4;
+        if (currentViewId == R.id.ratingBar) return 5;
+        if (currentViewId == R.id.cancelButton) return 6;
+        if (currentViewId == R.id.ratingSubmitButton) return 7;
         return -1;
     }
 
@@ -76,7 +78,7 @@ public class MyRatingNavigation {
         }
     }
 
-    public static void setupRatingBarField(Context ctx, RatingBar ratingBar, View focusedView, Theme theme) {
+    public static void setupRatingBarField(Context ctx, RatingBar ratingBar, View focusedView, Theme theme, float rating) {
         if (ratingBar == null) return;
 
         if (focusedView.getId() == R.id.ratingBar) {
@@ -86,7 +88,7 @@ public class MyRatingNavigation {
 
         ratingBar.setNumStars(5);
         ratingBar.setStepSize(1);
-        ratingBar.setRating(5);
+        ratingBar.setRating(rating);
     }
 
 

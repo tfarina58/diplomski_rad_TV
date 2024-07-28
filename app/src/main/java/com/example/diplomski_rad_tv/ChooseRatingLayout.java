@@ -12,6 +12,7 @@ public class ChooseRatingLayout {
     public static void setupMyRatingButton(Context ctx, Button button, View focusedView, Language language) {
         if (button == null) return;
 
+        button.setAllCaps(false);
         switch (language) {
             case german:
                 button.setText(R.string.my_rating_de);
@@ -29,6 +30,7 @@ public class ChooseRatingLayout {
     public static void setupCancelButton(Context ctx, Button button, View focusedView, Language language) {
         if (button == null) return;
 
+        button.setAllCaps(false);
         switch (language) {
             case german:
                 button.setText(R.string.cancel_de);
@@ -47,6 +49,7 @@ public class ChooseRatingLayout {
     public static void setupShowRatingButton(Context ctx, Button button, View focusedView, Language language) {
         if (button == null) return;
 
+        button.setAllCaps(false);
         switch (language) {
             case german:
                 button.setText(R.string.show_ratings_de);

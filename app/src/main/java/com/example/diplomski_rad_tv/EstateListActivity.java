@@ -26,6 +26,9 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
@@ -102,6 +105,7 @@ public class EstateListActivity extends Activity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         estates = new Estate[0];
+                        loadingInProgress = false;
                         setupEstatesToShow();
                         setNewContentView();
                     }
@@ -116,60 +120,18 @@ public class EstateListActivity extends Activity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // super.onKeyDown(keyCode, event);
-
-        if (this.focusedLayout.equals("rating")) {
-            int oldFocusedViewId = this.layoutFocusedView.getId();
-
-            if (keyCode >= 19 && keyCode <= 22) {
-                int newFocusedViewId = ChooseRatingLayoutNavigation.navigateOverLayout(oldFocusedViewId, keyCode - 19);
-
-                if (newFocusedViewId == 0) return true;
-
-                this.layoutFocusedView = findViewById(newFocusedViewId);
-                this.layoutFocusedView.requestFocus();
-
-                // Remove focus from old View
-                int row = ChooseRatingLayoutNavigation.getRowWithId(oldFocusedViewId);
-                updateLayoutView(this.focusedLayout, row);
-
-                // Add focus to new View
-                row = ChooseRatingLayoutNavigation.getRowWithId(newFocusedViewId);
-                updateLayoutView(this.focusedLayout, row);
-
-            } else if (keyCode == 4) {
-                FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
-                ConstraintLayout background = findViewById(R.id.ratingMain);
-                TextView chooseRatingTitle = findViewById(R.id.chooseRatingTitle);
-                Button showRatingsButton = findViewById(R.id.showRatingsButton);
-                Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
-                Button submitRatingButton = findViewById(R.id.submitRatingButton);
-
-                this.focusedLayout = "";
-                this.layoutFocusedView = null;
-                this.focusedView.requestFocus();
-
-                this.setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, false, this.layoutFocusedView, this.language, this.theme);
-            }
-            // Enter button
-            else if (keyCode == 23) this.layoutFocusedView.callOnClick();
-
-            return true;
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
         int oldFocusedViewId = this.focusedView.getId();
 
         // Up, down, left, right navigation button
         if (keyCode >= 19 && keyCode <= 22) {
             if (specialCaseNavigation(oldFocusedViewId, keyCode - 19)) return true;
 
-            int newFocusedViewId = GridNavigation.navigateOverActivity(this.grid, oldFocusedViewId, keyCode - 19);
+            int newFocusedViewId = GridNavigation.navigateOverActivity(true, this.grid, oldFocusedViewId, keyCode - 19);
 
             // If navigating up or down
             if (keyCode == 19 || keyCode == 20)
                 while (!checkViewExistence(newFocusedViewId) && newFocusedViewId != 0)
-                    newFocusedViewId = GridNavigation.navigateOverActivity(this.grid, newFocusedViewId, keyCode - 19);
+                    newFocusedViewId = GridNavigation.navigateOverActivity(true, this.grid, newFocusedViewId, keyCode - 19);
 
             if (newFocusedViewId == 0 || !checkViewExistence(newFocusedViewId)) return false;
 
@@ -177,11 +139,11 @@ public class EstateListActivity extends Activity {
             this.focusedView.requestFocus();
 
             // Remove focus from old View
-            int row = GridNavigation.getRowWithId(oldFocusedViewId);
+            int row = GridNavigation.getEstateRowWithId(oldFocusedViewId);
             updateView(row);
 
             // Add focus to new View
-            row = GridNavigation.getRowWithId(newFocusedViewId);
+            row = GridNavigation.getEstateRowWithId(newFocusedViewId);
             updateView(row);
 
             if (newFocusedViewId == R.id.searchView || newFocusedViewId == R.id.pagination) {
@@ -241,25 +203,7 @@ public class EstateListActivity extends Activity {
             button = findViewById(R.id.ratingButton);
             icon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), button, icon, this.focusedView, this.language);
-
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    focusedLayout = "rating";
-
-                    FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
-                    ConstraintLayout background = findViewById(R.id.ratingMain);
-                    TextView chooseRatingTitle = findViewById(R.id.chooseRatingTitle);
-                    Button showRatingsButton = findViewById(R.id.showRatingsButton);
-                    Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
-                    Button submitRatingButton = findViewById(R.id.submitRatingButton);
-
-                    layoutFocusedView = showRatingsButton;
-
-                    setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, true, layoutFocusedView, language, theme);
-                }
-            });
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), button, icon, false, this.focusedView, this.language);
 
             // Language button
             button = findViewById(R.id.languageButton);
@@ -311,8 +255,7 @@ public class EstateListActivity extends Activity {
                     updateView(0);
                     updateView(1);
                     updateView(2);
-                    updateView(3);
-                    updateView(5);
+                    updateView(4);
                 }
             });
 
@@ -328,12 +271,12 @@ public class EstateListActivity extends Activity {
                     theme = theme.next();
                     sharedPreferencesService.setTheme(theme);
 
-                    updateView(2);
+                    updateView(1);
 
                     TextView centerText = findViewById(R.id.centerText);
                     CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, estatesToShow.size(), "estates");
 
-                    if (grid == GridNavigation.one) updateView(7);
+                    if (grid == GridNavigation.one) updateView(6);
                     else if (grid == GridNavigation.three) {
                         {
                             ImageButton background = findViewById(R.id.backgroundGrid3);
@@ -629,7 +572,7 @@ public class EstateListActivity extends Activity {
         main.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navigateToCategoryListActivity();
+                navigateToCategoryListActivity(estates[estatesToShow.get(currentPage)]);
             }
         });
     }
@@ -766,40 +709,35 @@ public class EstateListActivity extends Activity {
 
     void updateView(int row) {
         if (row == 0) {
-            Button ratingButton = findViewById(R.id.ratingButton);
-            ImageView ratingIcon = findViewById(R.id.ratingIcon);
-
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, this.focusedView, this.language);
-        } else if (row == 1) {
             Button languageButton = findViewById(R.id.languageButton);
             ImageView languageIcon = findViewById(R.id.languageIcon);
 
             LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
-        } else if (row == 2) {
+        } else if (row == 1) {
             Button themeButton = findViewById(R.id.themeButton);
             ImageView themeIcon = findViewById(R.id.themeIcon);
 
             ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
-        } else if (row == 3) {
+        } else if (row == 2) {
             Button gridButton = findViewById(R.id.gridButton);
             ImageView gridIcon = findViewById(R.id.gridIcon);
 
             GridHeaderButton.setupGridButton(getApplicationContext(), gridButton, gridIcon, this.focusedView, this.language);
-        } else if (row == 4) {
+        } else if (row == 3) {
             TextClock textClock = findViewById(R.id.textClock);
 
             ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
-        } else if (row == 5) {
+        } else if (row == 4) {
             SearchView searchbarButton = findViewById(R.id.searchView);
 
             this.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.language);
-        } else if (row == 6) {
+        } else if (row == 5) {
             Button paginationButton = findViewById(R.id.pagination);
             EditText paginationCurrentPage = findViewById(R.id.pageNumber);
             TextView paginationTotalPages = findViewById(R.id.totalPagesNumber);
 
             this.setupPaginationButton(paginationButton, paginationCurrentPage, paginationTotalPages);
-        } else if (row == 7 && this.grid == GridNavigation.one) {
+        } else if (row == 6 && this.grid == GridNavigation.one) {
             ImageButton main = findViewById(R.id.backgroundGrid1);
             TextView title = findViewById(R.id.gridTitle1);
 
@@ -810,7 +748,7 @@ public class EstateListActivity extends Activity {
                 this.setupMainBackground(getApplicationContext(), main, this.focusedView, "", this.theme);
                 this.setMainTitle(getApplicationContext(), title, null, this.language, this.theme, this.loadingInProgress, this.estatesToShow.size(), this.currentPage);
             }
-        } else if (row == 7 && (this.grid == GridNavigation.three || this.grid == GridNavigation.six)) {
+        } else if (row == 6 && (this.grid == GridNavigation.three || this.grid == GridNavigation.six)) {
             ImageButton imageButton = findViewById(R.id.gridButton1);
             Button imageBackground = findViewById(R.id.gridButtonBackground1);
             TextView imageTitle = findViewById(R.id.gridButtonTitle1);
@@ -818,7 +756,7 @@ public class EstateListActivity extends Activity {
 
             if (viewIndex < this.estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
-        } else if (row == 8) {
+        } else if (row == 7) {
             ImageButton imageButton = findViewById(R.id.gridButton2);
             Button imageBackground = findViewById(R.id.gridButtonBackground2);
             TextView imageTitle = findViewById(R.id.gridButtonTitle2);
@@ -828,7 +766,7 @@ public class EstateListActivity extends Activity {
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
-        } else if (row == 9) {
+        } else if (row == 8) {
             ImageButton imageButton = findViewById(R.id.gridButton3);
             Button imageBackground = findViewById(R.id.gridButtonBackground3);
             TextView imageTitle = findViewById(R.id.gridButtonTitle3);
@@ -838,7 +776,7 @@ public class EstateListActivity extends Activity {
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
-        } else if (row == 10) {
+        } else if (row == 9) {
             ImageButton imageButton = findViewById(R.id.gridButton4);
             Button imageBackground = findViewById(R.id.gridButtonBackground4);
             TextView imageTitle = findViewById(R.id.gridButtonTitle4);
@@ -848,7 +786,7 @@ public class EstateListActivity extends Activity {
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
-        } else if (row == 11) {
+        } else if (row == 10) {
             ImageButton imageButton = findViewById(R.id.gridButton5);
             Button imageBackground = findViewById(R.id.gridButtonBackground5);
             TextView imageTitle = findViewById(R.id.gridButtonTitle5);
@@ -858,7 +796,7 @@ public class EstateListActivity extends Activity {
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
             else
                 GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
-        } else if (row == 12) {
+        } else if (row == 11) {
             ImageButton imageButton = findViewById(R.id.gridButton6);
             Button imageBackground = findViewById(R.id.gridButtonBackground6);
             TextView imageTitle = findViewById(R.id.gridButtonTitle6);
@@ -898,24 +836,18 @@ public class EstateListActivity extends Activity {
             }
     }
 
-    void navigateToCategoryListActivity() {
-        int viewIndex = GridNavigation.getViewIndexAsInt(this.focusedView.getId());
-        int overallIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + viewIndex;
+    void navigateToCategoryListActivity(Estate estate) {
+        this.sharedPreferencesService.setEstateId(estate.id);
 
-        // Happens only when array length == 0
-        if (overallIndex >= this.estatesToShow.size()) return;
+        getActiveGuestId(estate.id);
 
-        String estateId = this.estates[this.estatesToShow.get(overallIndex)].id;
-        if (estateId == null || estateId.isEmpty()) return;
-
-        this.sharedPreferencesService.setEstateId(estateId);
         startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
     }
 
     boolean checkViewExistence(int focusedViewId) {
         switch (this.grid) {
             case three:
-                if (focusedViewId == R.id.ratingButton) return true;
+                if (focusedViewId == R.id.ratingButton) return false;
                 if (focusedViewId == R.id.languageButton) return true;
                 if (focusedViewId == R.id.themeButton) return true;
                 if (focusedViewId == R.id.gridButton) return true;
@@ -936,7 +868,7 @@ public class EstateListActivity extends Activity {
                 }
                 break;
             case six:
-                if (focusedViewId == R.id.ratingButton) return true;
+                if (focusedViewId == R.id.ratingButton) return false;
                 if (focusedViewId == R.id.languageButton) return true;
                 if (focusedViewId == R.id.themeButton) return true;
                 if (focusedViewId == R.id.gridButton) return true;
@@ -969,7 +901,7 @@ public class EstateListActivity extends Activity {
                 }
                 break;
             default:
-                if (focusedViewId == R.id.ratingButton) return true;
+                if (focusedViewId == R.id.ratingButton) return false;
                 if (focusedViewId == R.id.languageButton) return true;
                 if (focusedViewId == R.id.themeButton) return true;
                 if (focusedViewId == R.id.gridButton) return true;
@@ -992,26 +924,26 @@ public class EstateListActivity extends Activity {
                     this.currentPage--;
                     if (this.grid == GridNavigation.one) {
                         backgroundAlreadySet = false;
-                        this.updateView(7);
+                        this.updateView(6);
                     } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton3);
+                        this.updateView(6);
                         this.updateView(7);
                         this.updateView(8);
-                        this.updateView(9);
                     } else if (this.grid == GridNavigation.six) {
                         if (GridNavigation.isFirstRow(this.focusedView.getId())) {
                             this.focusedView = findViewById(R.id.gridButton3);
+                            this.updateView(6);
                             this.updateView(7);
                             this.updateView(8);
-                            this.updateView(9);
                         } else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
                             this.focusedView = findViewById(R.id.gridButton6);
+                            this.updateView(9);
                             this.updateView(10);
                             this.updateView(11);
-                            this.updateView(12);
                         }
                     }
-                    this.updateView(6);
+                    this.updateView(5);
                 }
                 return true;
             }
@@ -1023,28 +955,28 @@ public class EstateListActivity extends Activity {
                     this.currentPage++;
                     if (this.grid == GridNavigation.one) {
                         backgroundAlreadySet = false;
-                        this.updateView(7);
+                        this.updateView(6);
                     } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton1);
+                        this.updateView(6);
                         this.updateView(7);
                         this.updateView(8);
-                        this.updateView(9);
                     } else if (this.grid == GridNavigation.six) {
                         if (GridNavigation.isFirstRow(this.focusedView.getId()))
                             this.focusedView = findViewById(R.id.gridButton1);
                         else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
                             this.focusedView = findViewById(R.id.gridButton4);
 
+                            this.updateView(6);
                             this.updateView(7);
                             this.updateView(8);
-                            this.updateView(9);
 
+                            this.updateView(9);
                             this.updateView(10);
                             this.updateView(11);
-                            this.updateView(12);
                         }
                     }
-                    this.updateView(6);
+                    this.updateView(5);
                 }
                 return true;
             }
@@ -1074,7 +1006,7 @@ public class EstateListActivity extends Activity {
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity();
+                    navigateToCategoryListActivity(estates[0]);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1090,7 +1022,7 @@ public class EstateListActivity extends Activity {
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity();
+                    navigateToCategoryListActivity(estates[1]);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1106,7 +1038,7 @@ public class EstateListActivity extends Activity {
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity();
+                    navigateToCategoryListActivity(estates[2]);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1122,7 +1054,7 @@ public class EstateListActivity extends Activity {
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity();
+                    navigateToCategoryListActivity(estates[3]);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1138,7 +1070,7 @@ public class EstateListActivity extends Activity {
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity();
+                    navigateToCategoryListActivity(estates[4]);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1154,7 +1086,7 @@ public class EstateListActivity extends Activity {
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity();
+                    navigateToCategoryListActivity(estates[5]);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1177,97 +1109,42 @@ public class EstateListActivity extends Activity {
         ProgressBarLoader.manageProgressBar(ctx, progressBar, theme, loadingInProgress);
     }
 
-    void setupChooseRatingLayout(Context ctx, FrameLayout chooseRatingLayout, ConstraintLayout background, TextView chooseRatingTitle, Button showRatingsButton, Button cancelButtonRating, Button submitRatingButton, boolean visible, View layoutFocusedView, Language language, Theme theme) {
-        if (chooseRatingLayout == null || background == null || chooseRatingTitle == null || showRatingsButton == null || cancelButtonRating == null || submitRatingButton == null) return;
-
-        if (!visible) {
-            chooseRatingLayout.setVisibility(View.INVISIBLE);
-            return;
-        }
-        chooseRatingLayout.setVisibility(View.VISIBLE);
-
-        ChooseRatingLayout.setupLayoutTitle(ctx, chooseRatingTitle, language, theme);
-        ChooseRatingLayout.setupLayoutBackground(ctx, background, theme);
-        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language);
-        showRatingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), RatingListActivity.class));
-            }
-        });
-
-        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language);
-        cancelButtonRating.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                focusedLayout = "";
-
-                FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
-                ConstraintLayout background = findViewById(R.id.ratingMain);
-                TextView chooseRatingTitle = findViewById(R.id.chooseRatingTitle);
-                Button showRatingsButton = findViewById(R.id.showRatingsButton);
-                Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
-                Button submitRatingButton = findViewById(R.id.submitRatingButton);
-
-                // layoutFocusedView = null;
-
-                setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, false, layoutFocusedView, language, theme);
-
-            }
-        });
-
-        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language);
-        submitRatingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), MyRatingActivity.class));
-            }
-        });
-    }
-
-    public void updateLayoutView(String layout, int row) {
-        if (layout.equals("rating")) {
-            switch (row) {
-                case 0:
-                    Button showRatingsButton = findViewById(R.id.showRatingsButton);
-
-                    ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language);
-                    break;
-                case 1:
-                    Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
-
-                    ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language);
-                    break;
-                case 2:
-                    Button submitRatingButton = findViewById(R.id.submitRatingButton);
-
-                    ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language);
-                    break;
-            }
-        } else if (layout.equals("password")) {
-            switch (row) {
-                case 0:
-                    EditText passwordField = findViewById(R.id.password);
-                    TextView passwordFieldTitle = findViewById(R.id.passwordTitle);
-
-                    EnterPasswordLayout.setupPasswordField(getApplicationContext(), passwordField, passwordFieldTitle, this.layoutFocusedView, this.language, this.theme);
-                    break;
-                case 1:
-                    Button cancelButton = findViewById(R.id.cancelButtonPassword);
-
-                    EnterPasswordLayout.setupCancelButton(getApplicationContext(), cancelButton, this.layoutFocusedView, this.language);
-                    break;
-                case 2:
-                    Button submitButton = findViewById(R.id.submitButton);
-
-                    EnterPasswordLayout.setupSubmitButton(getApplicationContext(), submitButton, this.layoutFocusedView, this.language);
-                    break;
-            }
-        }
-    }
-
     void setupGridTitle(TextView gridTitle) {
         if (gridTitle == null) return;
         gridTitle.setText("");
+    }
+
+    void getActiveGuestId(String estateId) {
+        String oldGuestId = this.sharedPreferencesService.getGuestId();
+        DocumentReference query = this.firestore.collection("estates").document(estateId);
+
+        query.get()
+            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
+                    ArrayList<HashMap<String, Object>> guests = (ArrayList<HashMap<String, Object>>)queryDocumentSnapshots.get("guests"); // ArrayList<HashMap<String, Object>>
+                    if (guests == null || guests.size() == 0) return;
+
+                    int guestsLength = guests.size();
+                    for (int i = 0; i < guestsLength; ++i) {
+                        Timestamp fromStamp = (Timestamp)(guests.get(i).getOrDefault("from", null));
+                        Timestamp toStamp = (Timestamp)(guests.get(i).getOrDefault("to", null));
+                        if (fromStamp == null || toStamp == null) continue;
+
+                        long epochFrom = fromStamp.getSeconds();
+                        long epochNow = System.currentTimeMillis() / 1000;
+                        long epochTo = toStamp.getSeconds();
+
+                        if (epochNow - epochFrom >= 0 && epochTo - epochNow > 0) {
+                            String newGuestId = (String)(guests.get(i).getOrDefault("id", ""));
+                            if (!oldGuestId.equals(newGuestId)) {
+                                sharedPreferencesService.setGuestId(newGuestId);
+                                sharedPreferencesService.setRatingId("");
+                            }
+                            break;
+                        }
+                    }
+                }
+            });
     }
 }
