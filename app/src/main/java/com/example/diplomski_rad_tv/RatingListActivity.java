@@ -187,7 +187,7 @@ public class RatingListActivity extends Activity {
             button = findViewById(R.id.ratingButton);
             icon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), button, icon, true, this.focusedView, this.language);
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), button, icon, true, this.focusedView, this.language, this.theme);
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -212,7 +212,7 @@ public class RatingListActivity extends Activity {
             button = findViewById(R.id.languageButton);
             icon = findViewById(R.id.languageIcon);
 
-            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), button, icon, this.focusedView, this.language);
+            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), button, icon, this.focusedView, this.language, this.theme);
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -229,16 +229,16 @@ public class RatingListActivity extends Activity {
                     updateView(0);
                     updateView(1);
                     updateView(2);
-                    /*if (ratings[0].username.isEmpty()) updateView(4);
-                    if (ratings[1].username.isEmpty()) updateView(5);
-                    if (ratings[2].username.isEmpty()) updateView(6);
-                    if (ratings[3].username.isEmpty()) updateView(7);
-                    if (ratings[4].username.isEmpty()) updateView(8);
-                    if (ratings[5].username.isEmpty()) updateView(9);
-                    if (ratings[6].username.isEmpty()) updateView(10);
-                    if (ratings[7].username.isEmpty()) updateView(11);
-                    if (ratings[8].username.isEmpty()) updateView(12);
-                    if (ratings[9].username.isEmpty()) updateView(13);*/
+                    if (ratings.length > 0 && ratings[0].username.isEmpty()) updateView(4);
+                    if (ratings.length > 1 && ratings[1].username.isEmpty()) updateView(5);
+                    if (ratings.length > 2 && ratings[2].username.isEmpty()) updateView(6);
+                    if (ratings.length > 3 && ratings[3].username.isEmpty()) updateView(7);
+                    if (ratings.length > 4 && ratings[4].username.isEmpty()) updateView(8);
+                    if (ratings.length > 5 && ratings[5].username.isEmpty()) updateView(9);
+                    if (ratings.length > 6 && ratings[6].username.isEmpty()) updateView(10);
+                    if (ratings.length > 7 && ratings[7].username.isEmpty()) updateView(11);
+                    if (ratings.length > 8 && ratings[8].username.isEmpty()) updateView(12);
+                    if (ratings.length > 9 && ratings[9].username.isEmpty()) updateView(13);
                 }
             });
 
@@ -254,7 +254,9 @@ public class RatingListActivity extends Activity {
                     theme = theme.next();
                     sharedPreferencesService.setTheme(theme);
 
-                    updateView(2);
+                    // updateView(2);
+
+                    setupHeaderButtons();
 
                     TextView ratingTitle = findViewById(R.id.ratingTitle);
                     setRatingTitle(getApplicationContext(), ratingTitle, language, theme);
@@ -268,16 +270,16 @@ public class RatingListActivity extends Activity {
                     ProgressBar progressBar = findViewById(R.id.progressBar);
                     ProgressBarLoader.manageProgressBar(getApplicationContext(), progressBar, theme, loadingInProgress);
 
-                    if (ratings[0].username.isEmpty()) updateView(4);
-                    if (ratings[1].username.isEmpty()) updateView(5);
-                    if (ratings[2].username.isEmpty()) updateView(6);
-                    if (ratings[3].username.isEmpty()) updateView(7);
-                    if (ratings[4].username.isEmpty()) updateView(8);
-                    if (ratings[5].username.isEmpty()) updateView(9);
-                    if (ratings[6].username.isEmpty()) updateView(10);
-                    if (ratings[7].username.isEmpty()) updateView(11);
-                    if (ratings[8].username.isEmpty()) updateView(12);
-                    if (ratings[9].username.isEmpty()) updateView(13);
+                    if (ratings.length > 0 && ratings[0].username.isEmpty()) updateView(4);
+                    if (ratings.length > 1 && ratings[1].username.isEmpty()) updateView(5);
+                    if (ratings.length > 2 && ratings[2].username.isEmpty()) updateView(6);
+                    if (ratings.length > 3 && ratings[3].username.isEmpty()) updateView(7);
+                    if (ratings.length > 4 && ratings[4].username.isEmpty()) updateView(8);
+                    if (ratings.length > 5 && ratings[5].username.isEmpty()) updateView(9);
+                    if (ratings.length > 6 && ratings[6].username.isEmpty()) updateView(10);
+                    if (ratings.length > 7 && ratings[7].username.isEmpty()) updateView(11);
+                    if (ratings.length > 8 && ratings[8].username.isEmpty()) updateView(12);
+                    if (ratings.length > 9 && ratings[9].username.isEmpty()) updateView(13);
                 }
             });
         }
@@ -286,7 +288,7 @@ public class RatingListActivity extends Activity {
             // Clock button
             TextClock textClock = findViewById(R.id.textClock);
 
-            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
 
             textClock.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -324,16 +326,6 @@ public class RatingListActivity extends Activity {
         if (focusedViewId == R.id.languageButton) return true;
         if (focusedViewId == R.id.themeButton) return true;
         if (focusedViewId == R.id.textClock) return true;
-        /*if (focusedViewId == R.id.ratingButton1) return this.ratings.length > 0;
-        if (focusedViewId == R.id.ratingButton2) return this.ratings.length > 1;
-        if (focusedViewId == R.id.ratingButton3) return this.ratings.length > 2;
-        if (focusedViewId == R.id.ratingButton4) return this.ratings.length > 3;
-        if (focusedViewId == R.id.ratingButton5) return this.ratings.length > 4;
-        if (focusedViewId == R.id.ratingButton6) return this.ratings.length > 5;
-        if (focusedViewId == R.id.ratingButton7) return this.ratings.length > 6;
-        if (focusedViewId == R.id.ratingButton8) return this.ratings.length > 7;
-        if (focusedViewId == R.id.ratingButton9) return this.ratings.length > 8;
-        if (focusedViewId == R.id.ratingButton10) return this.ratings.length > 9;*/
         return false;
     }
 
@@ -342,12 +334,12 @@ public class RatingListActivity extends Activity {
             Button ratingButton = findViewById(R.id.ratingButton);
             ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
         } else if (row == 1) {
             Button languageButton = findViewById(R.id.languageButton);
             ImageView languageIcon = findViewById(R.id.languageIcon);
 
-            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
         } else if (row == 2) {
             Button themeButton = findViewById(R.id.themeButton);
             ImageView themeIcon = findViewById(R.id.themeIcon);
@@ -356,7 +348,7 @@ public class RatingListActivity extends Activity {
         } else if (row == 3) {
             TextClock textClock = findViewById(R.id.textClock);
 
-            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
         } else if (row == 4) {
             Button ratingButton = findViewById(R.id.ratingButton1);
             TextView ratingUsername = findViewById(R.id.ratingUsername1);
@@ -478,17 +470,17 @@ public class RatingListActivity extends Activity {
             case 0:
                 Button showRatingsButton = findViewById(R.id.showRatingsButton);
 
-                ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language);
+                ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language, this.theme);
                 break;
             case 1:
                 Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
 
-                ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language);
+                ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language, this.theme);
                 break;
             case 2:
                 Button submitRatingButton = findViewById(R.id.submitRatingButton);
 
-                ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language);
+                ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language, this.theme);
                 break;
         }
     }
@@ -504,7 +496,7 @@ public class RatingListActivity extends Activity {
 
         ChooseRatingLayout.setupLayoutTitle(ctx, chooseRatingTitle, language, theme);
         ChooseRatingLayout.setupLayoutBackground(ctx, background, theme);
-        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language);
+        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language, theme);
         showRatingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -512,7 +504,7 @@ public class RatingListActivity extends Activity {
             }
         });
 
-        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language);
+        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language, theme);
         cancelButtonRating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -534,7 +526,7 @@ public class RatingListActivity extends Activity {
             }
         });
 
-        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language);
+        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language, theme);
         submitRatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -548,5 +540,26 @@ public class RatingListActivity extends Activity {
 
         if (theme == Theme.light) background.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
         else background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
+    }
+
+    void setupHeaderButtons() {
+        Button ratingButton = findViewById(R.id.ratingButton);
+        ImageView ratingIcon = findViewById(R.id.ratingIcon);
+
+        RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+
+        Button languageButton = findViewById(R.id.languageButton);
+        ImageView languageIcon = findViewById(R.id.languageIcon);
+
+        LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+
+        Button themeButton = findViewById(R.id.themeButton);
+        ImageView themeIcon = findViewById(R.id.themeIcon);
+
+        ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+
+        TextClock textClock = findViewById(R.id.textClock);
+
+        ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
     }
 }

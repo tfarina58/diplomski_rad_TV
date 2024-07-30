@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import androidx.core.content.ContextCompat;
 
 public class GridHeaderButton {
-    public static void setupGridButton(Context ctx, Button gridButton, ImageView gridIcon, View focusedView, Language language) {
+    public static void setupGridButton(Context ctx, Button gridButton, ImageView gridIcon, View focusedView, Language language, Theme theme) {
         if (gridButton == null || gridIcon == null) return;
 
         if (language == Language.english) gridButton.setText(R.string.grid_en);
@@ -17,7 +17,15 @@ public class GridHeaderButton {
 
         gridIcon.setBackground(ContextCompat.getDrawable(ctx, R.drawable.grid));
 
-        if (focusedView.getId() == R.id.gridButton) gridButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_header_button));
-        else gridButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.header_button));
+        if (focusedView.getId() == R.id.gridButton) {
+            if (theme == Theme.light) gridButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cream_background));
+            else gridButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.purple_background));
+        } else {
+            if (theme == Theme.light) gridButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_cream_background));
+            else gridButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_purple_background));
+        }
+
+        if (theme == Theme.light) gridButton.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
+        else gridButton.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
     }
 }

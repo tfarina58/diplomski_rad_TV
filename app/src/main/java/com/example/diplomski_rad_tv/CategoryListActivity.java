@@ -298,7 +298,7 @@ public class CategoryListActivity extends Activity {
             button = findViewById(R.id.ratingButton);
             icon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), button, icon, true, this.focusedView, this.language);
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), button, icon, true, this.focusedView, this.language, this.theme);
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -322,7 +322,7 @@ public class CategoryListActivity extends Activity {
             button = findViewById(R.id.languageButton);
             icon = findViewById(R.id.languageIcon);
 
-            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), button, icon, this.focusedView, this.language);
+            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), button, icon, this.focusedView, this.language, this.theme);
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -357,12 +357,13 @@ public class CategoryListActivity extends Activity {
                     CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, categoriesToShow.size(), "categories");
 
                     SearchView searchbarButton = findViewById(R.id.searchView);
-                    setupSearchBarButton(getApplicationContext(), searchbarButton, searchbarText, language);
+                    SearchbarButton.setupSearchBarButton(getApplicationContext(), searchbarButton, searchbarText, focusedView, language, theme);
 
                     Button pagination = findViewById(R.id.pagination);
                     EditText pageNumber = findViewById(R.id.pageNumber);
+                    TextView paginationSlash = findViewById(R.id.paginationSlash);
                     TextView totalPagesNumber = findViewById(R.id.totalPagesNumber);
-                    setupPaginationButton(pagination, pageNumber, totalPagesNumber);
+                    PaginationButton.setupPaginationButton(getApplicationContext(), pagination, pageNumber, paginationSlash, totalPagesNumber, focusedView, theme, categoriesToShow.size(), currentPage, totalPages);
 
                     updateView(0);
                     updateView(1);
@@ -384,7 +385,23 @@ public class CategoryListActivity extends Activity {
                     theme = theme.next();
                     sharedPreferencesService.setTheme(theme);
 
-                    updateView(2);
+                    // updateView(2);
+
+                    setupHeaderButtons();
+
+                    {
+                        SearchView searchbarButton = findViewById(R.id.searchView);
+                        SearchbarButton.setupSearchBarButton(getApplicationContext(), searchbarButton, searchbarText, focusedView, language, theme);
+                    }
+
+                    {
+                        Button paginationButton = findViewById(R.id.pagination);
+                        EditText paginationCurrentPage = findViewById(R.id.pageNumber);
+                        TextView paginationSlash = findViewById(R.id.paginationSlash);
+                        TextView paginationTotalPages = findViewById(R.id.totalPagesNumber);
+
+                        PaginationButton.setupPaginationButton(getApplicationContext(), paginationButton, paginationCurrentPage, paginationSlash, paginationTotalPages, focusedView, theme, categoriesToShow.size(), currentPage, totalPages);
+                    }
 
                     TextView centerText = findViewById(R.id.centerText);
                     CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, categoriesToShow.size(), "categories");
@@ -500,7 +517,7 @@ public class CategoryListActivity extends Activity {
             button = findViewById(R.id.gridButton);
             icon = findViewById(R.id.gridIcon);
 
-            GridHeaderButton.setupGridButton(getApplicationContext(), button, icon, this.focusedView, this.language);
+            GridHeaderButton.setupGridButton(getApplicationContext(), button, icon, this.focusedView, this.language, this.theme);
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -521,7 +538,7 @@ public class CategoryListActivity extends Activity {
             // Clock button
             TextClock textClock = findViewById(R.id.textClock);
 
-            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
 
             textClock.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -545,7 +562,7 @@ public class CategoryListActivity extends Activity {
             // Searchbar button
             SearchView searchbarButton = findViewById(R.id.searchView);
 
-            this.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.language);
+            SearchbarButton.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.focusedView, this.language, this.theme);
 
             searchbarButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -582,9 +599,10 @@ public class CategoryListActivity extends Activity {
             // Pagination button
             Button paginationButton = findViewById(R.id.pagination);
             EditText paginationCurrentPage = findViewById(R.id.pageNumber);
+            TextView paginationSlash = findViewById(R.id.paginationSlash);
             TextView paginationTotalPages = findViewById(R.id.totalPagesNumber);
 
-            setupPaginationButton(paginationButton, paginationCurrentPage, paginationTotalPages);
+            PaginationButton.setupPaginationButton(getApplicationContext(), paginationButton, paginationCurrentPage, paginationSlash, paginationTotalPages, focusedView, theme, categoriesToShow.size(), currentPage, totalPages);
 
             paginationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -794,53 +812,17 @@ public class CategoryListActivity extends Activity {
         else background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
     }
 
-    void setupSearchBarButton(Context ctx, SearchView searchbarButton, String searchbarText, Language language) {
-        if (searchbarButton == null) return;
-
-        if (!searchbarText.isEmpty()) searchbarButton.setQuery(searchbarText, false);
-        else {
-            switch (language) {
-                case german:
-                    searchbarButton.setQueryHint(ContextCompat.getString(ctx, R.string.search_de));
-                    break;
-                case croatian:
-                    searchbarButton.setQueryHint(ContextCompat.getString(ctx, R.string.search_hr));
-                    break;
-                default:
-                    searchbarButton.setQueryHint(ContextCompat.getString(ctx, R.string.search_en));
-            }
-        }
-
-        if (focusedView.getId() == R.id.searchView) searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
-        else searchbarButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
-    }
-
-    void setupPaginationButton(Button paginationButton, EditText paginationCurrentPage, TextView paginationTotalPages) {
-        if (paginationButton == null || paginationCurrentPage == null || paginationTotalPages == null)
-            return;
-
-        if (this.categoriesToShow.size() != 0)
-            paginationCurrentPage.setText(Integer.toString(this.currentPage + 1));
-        else paginationCurrentPage.setText("0");
-        paginationTotalPages.setText(Integer.toString(this.totalPages));
-
-        if (focusedView.getId() == R.id.pagination)
-            paginationButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.highlighted_header_button));
-        else
-            paginationButton.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.header_button));
-    }
-
     void updateView(int row) {
         if (row == 0) {
             Button ratingButton = findViewById(R.id.ratingButton);
             ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
         } else if (row == 1) {
             Button languageButton = findViewById(R.id.languageButton);
             ImageView languageIcon = findViewById(R.id.languageIcon);
 
-            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
         } else if (row == 2) {
             Button themeButton = findViewById(R.id.themeButton);
             ImageView themeIcon = findViewById(R.id.themeIcon);
@@ -850,21 +832,22 @@ public class CategoryListActivity extends Activity {
             Button gridButton = findViewById(R.id.gridButton);
             ImageView gridIcon = findViewById(R.id.gridIcon);
 
-            GridHeaderButton.setupGridButton(getApplicationContext(), gridButton, gridIcon, this.focusedView, this.language);
+            GridHeaderButton.setupGridButton(getApplicationContext(), gridButton, gridIcon, this.focusedView, this.language, this.theme);
         } else if (row == 4) {
             TextClock textClock = findViewById(R.id.textClock);
 
-            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
         } else if (row == 5) {
             SearchView searchbarButton = findViewById(R.id.searchView);
 
-            this.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.language);
+            SearchbarButton.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.focusedView, this.language, this.theme);
         } else if (row == 6) {
             Button paginationButton = findViewById(R.id.pagination);
             EditText paginationCurrentPage = findViewById(R.id.pageNumber);
+            TextView paginationSlash = findViewById(R.id.paginationSlash);
             TextView paginationTotalPages = findViewById(R.id.totalPagesNumber);
 
-            this.setupPaginationButton(paginationButton, paginationCurrentPage, paginationTotalPages);
+            PaginationButton.setupPaginationButton(getApplicationContext(), paginationButton, paginationCurrentPage, paginationSlash, paginationTotalPages, this.focusedView, this.theme, this.categoriesToShow.size(), this.currentPage, this.totalPages);
         } else if (row == 7 && this.grid == GridNavigation.one) {
             ImageButton main = findViewById(R.id.backgroundGrid1);
             TextView title = findViewById(R.id.gridTitle1);
@@ -1314,7 +1297,7 @@ public class CategoryListActivity extends Activity {
         EnterPasswordLayout.setupLayoutTitle(ctx, enterPasswordTitle, language, theme);
         EnterPasswordLayout.setupLayoutBackground(ctx, background, theme);
         EnterPasswordLayout.setupPasswordField(ctx, passwordField, passwordFieldTitle, layoutFocusedView, language, theme);
-        EnterPasswordLayout.setupCancelButton(ctx, cancelButton, layoutFocusedView, language);
+        EnterPasswordLayout.setupCancelButton(ctx, cancelButton, layoutFocusedView, language, theme);
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1334,7 +1317,7 @@ public class CategoryListActivity extends Activity {
             }
         });
 
-        EnterPasswordLayout.setupSubmitButton(getApplicationContext(), submitButton, layoutFocusedView, language);
+        EnterPasswordLayout.setupSubmitButton(getApplicationContext(), submitButton, layoutFocusedView, language, theme);
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1360,7 +1343,7 @@ public class CategoryListActivity extends Activity {
 
         ChooseRatingLayout.setupLayoutTitle(ctx, chooseRatingTitle, language, theme);
         ChooseRatingLayout.setupLayoutBackground(ctx, background, theme);
-        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language);
+        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language, theme);
         showRatingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1368,7 +1351,7 @@ public class CategoryListActivity extends Activity {
             }
         });
 
-        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language);
+        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language, theme);
         cancelButtonRating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1387,7 +1370,7 @@ public class CategoryListActivity extends Activity {
             }
         });
 
-        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language);
+        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language, theme);
         submitRatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1402,17 +1385,17 @@ public class CategoryListActivity extends Activity {
                 case 0:
                     Button showRatingsButton = findViewById(R.id.showRatingsButton);
 
-                    ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language);
+                    ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language, this.theme);
                     break;
                 case 1:
                     Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
 
-                    ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language);
+                    ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language, this.theme);
                     break;
                 case 2:
                     Button submitRatingButton = findViewById(R.id.submitRatingButton);
 
-                    ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language);
+                    ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language, this.theme);
                     break;
             }
         } else if (layout.equals("password")) {
@@ -1426,12 +1409,12 @@ public class CategoryListActivity extends Activity {
                 case 1:
                     Button cancelButton = findViewById(R.id.cancelButtonPassword);
 
-                    EnterPasswordLayout.setupCancelButton(getApplicationContext(), cancelButton, this.layoutFocusedView, this.language);
+                    EnterPasswordLayout.setupCancelButton(getApplicationContext(), cancelButton, this.layoutFocusedView, this.language, this.theme);
                     break;
                 case 2:
                     Button submitButton = findViewById(R.id.submitButton);
 
-                    EnterPasswordLayout.setupSubmitButton(getApplicationContext(), submitButton, this.layoutFocusedView, this.language);
+                    EnterPasswordLayout.setupSubmitButton(getApplicationContext(), submitButton, this.layoutFocusedView, this.language, this.theme);
                     break;
             }
         }
@@ -1482,5 +1465,31 @@ public class CategoryListActivity extends Activity {
 
         if (theme == Theme.light) gridTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
         else gridTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+    }
+
+    void setupHeaderButtons() {
+        Button ratingButton = findViewById(R.id.ratingButton);
+        ImageView ratingIcon = findViewById(R.id.ratingIcon);
+
+        RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+
+        Button languageButton = findViewById(R.id.languageButton);
+        ImageView languageIcon = findViewById(R.id.languageIcon);
+
+        LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+
+        Button themeButton = findViewById(R.id.themeButton);
+        ImageView themeIcon = findViewById(R.id.themeIcon);
+
+        ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+
+        Button gridButton = findViewById(R.id.gridButton);
+        ImageView gridIcon = findViewById(R.id.gridIcon);
+
+        GridHeaderButton.setupGridButton(getApplicationContext(), gridButton, gridIcon, this.focusedView, this.language, this.theme);
+
+        TextClock textClock = findViewById(R.id.textClock);
+
+        ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
     }
 }

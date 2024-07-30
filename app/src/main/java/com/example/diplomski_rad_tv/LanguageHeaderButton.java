@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import androidx.core.content.ContextCompat;
 
 public class LanguageHeaderButton {
-    public static void setupLanguageButton(Context ctx, Button languageButton, ImageView languageIcon, View focusedView, Language language) {
+    public static void setupLanguageButton(Context ctx, Button languageButton, ImageView languageIcon, View focusedView, Language language, Theme theme) {
         if (languageButton == null || languageIcon == null) return;
 
         switch (language) {
@@ -25,7 +25,15 @@ public class LanguageHeaderButton {
                 languageIcon.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.english));
         }
 
-        if (focusedView.getId() == R.id.languageButton) languageButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_header_button));
-        else languageButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.header_button));
+        if (focusedView.getId() == R.id.languageButton) {
+            if (theme == Theme.light) languageButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cream_background));
+            else languageButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.purple_background));
+        } else {
+            if (theme == Theme.light) languageButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_cream_background));
+            else languageButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_purple_background));
+        }
+
+        if (theme == Theme.light) languageButton.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
+        else languageButton.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
     }
 }

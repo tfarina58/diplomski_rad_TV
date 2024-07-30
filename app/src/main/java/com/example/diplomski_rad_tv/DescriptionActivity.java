@@ -79,7 +79,7 @@ public class DescriptionActivity extends Activity {
             Button ratingButton = findViewById(R.id.ratingButton);
             ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
+            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
 
             ratingButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -106,7 +106,7 @@ public class DescriptionActivity extends Activity {
             Button languageButton = findViewById(R.id.languageButton);
             ImageView languageIcon = findViewById(R.id.languageIcon);
 
-            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
 
             languageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -141,10 +141,12 @@ public class DescriptionActivity extends Activity {
                     theme = theme.next();
                     sharedPreferencesService.setTheme(theme);
 
-                    updateView(element.template, 2);
+                    // updateView(element.template, 2);
 
                     ConstraintLayout background = findViewById(R.id.background);
                     setupBackground(getApplicationContext(), background, theme);
+
+                    setupHeaderButtons();
 
                     TextView descriptionTitle = findViewById(R.id.descriptionTitle);
                     setupTitle(getApplicationContext(), descriptionTitle, element.title, language, theme);
@@ -167,7 +169,7 @@ public class DescriptionActivity extends Activity {
         {
             TextClock textClock = findViewById(R.id.textClock);
 
-            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
 
             textClock.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -309,6 +311,23 @@ public class DescriptionActivity extends Activity {
 
                 CustomScrollView scrollView = findViewById(R.id.scrollView);
                 this.scrollToCenterView(scrollView, this.focusedView);
+
+                return false;
+            }
+            return true;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        } else if (this.focusedLayout.equals("bigDescriptionTemplate")) {
+            if (keyCode == 4) {
+                focusedLayout = "";
+
+                TextView bigWorkingHoursLayout = findViewById(R.id.bigDescriptionContent);
+
+                BigDescriptionTemplate2.setupBigDescriptionTemplate2(getApplicationContext(), bigWorkingHoursLayout, false, element.description, language, theme);
+
+                CustomScrollView scrollView = findViewById(R.id.scrollView);
+                this.scrollToCenterView(scrollView, bigWorkingHoursLayout);
 
                 return false;
             }
@@ -496,18 +515,26 @@ public class DescriptionActivity extends Activity {
                 } else descriptionView.setText(descriptionEn);
         }
 
-        if (focusedView.getId() == descriptionView.getId()) {
-           if (theme == Theme.light) {
-               descriptionView.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_light));
-               descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
-           } else {
-               descriptionView.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_dark));
-               descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
-           }
+        if (focusedView.getId() == R.id.descriptionContent) {
+            if (theme == Theme.dark) {
+                descriptionView.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_purple_background_focused));
+                descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+                descriptionView.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_dark_mode));
+            } else {
+                descriptionView.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_cream_background_focused));
+                descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+                descriptionView.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_light_mode));
+            }
         } else {
-            descriptionView.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
-            if (theme == Theme.light) descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
-            else descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+            if (theme == Theme.dark) {
+                descriptionView.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_purple_background));
+                descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+                descriptionView.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_dark_mode));
+            } else {
+                descriptionView.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_cream_background));
+                descriptionView.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+                descriptionView.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_light_mode));
+            }
         }
     }
 
@@ -755,13 +782,13 @@ public class DescriptionActivity extends Activity {
                 Button ratingButton = findViewById(R.id.ratingButton);
                 ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
+                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
             }
             else if (row == 1) {
                 Button languageButton = findViewById(R.id.languageButton);
                 ImageView languageIcon = findViewById(R.id.languageIcon);
 
-                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
             }
             else if (row == 2) {
                 Button themeButton = findViewById(R.id.themeButton);
@@ -772,7 +799,7 @@ public class DescriptionActivity extends Activity {
             else if (row == 3) {
                 TextClock textClock = findViewById(R.id.textClock);
 
-                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
             }
             else if (row == 4) {
                 TextView description = findViewById(R.id.descriptionContent);
@@ -864,13 +891,13 @@ public class DescriptionActivity extends Activity {
                 Button ratingButton = findViewById(R.id.ratingButton);
                 ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
+                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
             }
             else if (row == 1) {
                 Button languageButton = findViewById(R.id.languageButton);
                 ImageView languageIcon = findViewById(R.id.languageIcon);
 
-                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
             }
             else if (row == 2) {
                 Button themeButton = findViewById(R.id.themeButton);
@@ -881,7 +908,7 @@ public class DescriptionActivity extends Activity {
             else if (row == 3) {
                 TextClock textClock = findViewById(R.id.textClock);
 
-                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
             }
             else if (row == 4) {
                 TextView description = findViewById(R.id.descriptionContent);
@@ -925,13 +952,13 @@ public class DescriptionActivity extends Activity {
                 Button ratingButton = findViewById(R.id.ratingButton);
                 ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language);
+                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
             }
             else if (row == 1) {
                 Button languageButton = findViewById(R.id.languageButton);
                 ImageView languageIcon = findViewById(R.id.languageIcon);
 
-                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
             }
             else if (row == 2) {
                 Button themeButton = findViewById(R.id.themeButton);
@@ -942,7 +969,7 @@ public class DescriptionActivity extends Activity {
             else if (row == 3) {
                 TextClock textClock = findViewById(R.id.textClock);
 
-                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
             }
             else if (row == 4) {
                 ViewPager2 viewPager = findViewById(R.id.viewPager);
@@ -1026,6 +1053,7 @@ public class DescriptionActivity extends Activity {
     void setupDescriptionActivity1() {
         TextView description = findViewById(R.id.descriptionContent);
         this.focusedView = description;
+        this.focusedView.requestFocus();
 
         this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
 
@@ -1044,13 +1072,17 @@ public class DescriptionActivity extends Activity {
     void setupDescriptionActivity2() {
         TextView description = findViewById(R.id.descriptionContent);
         this.focusedView = description;
+        this.focusedView.requestFocus();
 
         this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
 
         description.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                focusedLayout = "bigDescriptionTemplate";
 
+                TextView bigDescriptionTemplate = findViewById(R.id.bigDescriptionContent);
+                BigDescriptionTemplate2.setupBigDescriptionTemplate2(getApplicationContext(), bigDescriptionTemplate, true, element.description, language, theme);
             }
         });
 
@@ -1069,7 +1101,8 @@ public class DescriptionActivity extends Activity {
 
     void setupDescriptionActivity3() {
         ViewPager2 viewPager = findViewById(R.id.viewPager);
-        if (viewPager != null) this.focusedView = viewPager;
+        this.focusedView = viewPager;
+        this.focusedView.requestFocus();
 
         Adapter adapter = new Adapter(this.element.images);
         viewPager = findViewById(R.id.viewPager);
@@ -1099,7 +1132,7 @@ public class DescriptionActivity extends Activity {
 
         ChooseRatingLayout.setupLayoutTitle(ctx, chooseRatingTitle, language, theme);
         ChooseRatingLayout.setupLayoutBackground(ctx, background, theme);
-        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language);
+        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language, theme);
         showRatingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1107,7 +1140,7 @@ public class DescriptionActivity extends Activity {
             }
         });
 
-        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language);
+        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language, theme);
         cancelButtonRating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1129,7 +1162,7 @@ public class DescriptionActivity extends Activity {
             }
         });
 
-        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language);
+        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language, theme);
         submitRatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1143,17 +1176,17 @@ public class DescriptionActivity extends Activity {
             case 0:
                 Button showRatingsButton = findViewById(R.id.showRatingsButton);
 
-                ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language);
+                ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language, this.theme);
                 break;
             case 1:
                 Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
 
-                ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language);
+                ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language, this.theme);
                 break;
             case 2:
                 Button submitRatingButton = findViewById(R.id.submitRatingButton);
 
-                ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language);
+                ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language, this.theme);
                 break;
         }
     }
@@ -1181,4 +1214,24 @@ public class DescriptionActivity extends Activity {
         return false;
     }
 
+    void setupHeaderButtons() {
+        Button ratingButton = findViewById(R.id.ratingButton);
+        ImageView ratingIcon = findViewById(R.id.ratingIcon);
+
+        RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+
+        Button languageButton = findViewById(R.id.languageButton);
+        ImageView languageIcon = findViewById(R.id.languageIcon);
+
+        LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+
+        Button themeButton = findViewById(R.id.themeButton);
+        ImageView themeIcon = findViewById(R.id.themeIcon);
+
+        ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+
+        TextClock textClock = findViewById(R.id.textClock);
+
+        ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+    }
 }

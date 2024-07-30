@@ -26,32 +26,32 @@ public class EnterPasswordLayout {
 
         if (focusedView.getId() == R.id.password) {
             if (theme == Theme.light) {
-                passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.edittext_design_focused_light));
-                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
-                passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
-                passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+                passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.password_field_cream_background));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
+                passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.cream_secondary));
+                passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
             } else {
-                passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.edittext_design_focused_dark));
-                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
-                passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
-                passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+                passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.password_field_purple_background));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
+                passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.purple_tertiary));
+                passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
             }
         } else {
             if (theme == Theme.light) {
-                passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
-                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
-                passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
-                passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
+                passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_cream_background));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
+                passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.cream_secondary));
+                passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
             } else {
-                passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
-                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
-                passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
-                passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+                passwordField.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_purple_background));
+                passwordField.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
+                passwordFieldTitle.setBackground(ContextCompat.getDrawable(ctx, R.color.purple_tertiary));
+                passwordFieldTitle.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
             }
         }
     }
 
-    public static void setupCancelButton(Context ctx, Button button, View focusedView, Language language) {
+    public static void setupCancelButton(Context ctx, Button button, View focusedView, Language language, Theme theme) {
         if (button == null) return;
 
         button.setAllCaps(false);
@@ -66,11 +66,19 @@ public class EnterPasswordLayout {
                 button.setText(R.string.cancel_en);
         }
 
-        if (focusedView.getId() == R.id.cancelButtonPassword) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design_focused));
-        else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design));
+        if (focusedView.getId() == R.id.cancelButtonPassword) {
+            if (theme == Theme.light) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cream_background));
+            else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.purple_background));
+        } else {
+            if (theme == Theme.light) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_cream_background));
+            else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_purple_background));
+        }
+
+        if (theme == Theme.light) button.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
+        else button.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
     }
 
-    public static void setupSubmitButton(Context ctx, Button button, View focusedView, Language language) {
+    public static void setupSubmitButton(Context ctx, Button button, View focusedView, Language language, Theme theme) {
         if (button == null) return;
 
         button.setAllCaps(false);
@@ -85,8 +93,16 @@ public class EnterPasswordLayout {
                 button.setText(R.string.submit_password_en);
         }
 
-        if (focusedView.getId() == R.id.submitButton) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design_focused));
-        else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design));
+        if (focusedView.getId() == R.id.submitButton) {
+            if (theme == Theme.light) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cream_background));
+            else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.purple_background));
+        } else {
+            if (theme == Theme.light) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_cream_background));
+            else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_purple_background));
+        }
+
+        if (theme == Theme.light) button.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
+        else button.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
     }
 
     public static void setupLayoutTitle(Context ctx, TextView enterPasswordTitle, Language language, Theme theme) {
@@ -103,14 +119,14 @@ public class EnterPasswordLayout {
                 enterPasswordTitle.setText(ContextCompat.getString(ctx, R.string.enter_password_en));
         }
 
-        if (theme == Theme.light) enterPasswordTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
-        else enterPasswordTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
+        if (theme == Theme.light) enterPasswordTitle.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
+        else enterPasswordTitle.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
     }
 
     public static void setupLayoutBackground(Context ctx, ConstraintLayout background, Theme theme) {
         if (background == null) return;
 
-        if (theme == Theme.light) background.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
-        else background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
+        if (theme == Theme.light) background.setBackground(ContextCompat.getDrawable(ctx, R.drawable.password_field_cream_background));
+        else background.setBackground(ContextCompat.getDrawable(ctx, R.drawable.password_field_purple_background));
     }
 }

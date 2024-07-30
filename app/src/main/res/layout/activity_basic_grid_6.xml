@@ -43,7 +43,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:adjustViewBounds="true"
-        android:background="@drawable/header_button"
+        android:background="@drawable/purple_background"
         android:gravity="center"
         android:scaleType="fitCenter"
         android:text="@string/rating_en"
@@ -75,7 +75,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:adjustViewBounds="true"
-        android:background="@drawable/header_button"
+        android:background="@drawable/purple_background"
         android:gravity="center"
         android:scaleType="fitCenter"
         android:text="@string/language_hr"
@@ -107,7 +107,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:adjustViewBounds="true"
-        android:background="@drawable/header_button"
+        android:background="@drawable/purple_background"
         android:gravity="center"
         android:scaleType="fitCenter"
         android:text="@string/light_theme_hr"
@@ -137,7 +137,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:adjustViewBounds="true"
-        android:background="@drawable/header_button"
+        android:background="@drawable/purple_background"
         android:gravity="center"
         android:scaleType="fitCenter"
         android:text="@string/grid_en"
@@ -169,7 +169,7 @@
         android:gravity="center"
         android:text="12:45:00 AM"
         android:textFontWeight="@android:integer/config_longAnimTime"
-        android:background="@drawable/header_button"
+        android:background="@drawable/purple_background"
         android:textAlignment="center"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -183,7 +183,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:iconifiedByDefault="false"
-        android:background="@drawable/header_button"
+        android:background="@drawable/purple_background"
         android:queryHint="Search..."
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -201,7 +201,7 @@
         android:textFontWeight="@android:integer/config_longAnimTime"
         android:textSize="14sp"
         android:textColor="#ffffff"
-        android:background="@drawable/header_button"
+        android:background="@drawable/purple_background"
         android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -528,90 +528,13 @@
         android:layout_height="250dp"
         android:visibility="invisible"
         android:translationZ="20dp"
-        android:background="@color/dark_theme"
+        android:background="@color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:background="@drawable/main_border_dark"
-            android:id="@+id/passwordMain"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/enterPasswordTitle"
-                android:layout_width="400dp"
-                android:layout_height="50dp"
-                android:text="@string/enter_password_en"
-                android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textFontWeight="@android:integer/config_longAnimTime"
-                android:textSize="30sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.11" />
-
-            <EditText
-                android:id="@+id/password"
-                android:layout_width="400dp"
-                android:layout_height="50dp"
-                android:inputType="textPassword"
-                android:cursorVisible="false"
-                android:background="@color/dark_theme"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintTop_toBottomOf="parent" />
-
-            <TextView
-                android:id="@+id/passwordTitle"
-                android:layout_width="75dp"
-                android:layout_height="24dp"
-                android:layout_marginBottom="36dp"
-                android:background="@color/dark_theme"
-                android:text="@string/password_en"
-                android:textAlignment="center"
-                app:layout_constraintBottom_toBottomOf="@+id/password"
-                app:layout_constraintEnd_toEndOf="@+id/password"
-                app:layout_constraintHorizontal_bias="0.052"
-                app:layout_constraintStart_toStartOf="@+id/password" />
-
-
-            <Button
-                android:id="@+id/cancelButtonPassword"
-                android:layout_width="180dp"
-                android:layout_height="50dp"
-                android:layout_marginBottom="36dp"
-                android:background="@drawable/button_design"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:text="@string/cancel_en"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.156"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <Button
-                android:id="@+id/submitButton"
-                android:layout_width="180dp"
-                android:layout_height="50dp"
-                android:layout_marginBottom="36dp"
-                android:background="@drawable/button_design"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:text="@string/submit_password_en"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.843"
-                app:layout_constraintStart_toStartOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <include layout="@layout/enter_password_layout"></include>
 
     </FrameLayout>
 
@@ -621,77 +544,13 @@
         android:layout_height="250dp"
         android:visibility="invisible"
         android:translationZ="20dp"
-        android:background="@color/dark_theme"
+        android:background="@color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/ratingMain"
-            android:background="@drawable/main_border_dark"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/chooseRatingTitle"
-                android:layout_width="400dp"
-                android:layout_height="50dp"
-                android:text="@string/choose_rating_page_en"
-                android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textFontWeight="@android:integer/config_longAnimTime"
-                android:textSize="30sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.31" />
-
-            <Button
-                android:id="@+id/showRatingsButton"
-                android:layout_width="112dp"
-                android:layout_height="50dp"
-                android:layout_marginBottom="60dp"
-                android:background="@drawable/button_design"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:text="@string/show_ratings_en"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.12"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <Button
-                android:id="@+id/cancelButtonRating"
-                android:layout_width="112dp"
-                android:layout_height="50dp"
-                android:layout_marginBottom="60dp"
-                android:background="@drawable/button_design"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:text="@string/cancel_en"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.498"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <Button
-                android:id="@+id/submitRatingButton"
-                android:layout_width="112dp"
-                android:layout_height="50dp"
-                android:layout_marginBottom="60dp"
-                android:background="@drawable/button_design"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:text="@string/my_rating_en"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.88"
-                app:layout_constraintStart_toStartOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <include layout="@layout/choose_rating_layout"></include>
 
     </FrameLayout>
 

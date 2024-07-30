@@ -95,7 +95,7 @@ public class BigWorkingHoursLayout {
         }
 
         if (theme == Theme.light) {
-            background.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
+            background.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_cream_background));
             bigWorkingHoursTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             mondayTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             mondayContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
@@ -112,7 +112,7 @@ public class BigWorkingHoursLayout {
             sundayTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             sundayContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
         } else {
-            background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
+            background.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_purple_background));
             bigWorkingHoursTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
             mondayTitle.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
             mondayContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));

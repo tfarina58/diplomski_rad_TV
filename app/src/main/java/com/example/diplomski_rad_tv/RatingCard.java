@@ -13,7 +13,7 @@ public class RatingCard {
         if (ratingButton == null || ratingUsername == null || ratingBar == null || ratingComment == null) return;
 
         if (rating == null) {
-            ratingButton.setVisibility(View.GONE); // TODO: GONE??
+            ratingButton.setVisibility(View.GONE);
             ratingUsername.setVisibility(View.GONE);
             ratingBar.setVisibility(View.GONE);
             centerLine.setVisibility(View.GONE);
@@ -31,7 +31,7 @@ public class RatingCard {
             ratingButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cream_background));
             ratingUsername.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             ratingComment.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
-            centerLine.setBackground(ContextCompat.getDrawable(ctx, R.color.cream_secondary));
+            centerLine.setBackground(ContextCompat.getDrawable(ctx, R.color.cream_tertiary));
         } else {
             ratingButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.purple_background));
             ratingUsername.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));

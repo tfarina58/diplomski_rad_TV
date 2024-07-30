@@ -46,7 +46,7 @@ public class LoginActivity extends Activity {
 
         this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
 
-        // this.sharedPreferencesService.clearAllInfo();
+        // this.sharedPreferencesService.clearUserAndEstateInfo();
 
         String userId = sharedPreferencesService.getUserId();
         String estateId = sharedPreferencesService.getEstateId();
@@ -138,7 +138,7 @@ public class LoginActivity extends Activity {
                 break;
             case 2:
                 Button loginButton = findViewById(R.id.loginButton);
-                LoginNavigation.setupLoginButton(getApplicationContext(), loginButton, this.focusedView, this.language);
+                LoginNavigation.setupLoginButton(getApplicationContext(), loginButton, this.focusedView, this.language, this.theme);
 
                 if (!loginButton.hasOnClickListeners()) {
                     loginButton.setOnClickListener(new View.OnClickListener() {

@@ -53,11 +53,11 @@ public class SmallWorkingHours {
         }
 
         if (focusedView.getId() == R.id.smallWorkingHours) {
-            if (theme == Theme.light) smallWorkingHours.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_light));
-            else smallWorkingHours.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_dark));
+            if (theme == Theme.light) smallWorkingHours.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_cream_background_focused));
+            else smallWorkingHours.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_purple_background_focused));
         } else {
-            if (theme == Theme.light) smallWorkingHours.setBackground(ContextCompat.getDrawable(ctx, R.color.light_theme));
-            else smallWorkingHours.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
+            if (theme == Theme.light) smallWorkingHours.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_cream_background));
+            else smallWorkingHours.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_purple_background));
         }
 
         if (theme == Theme.light) {

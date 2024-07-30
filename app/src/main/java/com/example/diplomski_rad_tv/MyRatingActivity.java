@@ -189,7 +189,7 @@ public class MyRatingActivity extends Activity {
                 Button headerButton = findViewById(R.id.ratingButton);
                 ImageView headerIcon = findViewById(R.id.ratingIcon);
 
-                RatingHeaderButton.setupRatingButton(getApplicationContext(), headerButton, headerIcon, true, this.focusedView, this.language);
+                RatingHeaderButton.setupRatingButton(getApplicationContext(), headerButton, headerIcon, true, this.focusedView, this.language, this.theme);
 
                 headerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -212,7 +212,7 @@ public class MyRatingActivity extends Activity {
             case 1:
                 Button languageButton = findViewById(R.id.languageButton);
                 ImageView languageIcon = findViewById(R.id.languageIcon);
-                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language);
+                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
 
                 languageButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -256,15 +256,19 @@ public class MyRatingActivity extends Activity {
                                 setupTitle(getApplicationContext(), titleView, language, theme);
                             }
 
+                            setupHeaderButtons();
+
                             updateView(4);
                             updateView(5);
+                            updateView(6);
+                            updateView(7);
                         }
                     });
                 }
                 break;
             case 3:
                 TextClock textClock = findViewById(R.id.textClock);
-                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format);
+                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
 
                 textClock.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -286,7 +290,7 @@ public class MyRatingActivity extends Activity {
                 MyRatingNavigation.setupRatingBarField(getApplicationContext(), ratingBar, this.focusedView, this.theme, ratingBar.getRating());
             case 6:
                 Button cancelButton = findViewById(R.id.cancelButton);
-                MyRatingNavigation.setupCancelButton(getApplicationContext(), cancelButton, this.focusedView, this.language);
+                MyRatingNavigation.setupCancelButton(getApplicationContext(), cancelButton, this.focusedView, this.language, this.theme);
 
                 if (!cancelButton.hasOnClickListeners()) {
                     cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -299,7 +303,7 @@ public class MyRatingActivity extends Activity {
                 break;
             case 7:
                 Button ratingSubmitButton = findViewById(R.id.ratingSubmitButton);
-                MyRatingNavigation.setupRatingSubmitButton(getApplicationContext(), ratingSubmitButton, this.focusedView, this.language);
+                MyRatingNavigation.setupRatingSubmitButton(getApplicationContext(), ratingSubmitButton, this.focusedView, this.language, this.theme);
 
                 if (!ratingSubmitButton.hasOnClickListeners()) {
                     ratingSubmitButton.setOnClickListener(new View.OnClickListener() {
@@ -472,17 +476,17 @@ public class MyRatingActivity extends Activity {
             case 0:
                 Button showRatingsButton = findViewById(R.id.showRatingsButton);
 
-                ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language);
+                ChooseRatingLayout.setupShowRatingButton(getApplicationContext(), showRatingsButton, this.layoutFocusedView, this.language, this.theme);
                 break;
             case 1:
                 Button cancelButtonRating = findViewById(R.id.cancelButtonRating);
 
-                ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language);
+                ChooseRatingLayout.setupCancelButton(getApplicationContext(), cancelButtonRating, this.layoutFocusedView, this.language, this.theme);
                 break;
             case 2:
                 Button submitRatingButton = findViewById(R.id.submitRatingButton);
 
-                ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language);
+                ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, this.layoutFocusedView, this.language, this.theme);
                 break;
         }
 
@@ -499,7 +503,7 @@ public class MyRatingActivity extends Activity {
 
         ChooseRatingLayout.setupLayoutTitle(ctx, chooseRatingTitle, language, theme);
         ChooseRatingLayout.setupLayoutBackground(ctx, background, theme);
-        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language);
+        ChooseRatingLayout.setupShowRatingButton(ctx, showRatingsButton, layoutFocusedView, language, theme);
         showRatingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -507,7 +511,7 @@ public class MyRatingActivity extends Activity {
             }
         });
 
-        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language);
+        ChooseRatingLayout.setupCancelButton(ctx, cancelButtonRating, layoutFocusedView, language, theme);
         cancelButtonRating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -527,12 +531,33 @@ public class MyRatingActivity extends Activity {
             }
         });
 
-        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language);
+        ChooseRatingLayout.setupMyRatingButton(getApplicationContext(), submitRatingButton, layoutFocusedView, language, theme);
         submitRatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), MyRatingActivity.class));
             }
         });
+    }
+
+    void setupHeaderButtons() {
+        Button ratingButton = findViewById(R.id.ratingButton);
+        ImageView ratingIcon = findViewById(R.id.ratingIcon);
+
+        RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+
+        Button languageButton = findViewById(R.id.languageButton);
+        ImageView languageIcon = findViewById(R.id.languageIcon);
+
+        LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+
+        Button themeButton = findViewById(R.id.themeButton);
+        ImageView themeIcon = findViewById(R.id.themeIcon);
+
+        ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+
+        TextClock textClock = findViewById(R.id.textClock);
+
+        ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
     }
 }

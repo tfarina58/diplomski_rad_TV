@@ -39,7 +39,15 @@ public class ThemeHeaderButton {
             themeIcon.setBackground(ContextCompat.getDrawable(ctx, R.drawable.moon));
         }
 
-        if (focusedView.getId() == R.id.themeButton) themeButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_header_button));
-        else themeButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.header_button));
+        if (focusedView.getId() == R.id.themeButton) {
+            if (theme == Theme.light) themeButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cream_background));
+            else themeButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.purple_background));
+        } else {
+            if (theme == Theme.light) themeButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_cream_background));
+            else themeButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_purple_background));
+        }
+
+        if (theme == Theme.light) themeButton.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
+        else themeButton.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
     }
 }

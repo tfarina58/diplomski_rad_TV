@@ -58,20 +58,21 @@ public class MyRatingNavigation {
 
         if (focusedView.getId() == R.id.ratingContent) {
             if (theme == Theme.dark) {
-                ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_dark));
+                ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_purple_background_focused));
                 ratingContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
                 ratingContent.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_dark_mode));
             } else {
-                ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_light));
+                ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_cream_background_focused));
                 ratingContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
                 ratingContent.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_light_mode));
             }
         } else {
-            ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
             if (theme == Theme.dark) {
+                ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_purple_background));
                 ratingContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
                 ratingContent.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_dark_mode));
             } else {
+                ratingContent.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_cream_background));
                 ratingContent.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
                 ratingContent.setHintTextColor(ContextCompat.getColor(ctx, R.color.hint_color_light_mode));
             }
@@ -82,9 +83,12 @@ public class MyRatingNavigation {
         if (ratingBar == null) return;
 
         if (focusedView.getId() == R.id.ratingBar) {
-            if (theme == Theme.dark) ratingBar.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_dark));
-            else ratingBar.setBackground(ContextCompat.getDrawable(ctx, R.drawable.main_border_light));
-        } else ratingBar.setBackground(ContextCompat.getDrawable(ctx, R.drawable.image_button));
+            if (theme == Theme.dark) ratingBar.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_purple_background_focused));
+            else ratingBar.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_cream_background_focused));
+        } else {
+            if (theme == Theme.dark) ratingBar.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_purple_background));
+            else ratingBar.setBackground(ContextCompat.getDrawable(ctx, R.drawable.login_string_field_cream_background));
+        }
 
         ratingBar.setNumStars(5);
         ratingBar.setStepSize(1);
@@ -92,7 +96,7 @@ public class MyRatingNavigation {
     }
 
 
-    public static void setupCancelButton(Context ctx, Button button, View focusedView, Language language) {
+    public static void setupCancelButton(Context ctx, Button button, View focusedView, Language language, Theme theme) {
         if (button == null) return;
 
         switch (language) {
@@ -106,11 +110,19 @@ public class MyRatingNavigation {
                 button.setText(R.string.cancel_en);
         }
 
-        if (focusedView.getId() == R.id.cancelButton) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design_focused));
-        else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design));
+        if (focusedView.getId() == R.id.cancelButton) {
+            if (theme == Theme.light) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cream_background));
+            else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.purple_background));
+        } else {
+            if (theme == Theme.light) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_cream_background));
+            else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_purple_background));
+        }
+
+        if (theme == Theme.light) button.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
+        else button.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
     }
 
-    public static void setupRatingSubmitButton(Context ctx, Button button, View focusedView, Language language) {
+    public static void setupRatingSubmitButton(Context ctx, Button button, View focusedView, Language language, Theme theme) {
         if (button == null) return;
 
         switch (language) {
@@ -124,7 +136,15 @@ public class MyRatingNavigation {
                 button.setText(R.string.send_rating_en);
         }
 
-        if (focusedView.getId() == R.id.ratingSubmitButton) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design_focused));
-        else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.button_design));
+        if (focusedView.getId() == R.id.ratingSubmitButton) {
+            if (theme == Theme.light) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cream_background));
+            else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.purple_background));
+        } else {
+            if (theme == Theme.light) button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_cream_background));
+            else button.setBackground(ContextCompat.getDrawable(ctx, R.drawable.secondary_purple_background));
+        }
+
+        if (theme == Theme.light) button.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_light_mode));
+        else button.setTextColor(ContextCompat.getColor(ctx, R.color.header_button_text_dark_mode));
     }
 }
