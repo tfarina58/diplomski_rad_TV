@@ -198,7 +198,7 @@
         android:layout_height="250dp"
         android:visibility="invisible"
         android:translationZ="20dp"
-        android:background="@color/dark_theme"
+        android:background="@color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

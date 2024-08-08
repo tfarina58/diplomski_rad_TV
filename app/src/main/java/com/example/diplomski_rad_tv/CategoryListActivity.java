@@ -75,7 +75,7 @@ public class CategoryListActivity extends Activity {
 
         this.firestore = FirebaseFirestore.getInstance();
 
-        getCurrentUserName();
+        this.getActiveGuestId(this.estateId);
 
         Query query = firestore.collection("categories").whereEqualTo("estateId", estateId);
 
@@ -158,7 +158,10 @@ public class CategoryListActivity extends Activity {
                 this.setupChooseRatingLayout(getApplicationContext(), chooseRatingLayout, background, chooseRatingTitle, showRatingsButton, cancelButtonRating, submitRatingButton, false, this.layoutFocusedView, this.language, this.theme);
             }
             // Enter button
-            else if (keyCode == 23) this.layoutFocusedView.callOnClick();
+            else if (keyCode == 23) {
+                View tmpView = findViewById(this.layoutFocusedView.getId());
+                tmpView.performClick();
+            }
 
             return true;
         }
@@ -200,7 +203,10 @@ public class CategoryListActivity extends Activity {
                 this.setupPasswordLayout(getApplicationContext(), enterPasswordLayout, background, enterPasswordTitle, passwordField, passwordFieldTitle, cancelButton, submitButton, false, this.layoutFocusedView, this.language, this.theme);
             }
             // Enter button
-            else if (keyCode == 23) this.layoutFocusedView.callOnClick();
+            else if (keyCode == 23) {
+                View tmpView = findViewById(this.layoutFocusedView.getId());
+                tmpView.performClick();
+            }
 
             return true;
         }
@@ -251,7 +257,10 @@ public class CategoryListActivity extends Activity {
             this.setupPasswordLayout(getApplicationContext(), enterPasswordLayout, background, enterPasswordTitle, passwordField, passwordFieldTitle, cancelButton, submitButton, true, this.layoutFocusedView, this.language, this.theme);
         }
         // Enter button
-        else if (keyCode == 23) this.focusedView.callOnClick();
+        else if (keyCode == 23) {
+            View tmpView = findViewById(this.focusedView.getId());
+            tmpView.performClick();
+        }
 
         return true;
     }
@@ -303,6 +312,10 @@ public class CategoryListActivity extends Activity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (focusedLayout.equals("rating")) {
+                        findViewById(layoutFocusedView.getId()).performClick();
+                        return;
+                    }
                     focusedLayout = "rating";
 
                     FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
@@ -627,10 +640,12 @@ public class CategoryListActivity extends Activity {
                         try {
                             String input = paginationCurrentPage.getText().toString();
                             int pageIndexNumber = Integer.parseInt(input) - 1;
-                            if (pageIndexNumber < 0 || pageIndexNumber >= totalPages)
-                                throw new Exception();
                             if (pageIndexNumber != currentPage) {
-                                currentPage = pageIndexNumber;
+                                if (pageIndexNumber < 0) {
+                                    currentPage = 0;
+                                } else if (pageIndexNumber >= totalPages) {
+                                    currentPage = totalPages - 1;
+                                } else currentPage = pageIndexNumber;
                             }
                         } catch (Exception ex) {
                             switch (language) {
@@ -713,7 +728,9 @@ public class CategoryListActivity extends Activity {
         main.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navigateToElementListActivity();
+                int gridType = GridNavigation.getGridTypeAsInt(grid);
+                int currentEstateIndex = GridNavigation.getViewIndexAsInt(focusedView.getId());
+                navigateToElementListActivity(categories[categoriesToShow.get(currentPage * gridType + currentEstateIndex)].id);
             }
         });
     }
@@ -947,16 +964,7 @@ public class CategoryListActivity extends Activity {
             }
     }
 
-    void navigateToElementListActivity() {
-        int viewIndex = GridNavigation.getViewIndexAsInt(this.focusedView.getId());
-        int overallIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + viewIndex;
-
-        // Happens only when array length == 0
-        if (overallIndex >= this.categoriesToShow.size()) return;
-
-        String categoryId = this.categories[this.categoriesToShow.get(overallIndex)].id;
-        if (categoryId == null || categoryId.isEmpty()) return;
-
+    void navigateToElementListActivity(String categoryId) {
         this.sharedPreferencesService.setCategoryId(categoryId);
         startActivity(new Intent(getApplicationContext(), ElementListActivity.class));
     }
@@ -1041,26 +1049,17 @@ public class CategoryListActivity extends Activity {
                     this.currentPage--;
                     if (this.grid == GridNavigation.one) {
                         backgroundAlreadySet = false;
-                        this.updateView(7);
                     } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton3);
-                        this.updateView(7);
-                        this.updateView(8);
-                        this.updateView(9);
                     } else if (this.grid == GridNavigation.six) {
-                        if (GridNavigation.isFirstRow(this.focusedView.getId())) {
+                        if (GridNavigation.isFirstRow(oldFocusedViewId))
                             this.focusedView = findViewById(R.id.gridButton3);
-                            this.updateView(7);
-                            this.updateView(8);
-                            this.updateView(9);
-                        } else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
+                        else if (GridNavigation.isSecondRow(oldFocusedViewId))
                             this.focusedView = findViewById(R.id.gridButton6);
-                            this.updateView(10);
-                            this.updateView(11);
-                            this.updateView(12);
-                        }
+
                     }
-                    this.updateView(6);
+                    this.focusedView.requestFocus();
+                    this.setNewContentView();
                 }
                 return true;
             }
@@ -1072,28 +1071,19 @@ public class CategoryListActivity extends Activity {
                     this.currentPage++;
                     if (this.grid == GridNavigation.one) {
                         backgroundAlreadySet = false;
-                        this.updateView(7);
                     } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton1);
-                        this.updateView(7);
-                        this.updateView(8);
-                        this.updateView(9);
                     } else if (this.grid == GridNavigation.six) {
-                        if (GridNavigation.isFirstRow(this.focusedView.getId()))
+                        if (GridNavigation.isFirstRow(oldFocusedViewId))
                             this.focusedView = findViewById(R.id.gridButton1);
-                        else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
-                            this.focusedView = findViewById(R.id.gridButton4);
-
-                            this.updateView(7);
-                            this.updateView(8);
-                            this.updateView(9);
-
-                            this.updateView(10);
-                            this.updateView(11);
-                            this.updateView(12);
-                        }
+                        else if (GridNavigation.isSecondRow(oldFocusedViewId))
+                            if (this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + 3 < this.categoriesToShow.size())
+                                this.focusedView = findViewById(R.id.gridButton4);
+                            else
+                                this.focusedView = findViewById(R.id.gridButton1);
                     }
-                    this.updateView(6);
+                    this.focusedView.requestFocus();
+                    this.setNewContentView();
                 }
                 return true;
             }
@@ -1101,7 +1091,7 @@ public class CategoryListActivity extends Activity {
         return false;
     }
 
-    void setupGrid(Context ctx, View focusedView, Language language, Theme theme, boolean loadingInProgress, Category[] categories) {
+    void setupGrid(Context ctx, View focusedView, Language language, Theme theme, boolean loadingInProgress, Category[] shownCategories) {
 
         TextView gridTitle = null;
         if (this.grid == GridNavigation.three) gridTitle = findViewById(R.id.gridTitle3);
@@ -1118,13 +1108,14 @@ public class CategoryListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground1);
         imageTitle = findViewById(R.id.gridButtonTitle1);
 
-        if (0 < categories.length && categories[0] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[0]);
+        if (0 < shownCategories.length && shownCategories[0] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, shownCategories[0]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToElementListActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToElementListActivity(categories[categoriesToShow.get(currentPage * gridType)].id);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
@@ -1134,13 +1125,14 @@ public class CategoryListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground2);
         imageTitle = findViewById(R.id.gridButtonTitle2);
 
-        if (1 < categories.length && categories[1] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[1]);
+        if (1 < shownCategories.length && shownCategories[1] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, shownCategories[1]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToElementListActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToElementListActivity(categories[categoriesToShow.get(currentPage * gridType + 1)].id);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
@@ -1150,13 +1142,14 @@ public class CategoryListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground3);
         imageTitle = findViewById(R.id.gridButtonTitle3);
 
-        if (2 < categories.length && categories[2] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[2]);
+        if (2 < shownCategories.length && shownCategories[2] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, shownCategories[2]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToElementListActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToElementListActivity(categories[categoriesToShow.get(currentPage * gridType + 2)].id);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
@@ -1166,13 +1159,14 @@ public class CategoryListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground4);
         imageTitle = findViewById(R.id.gridButtonTitle4);
 
-        if (3 < categories.length && categories[3] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[3]);
+        if (3 < shownCategories.length && shownCategories[3] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, shownCategories[3]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToElementListActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToElementListActivity(categories[categoriesToShow.get(currentPage * gridType + 3)].id);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
@@ -1182,13 +1176,14 @@ public class CategoryListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground5);
         imageTitle = findViewById(R.id.gridButtonTitle5);
 
-        if (4 < categories.length && categories[4] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[4]);
+        if (4 < shownCategories.length && shownCategories[4] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, shownCategories[4]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToElementListActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToElementListActivity(categories[categoriesToShow.get(currentPage * gridType + 4)].id);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
@@ -1198,13 +1193,14 @@ public class CategoryListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground6);
         imageTitle = findViewById(R.id.gridButtonTitle6);
 
-        if (5 < categories.length && categories[5] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, categories[5]);
+        if (5 < shownCategories.length && shownCategories[5] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, shownCategories[5]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToElementListActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToElementListActivity(categories[categoriesToShow.get(currentPage * gridType + 5)].id);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Category) null);
@@ -1420,35 +1416,6 @@ public class CategoryListActivity extends Activity {
         }
     }
 
-    void getCurrentUserName() {
-        DocumentReference ref = firestore.collection("estates").document(this.sharedPreferencesService.getEstateId());
-
-        ref.get()
-            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
-                    ArrayList<HashMap<String, Object>> guests = (ArrayList<HashMap<String, Object>>)queryDocumentSnapshots.get("guests");
-                    if (guests == null || guests.size() == 0) return;
-
-                    int guestsLength = guests.size();
-                    for (int i = 0; i < guestsLength; ++i) {
-                        Timestamp fromStamp = (Timestamp)(guests.get(i).getOrDefault("from", null));
-                        Timestamp toStamp = (Timestamp)(guests.get(i).getOrDefault("to", null));
-                        if (fromStamp == null || toStamp == null) continue;
-
-                        long epochFrom = fromStamp.getSeconds();
-                        long epochNow = System.currentTimeMillis() / 1000;
-                        long epochTo = toStamp.getSeconds();
-
-                        if (epochNow - epochFrom >= 0 && epochTo - epochNow > 0) {
-                            userName = (String)(guests.get(i).getOrDefault("name", ""));
-                            break;
-                        }
-                    }
-                }
-            });
-    }
-
     void setupGridTitle(Context ctx, TextView gridTitle, String userName, Language language, Theme theme) {
         if (gridTitle == null) return;
 
@@ -1491,5 +1458,40 @@ public class CategoryListActivity extends Activity {
         TextClock textClock = findViewById(R.id.textClock);
 
         ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+    }
+
+    void getActiveGuestId(String estateId) {
+        String oldGuestId = this.sharedPreferencesService.getGuestId();
+        DocumentReference query = this.firestore.collection("estates").document(estateId);
+
+        query.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
+                        ArrayList<HashMap<String, Object>> guests = (ArrayList<HashMap<String, Object>>)queryDocumentSnapshots.get("guests"); // ArrayList<HashMap<String, Object>>
+                        if (guests == null || guests.size() == 0) return;
+
+                        int guestsLength = guests.size();
+                        for (int i = 0; i < guestsLength; ++i) {
+                            Timestamp fromStamp = (Timestamp)(guests.get(i).getOrDefault("from", null));
+                            Timestamp toStamp = (Timestamp)(guests.get(i).getOrDefault("to", null));
+                            if (fromStamp == null || toStamp == null) continue;
+
+                            long epochFrom = fromStamp.getSeconds();
+                            long epochNow = System.currentTimeMillis() / 1000;
+                            long epochTo = toStamp.getSeconds();
+
+                            if (epochNow - epochFrom >= 0 && epochTo - epochNow > 0) {
+                                userName = (String)(guests.get(i).getOrDefault("name", ""));
+                                String newGuestId = (String)(guests.get(i).getOrDefault("id", ""));
+                                if (!oldGuestId.equals(newGuestId)) {
+                                    sharedPreferencesService.setGuestId(newGuestId);
+                                    sharedPreferencesService.setRatingId("");
+                                }
+                                break;
+                            }
+                        }
+                    }
+                });
     }
 }

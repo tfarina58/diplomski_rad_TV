@@ -194,6 +194,10 @@ public class MyRatingActivity extends Activity {
                 headerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (focusedLayout.equals("rating")) {
+                            findViewById(layoutFocusedView.getId()).performClick();
+                            return;
+                        }
                         focusedLayout = "rating";
 
                         FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);

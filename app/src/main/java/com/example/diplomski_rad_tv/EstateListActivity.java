@@ -86,7 +86,7 @@ public class EstateListActivity extends Activity {
                             String image = document.getString("image");
                             GeoPoint coordinates = document.getGeoPoint("coordinates");
                             HashMap<String, Object> variables = (HashMap<String, Object>) document.get("variables");
-                            estates[i] = new Estate(estateId, ownerId, image, coordinates.getLatitude(), coordinates.getLongitude(), name, variables);
+                            estates[i] = new Estate(estateId, ownerId, image, coordinates != null ? coordinates.getLatitude() : 0, coordinates != null ? coordinates.getLongitude() : 0, name, variables);
                             i++;
                         }
                         loadingInProgress = false;
@@ -467,13 +467,16 @@ public class EstateListActivity extends Activity {
                     currentPage = 0;
                     totalPages = estatesToShow.size() == 0 ? 0 : (estatesToShow.size() - 1) / GridNavigation.getGridTypeAsInt(grid) + 1;
 
-
                     setNewContentView();
                     return true;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String s) {
+                    if (s.isEmpty()) {
+                        searchbarText = "";
+                        setupEstatesToShow();
+                    }
                     return true;
                 }
             });
@@ -587,7 +590,7 @@ public class EstateListActivity extends Activity {
         main.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navigateToCategoryListActivity(estates[estatesToShow.get(currentPage)]);
+                navigateToCategoryListActivity(estates[estatesToShow.get(currentPage)].id);
             }
         });
     }
@@ -734,8 +737,10 @@ public class EstateListActivity extends Activity {
             TextView imageTitle = findViewById(R.id.gridButtonTitle1);
             int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage;
 
-            if (viewIndex < this.estatesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
-            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
+            if (viewIndex < this.estatesToShow.size())
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.estates[this.estatesToShow.get(viewIndex)]);
+            else
+                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Estate) null);
         } else if (row == 7) {
             ImageButton imageButton = findViewById(R.id.gridButton2);
             Button imageBackground = findViewById(R.id.gridButtonBackground2);
@@ -791,6 +796,10 @@ public class EstateListActivity extends Activity {
 
     void setupEstatesToShow() {
         this.estatesToShow.clear();
+        if (searchbarText.trim().equals("")) {
+            for (int i = 0; i < estates.length; ++i) estatesToShow.add(i);
+            return;
+        }
         for (int i = 0; i < estates.length; ++i)
             switch (language) {
                 case german:
@@ -816,11 +825,8 @@ public class EstateListActivity extends Activity {
             }
     }
 
-    void navigateToCategoryListActivity(Estate estate) {
-        this.sharedPreferencesService.setEstateId(estate.id);
-
-        getActiveGuestId(estate.id);
-
+    void navigateToCategoryListActivity(String estateId) {
+        this.sharedPreferencesService.setEstateId(estateId);
         startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
     }
 
@@ -904,26 +910,17 @@ public class EstateListActivity extends Activity {
                     this.currentPage--;
                     if (this.grid == GridNavigation.one) {
                         backgroundAlreadySet = false;
-                        this.updateView(6);
                     } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton3);
-                        this.updateView(6);
-                        this.updateView(7);
-                        this.updateView(8);
                     } else if (this.grid == GridNavigation.six) {
-                        if (GridNavigation.isFirstRow(this.focusedView.getId())) {
+                        if (GridNavigation.isFirstRow(oldFocusedViewId))
                             this.focusedView = findViewById(R.id.gridButton3);
-                            this.updateView(6);
-                            this.updateView(7);
-                            this.updateView(8);
-                        } else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
+                        else if (GridNavigation.isSecondRow(oldFocusedViewId))
                             this.focusedView = findViewById(R.id.gridButton6);
-                            this.updateView(9);
-                            this.updateView(10);
-                            this.updateView(11);
-                        }
+
                     }
-                    this.updateView(5);
+                    this.focusedView.requestFocus();
+                    this.setNewContentView();
                 }
                 return true;
             }
@@ -935,28 +932,19 @@ public class EstateListActivity extends Activity {
                     this.currentPage++;
                     if (this.grid == GridNavigation.one) {
                         backgroundAlreadySet = false;
-                        this.updateView(6);
                     } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton1);
-                        this.updateView(6);
-                        this.updateView(7);
-                        this.updateView(8);
                     } else if (this.grid == GridNavigation.six) {
-                        if (GridNavigation.isFirstRow(this.focusedView.getId()))
+                        if (GridNavigation.isFirstRow(oldFocusedViewId))
                             this.focusedView = findViewById(R.id.gridButton1);
-                        else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
-                            this.focusedView = findViewById(R.id.gridButton4);
-
-                            this.updateView(6);
-                            this.updateView(7);
-                            this.updateView(8);
-
-                            this.updateView(9);
-                            this.updateView(10);
-                            this.updateView(11);
-                        }
+                        else if (GridNavigation.isSecondRow(oldFocusedViewId))
+                            if (this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + 3 < this.estatesToShow.size())
+                                this.focusedView = findViewById(R.id.gridButton4);
+                            else
+                                this.focusedView = findViewById(R.id.gridButton1);
                     }
-                    this.updateView(5);
+                    this.focusedView.requestFocus();
+                    this.setNewContentView();
                 }
                 return true;
             }
@@ -964,7 +952,7 @@ public class EstateListActivity extends Activity {
         return false;
     }
 
-    void setupGrid(Context ctx, View focusedView, Language language, Theme theme, boolean loadingInProgress, Estate[] estates) {
+    void setupGrid(Context ctx, View focusedView, Language language, Theme theme, boolean loadingInProgress, Estate[] shownEstates) {
         TextView gridTitle = null;
         if (this.grid == GridNavigation.three) gridTitle = findViewById(R.id.gridTitle3);
         else if (this.grid == GridNavigation.six) gridTitle = findViewById(R.id.gridTitle6);
@@ -980,13 +968,14 @@ public class EstateListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground1);
         imageTitle = findViewById(R.id.gridButtonTitle1);
 
-        if (0 < estates.length && estates[0] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[0]);
+        if (0 < shownEstates.length && shownEstates[0] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, shownEstates[0]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity(estates[0]);
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType)].id);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -996,13 +985,14 @@ public class EstateListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground2);
         imageTitle = findViewById(R.id.gridButtonTitle2);
 
-        if (1 < estates.length && estates[1] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[1]);
+        if (1 < shownEstates.length && shownEstates[1] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, shownEstates[1]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity(estates[1]);
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 1)].id);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1012,13 +1002,14 @@ public class EstateListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground3);
         imageTitle = findViewById(R.id.gridButtonTitle3);
 
-        if (2 < estates.length && estates[2] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[2]);
+        if (2 < shownEstates.length && shownEstates[2] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, shownEstates[2]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity(estates[2]);
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 2)].id);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1028,13 +1019,14 @@ public class EstateListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground4);
         imageTitle = findViewById(R.id.gridButtonTitle4);
 
-        if (3 < estates.length && estates[3] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[3]);
+        if (3 < shownEstates.length && shownEstates[3] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, shownEstates[3]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity(estates[3]);
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 3)].id);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1044,13 +1036,14 @@ public class EstateListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground5);
         imageTitle = findViewById(R.id.gridButtonTitle5);
 
-        if (4 < estates.length && estates[4] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[4]);
+        if (4 < shownEstates.length && shownEstates[4] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, shownEstates[4]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity(estates[4]);
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 4)].id);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1060,13 +1053,14 @@ public class EstateListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground6);
         imageTitle = findViewById(R.id.gridButtonTitle6);
 
-        if (5 < estates.length && estates[5] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, estates[5]);
+        if (5 < shownEstates.length && shownEstates[5] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, shownEstates[5]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToCategoryListActivity(estates[5]);
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 5)].id);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1092,40 +1086,6 @@ public class EstateListActivity extends Activity {
     void setupGridTitle(TextView gridTitle) {
         if (gridTitle == null) return;
         gridTitle.setText("");
-    }
-
-    void getActiveGuestId(String estateId) {
-        String oldGuestId = this.sharedPreferencesService.getGuestId();
-        DocumentReference query = this.firestore.collection("estates").document(estateId);
-
-        query.get()
-            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
-                    ArrayList<HashMap<String, Object>> guests = (ArrayList<HashMap<String, Object>>)queryDocumentSnapshots.get("guests"); // ArrayList<HashMap<String, Object>>
-                    if (guests == null || guests.size() == 0) return;
-
-                    int guestsLength = guests.size();
-                    for (int i = 0; i < guestsLength; ++i) {
-                        Timestamp fromStamp = (Timestamp)(guests.get(i).getOrDefault("from", null));
-                        Timestamp toStamp = (Timestamp)(guests.get(i).getOrDefault("to", null));
-                        if (fromStamp == null || toStamp == null) continue;
-
-                        long epochFrom = fromStamp.getSeconds();
-                        long epochNow = System.currentTimeMillis() / 1000;
-                        long epochTo = toStamp.getSeconds();
-
-                        if (epochNow - epochFrom >= 0 && epochTo - epochNow > 0) {
-                            String newGuestId = (String)(guests.get(i).getOrDefault("id", ""));
-                            if (!oldGuestId.equals(newGuestId)) {
-                                sharedPreferencesService.setGuestId(newGuestId);
-                                sharedPreferencesService.setRatingId("");
-                            }
-                            break;
-                        }
-                    }
-                }
-            });
     }
 
     void setupHeaderButtons() {

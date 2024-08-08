@@ -1,7 +1,6 @@
 package com.example.diplomski_rad_tv;
 
 import com.google.firebase.Timestamp;
-import com.google.type.DateTime;
 
 public class Rating {
     String id;

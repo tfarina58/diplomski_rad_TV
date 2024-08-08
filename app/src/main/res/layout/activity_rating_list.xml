@@ -174,7 +174,7 @@
         <Button
             android:id="@+id/ratingButton1"
             android:layout_width="820dp"
-            android:layout_height="300dp"
+            android:layout_height="330dp"
             android:layout_marginTop="100dp"
             android:background="@drawable/purple_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -228,7 +228,7 @@
             android:id="@+id/ratingComment1"
             android:layout_width="780dp"
             android:layout_height="162dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:textSize="18sp"
             android:textColor="@color/text_color_dark_mode"
             android:text="@string/lorem_ipsum"
@@ -239,10 +239,26 @@
             app:layout_constraintEnd_toEndOf="@+id/ratingButton1"
             app:layout_constraintStart_toStartOf="@+id/ratingButton1" />
 
+        <TextView
+            android:id="@+id/ratingTimestamp1"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="20dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/date_display"
+            android:textAlignment="textEnd"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton1"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton1" />
+
         <Button
             android:id="@+id/ratingButton2"
             android:layout_width="820dp"
-            android:layout_height="300dp"
+            android:layout_height="330dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/purple_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -296,7 +312,7 @@
             android:id="@+id/ratingComment2"
             android:layout_width="780dp"
             android:layout_height="162dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:textSize="18sp"
             android:textColor="@color/text_color_dark_mode"
             android:text="@string/lorem_ipsum"
@@ -307,10 +323,26 @@
             app:layout_constraintEnd_toEndOf="@+id/ratingButton2"
             app:layout_constraintStart_toStartOf="@+id/ratingButton2" />
 
+        <TextView
+            android:id="@+id/ratingTimestamp2"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="20dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/date_display"
+            android:textAlignment="textEnd"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton2"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton2" />
+
         <Button
             android:id="@+id/ratingButton3"
             android:layout_width="820dp"
-            android:layout_height="300dp"
+            android:layout_height="330dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/purple_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -364,7 +396,7 @@
             android:id="@+id/ratingComment3"
             android:layout_width="780dp"
             android:layout_height="162dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:textSize="18sp"
             android:textColor="@color/text_color_dark_mode"
             android:text="@string/lorem_ipsum"
@@ -375,10 +407,26 @@
             app:layout_constraintEnd_toEndOf="@+id/ratingButton3"
             app:layout_constraintStart_toStartOf="@+id/ratingButton3" />
 
+        <TextView
+            android:id="@+id/ratingTimestamp3"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="20dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/date_display"
+            android:textAlignment="textEnd"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton3"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton3" />
+
         <Button
             android:id="@+id/ratingButton4"
             android:layout_width="820dp"
-            android:layout_height="300dp"
+            android:layout_height="330dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/purple_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -432,7 +480,7 @@
             android:id="@+id/ratingComment4"
             android:layout_width="780dp"
             android:layout_height="162dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:textSize="18sp"
             android:textColor="@color/text_color_dark_mode"
             android:text="@string/lorem_ipsum"
@@ -443,10 +491,26 @@
             app:layout_constraintEnd_toEndOf="@+id/ratingButton4"
             app:layout_constraintStart_toStartOf="@+id/ratingButton4" />
 
+        <TextView
+            android:id="@+id/ratingTimestamp4"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="20dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/date_display"
+            android:textAlignment="textEnd"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton4"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton4" />
+
         <Button
             android:id="@+id/ratingButton5"
             android:layout_width="820dp"
-            android:layout_height="300dp"
+            android:layout_height="330dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/purple_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -500,7 +564,7 @@
             android:id="@+id/ratingComment5"
             android:layout_width="780dp"
             android:layout_height="162dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:textSize="18sp"
             android:textColor="@color/text_color_dark_mode"
             android:text="@string/lorem_ipsum"
@@ -511,10 +575,26 @@
             app:layout_constraintEnd_toEndOf="@+id/ratingButton5"
             app:layout_constraintStart_toStartOf="@+id/ratingButton5" />
 
+        <TextView
+            android:id="@+id/ratingTimestamp5"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="20dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/date_display"
+            android:textAlignment="textEnd"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton5"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton5" />
+
         <Button
             android:id="@+id/ratingButton6"
             android:layout_width="820dp"
-            android:layout_height="300dp"
+            android:layout_height="330dp"
             android:layout_marginTop="100dp"
             android:background="@drawable/purple_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -568,7 +648,7 @@
             android:id="@+id/ratingComment6"
             android:layout_width="780dp"
             android:layout_height="162dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:textSize="18sp"
             android:textColor="@color/text_color_dark_mode"
             android:text="@string/lorem_ipsum"
@@ -579,10 +659,26 @@
             app:layout_constraintEnd_toEndOf="@+id/ratingButton6"
             app:layout_constraintStart_toStartOf="@+id/ratingButton6" />
 
+        <TextView
+            android:id="@+id/ratingTimestamp6"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="20dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/date_display"
+            android:textAlignment="textEnd"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton6"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton6" />
+
         <Button
             android:id="@+id/ratingButton7"
             android:layout_width="820dp"
-            android:layout_height="300dp"
+            android:layout_height="330dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/purple_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -636,7 +732,7 @@
             android:id="@+id/ratingComment7"
             android:layout_width="780dp"
             android:layout_height="162dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:textSize="18sp"
             android:textColor="@color/text_color_dark_mode"
             android:text="@string/lorem_ipsum"
@@ -647,10 +743,26 @@
             app:layout_constraintEnd_toEndOf="@+id/ratingButton7"
             app:layout_constraintStart_toStartOf="@+id/ratingButton7" />
 
+        <TextView
+            android:id="@+id/ratingTimestamp7"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="20dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/date_display"
+            android:textAlignment="textEnd"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton7"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton7" />
+
         <Button
             android:id="@+id/ratingButton8"
             android:layout_width="820dp"
-            android:layout_height="300dp"
+            android:layout_height="330dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/purple_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -704,7 +816,7 @@
             android:id="@+id/ratingComment8"
             android:layout_width="780dp"
             android:layout_height="162dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:textSize="18sp"
             android:textColor="@color/text_color_dark_mode"
             android:text="@string/lorem_ipsum"
@@ -715,10 +827,26 @@
             app:layout_constraintEnd_toEndOf="@+id/ratingButton8"
             app:layout_constraintStart_toStartOf="@+id/ratingButton8" />
 
+        <TextView
+            android:id="@+id/ratingTimestamp8"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="20dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/date_display"
+            android:textAlignment="textEnd"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton8"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton8" />
+
         <Button
             android:id="@+id/ratingButton9"
             android:layout_width="820dp"
-            android:layout_height="300dp"
+            android:layout_height="330dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/purple_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -772,7 +900,7 @@
             android:id="@+id/ratingComment9"
             android:layout_width="780dp"
             android:layout_height="162dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:textSize="18sp"
             android:textColor="@color/text_color_dark_mode"
             android:text="@string/lorem_ipsum"
@@ -783,10 +911,26 @@
             app:layout_constraintEnd_toEndOf="@+id/ratingButton9"
             app:layout_constraintStart_toStartOf="@+id/ratingButton9" />
 
+        <TextView
+            android:id="@+id/ratingTimestamp9"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="20dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/date_display"
+            android:textAlignment="textEnd"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton9"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton9" />
+
         <Button
             android:id="@+id/ratingButton10"
             android:layout_width="820dp"
-            android:layout_height="300dp"
+            android:layout_height="330dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/purple_background"
             app:layout_constraintEnd_toEndOf="parent"
@@ -840,7 +984,7 @@
             android:id="@+id/ratingComment10"
             android:layout_width="780dp"
             android:layout_height="162dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="40dp"
             android:textSize="18sp"
             android:textColor="@color/text_color_dark_mode"
             android:text="@string/lorem_ipsum"
@@ -850,6 +994,22 @@
             app:layout_constraintBottom_toBottomOf="@+id/ratingButton10"
             app:layout_constraintEnd_toEndOf="@+id/ratingButton10"
             app:layout_constraintStart_toStartOf="@+id/ratingButton10" />
+
+        <TextView
+            android:id="@+id/ratingTimestamp10"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="20dp"
+            android:textSize="12sp"
+            android:textColor="@color/text_color_dark_mode"
+            android:text="@string/date_display"
+            android:textAlignment="textEnd"
+            android:translationZ="2dp"
+            android:padding="8dp"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="@+id/ratingButton10"
+            app:layout_constraintEnd_toEndOf="@+id/ratingButton10" />
 
         <Space
             android:id="@+id/space"
@@ -865,11 +1025,12 @@
             android:layout_height="250dp"
             android:visibility="invisible"
             android:translationZ="20dp"
-            android:background="@color/dark_theme"
+            android:layout_marginTop="166dp"
+            android:background="@color/transparent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintVertical_bias="0.05"
+            app:layout_constraintVertical_bias="0"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout

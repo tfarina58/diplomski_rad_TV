@@ -258,6 +258,10 @@ public class ElementListActivity extends Activity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (focusedLayout.equals("rating")) {
+                        findViewById(layoutFocusedView.getId()).performClick();
+                        return;
+                    }
                     focusedLayout = "rating";
 
                     FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
@@ -659,7 +663,8 @@ public class ElementListActivity extends Activity {
         main.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navigateToDescriptionActivity();
+                int gridType = GridNavigation.getGridTypeAsInt(grid);
+                navigateToDescriptionActivity(elements[elementsToShow.get(currentPage * gridType)]);
             }
         });
     }
@@ -893,22 +898,13 @@ public class ElementListActivity extends Activity {
             }
     }
 
-    void navigateToDescriptionActivity() {
-        int viewIndex = GridNavigation.getViewIndexAsInt(this.focusedView.getId());
-        int overallIndex = this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + viewIndex;
-
-        // Happens only when array length == 0
-        if (overallIndex >= this.elementsToShow.size()) return;
-
-        String elementId = this.elements[this.elementsToShow.get(overallIndex)].id;
-        if (elementId == null || elementId.isEmpty()) return;
-
-        this.sharedPreferencesService.setElementId(elementId);
+    void navigateToDescriptionActivity(Element element) {
+        this.sharedPreferencesService.setElementId(element.id);
 
         Intent intent = new Intent(getApplicationContext(), DescriptionActivity.class);
 
         Gson gson = new Gson();
-        String jsonElement = gson.toJson(this.elements[this.elementsToShow.get(overallIndex)]);
+        String jsonElement = gson.toJson(element);
 
         Bundle bundle = new Bundle();
         bundle.putString("element", jsonElement);
@@ -998,26 +994,17 @@ public class ElementListActivity extends Activity {
                     this.currentPage--;
                     if (this.grid == GridNavigation.one) {
                         backgroundAlreadySet = false;
-                        this.updateView(7);
                     } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton3);
-                        this.updateView(7);
-                        this.updateView(8);
-                        this.updateView(9);
                     } else if (this.grid == GridNavigation.six) {
-                        if (GridNavigation.isFirstRow(this.focusedView.getId())) {
+                        if (GridNavigation.isFirstRow(oldFocusedViewId))
                             this.focusedView = findViewById(R.id.gridButton3);
-                            this.updateView(7);
-                            this.updateView(8);
-                            this.updateView(9);
-                        } else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
+                        else if (GridNavigation.isSecondRow(oldFocusedViewId))
                             this.focusedView = findViewById(R.id.gridButton6);
-                            this.updateView(10);
-                            this.updateView(11);
-                            this.updateView(12);
-                        }
+
                     }
-                    this.updateView(6);
+                    this.focusedView.requestFocus();
+                    this.setNewContentView();
                 }
                 return true;
             }
@@ -1029,28 +1016,19 @@ public class ElementListActivity extends Activity {
                     this.currentPage++;
                     if (this.grid == GridNavigation.one) {
                         backgroundAlreadySet = false;
-                        this.updateView(7);
                     } else if (this.grid == GridNavigation.three) {
                         this.focusedView = findViewById(R.id.gridButton1);
-                        this.updateView(7);
-                        this.updateView(8);
-                        this.updateView(9);
                     } else if (this.grid == GridNavigation.six) {
-                        if (GridNavigation.isFirstRow(this.focusedView.getId()))
+                        if (GridNavigation.isFirstRow(oldFocusedViewId))
                             this.focusedView = findViewById(R.id.gridButton1);
-                        else if (GridNavigation.isSecondRow(this.focusedView.getId())) {
-                            this.focusedView = findViewById(R.id.gridButton4);
-
-                            this.updateView(7);
-                            this.updateView(8);
-                            this.updateView(9);
-
-                            this.updateView(10);
-                            this.updateView(11);
-                            this.updateView(12);
-                        }
+                        else if (GridNavigation.isSecondRow(oldFocusedViewId))
+                            if (this.currentPage * GridNavigation.getGridTypeAsInt(this.grid) + 3 < this.elementsToShow.size())
+                                this.focusedView = findViewById(R.id.gridButton4);
+                            else
+                                this.focusedView = findViewById(R.id.gridButton1);
                     }
-                    this.updateView(6);
+                    this.focusedView.requestFocus();
+                    this.setNewContentView();
                 }
                 return true;
             }
@@ -1058,7 +1036,7 @@ public class ElementListActivity extends Activity {
         return false;
     }
 
-    void setupGrid(Context ctx, View focusedView, Language language, Theme theme, boolean loadingInProgress, Element[] elements) {
+    void setupGrid(Context ctx, View focusedView, Language language, Theme theme, boolean loadingInProgress, Element[] shownElements) {
         TextView gridTitle = null;
         if (this.grid == GridNavigation.three) gridTitle = findViewById(R.id.gridTitle3);
         else if (this.grid == GridNavigation.six) gridTitle = findViewById(R.id.gridTitle6);
@@ -1074,13 +1052,14 @@ public class ElementListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground1);
         imageTitle = findViewById(R.id.gridButtonTitle1);
 
-        if (0 < elements.length && elements[0] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, elements[0]);
+        if (0 < shownElements.length && shownElements[0] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, shownElements[0]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToDescriptionActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToDescriptionActivity(elements[elementsToShow.get(currentPage * gridType)]);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Element) null);
@@ -1090,13 +1069,14 @@ public class ElementListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground2);
         imageTitle = findViewById(R.id.gridButtonTitle2);
 
-        if (1 < elements.length && elements[1] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, elements[1]);
+        if (1 < shownElements.length && shownElements[1] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, shownElements[1]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToDescriptionActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToDescriptionActivity(elements[elementsToShow.get(currentPage * gridType + 1)]);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Element) null);
@@ -1106,13 +1086,14 @@ public class ElementListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground3);
         imageTitle = findViewById(R.id.gridButtonTitle3);
 
-        if (2 < elements.length && elements[2] != null) {
-            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, elements[2]);
+        if (2 < shownElements.length && shownElements[2] != null) {
+            GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, shownElements[2]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToDescriptionActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToDescriptionActivity(elements[elementsToShow.get(currentPage * gridType + 2)]);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Element) null);
@@ -1122,13 +1103,14 @@ public class ElementListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground4);
         imageTitle = findViewById(R.id.gridButtonTitle4);
 
-        if (3 < elements.length && elements[3] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, elements[3]);
+        if (3 < shownElements.length && shownElements[3] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, shownElements[3]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToDescriptionActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToDescriptionActivity(elements[elementsToShow.get(currentPage * gridType + 3)]);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Element) null);
@@ -1138,13 +1120,14 @@ public class ElementListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground5);
         imageTitle = findViewById(R.id.gridButtonTitle5);
 
-        if (4 < elements.length && elements[4] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, elements[4]);
+        if (4 < shownElements.length && shownElements[4] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, shownElements[4]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToDescriptionActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToDescriptionActivity(elements[elementsToShow.get(currentPage * gridType + 4)]);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Element) null);
@@ -1154,13 +1137,14 @@ public class ElementListActivity extends Activity {
         imageBackground = findViewById(R.id.gridButtonBackground6);
         imageTitle = findViewById(R.id.gridButtonTitle6);
 
-        if (5 < elements.length && elements[5] != null) {
-            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, elements[5]);
+        if (5 < shownElements.length && shownElements[5] != null) {
+            GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, shownElements[5]);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    navigateToDescriptionActivity();
+                    int gridType = GridNavigation.getGridTypeAsInt(grid);
+                    navigateToDescriptionActivity(elements[elementsToShow.get(currentPage * gridType + 5)]);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Element) null);

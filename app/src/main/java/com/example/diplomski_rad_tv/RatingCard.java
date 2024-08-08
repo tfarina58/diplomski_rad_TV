@@ -8,9 +8,15 @@ import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.Timestamp;
+import com.google.type.DateTime;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+
 public class RatingCard {
-    public static void setupRatingCard(Context ctx, Button ratingButton, TextView ratingUsername, RatingBar ratingBar, Button centerLine, TextView ratingComment, Rating rating, Language language, Theme theme) {
-        if (ratingButton == null || ratingUsername == null || ratingBar == null || ratingComment == null) return;
+    public static void setupRatingCard(Context ctx, Button ratingButton, TextView ratingUsername, RatingBar ratingBar, Button centerLine, TextView ratingComment, TextView ratingTimestamp, Rating rating, Language language, Theme theme) {
+        if (ratingButton == null || ratingUsername == null || ratingBar == null || ratingComment == null || ratingTimestamp == null) return;
 
         if (rating == null) {
             ratingButton.setVisibility(View.GONE);
@@ -18,6 +24,7 @@ public class RatingCard {
             ratingBar.setVisibility(View.GONE);
             centerLine.setVisibility(View.GONE);
             ratingComment.setVisibility(View.GONE);
+            ratingTimestamp.setVisibility(View.GONE);
             return;
         }
 
@@ -26,17 +33,20 @@ public class RatingCard {
         ratingBar.setVisibility(View.VISIBLE);
         centerLine.setVisibility(View.VISIBLE);
         ratingComment.setVisibility(View.VISIBLE);
+        ratingTimestamp.setVisibility(View.VISIBLE);
 
         if (theme == Theme.light) {
             ratingButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.cream_background));
             ratingUsername.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             ratingComment.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
             centerLine.setBackground(ContextCompat.getDrawable(ctx, R.color.cream_tertiary));
+            ratingTimestamp.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_light_mode));
         } else {
             ratingButton.setBackground(ContextCompat.getDrawable(ctx, R.drawable.purple_background));
             ratingUsername.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
             ratingComment.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
             centerLine.setBackground(ContextCompat.getDrawable(ctx, R.color.purple_secondary));
+            ratingTimestamp.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
         }
 
         if (!rating.username.isEmpty()) ratingUsername.setText(rating.username);
@@ -54,5 +64,20 @@ public class RatingCard {
         }
 
         ratingBar.setRating((float)rating.rating);
+        ratingComment.setText(rating.comment);
+
+        Timestamp created = rating.created;
+        Date createdDate = created.toDate();
+        int date = createdDate.getDate();
+        int month = createdDate.getMonth();
+        int year = createdDate.getYear();
+
+        ratingTimestamp.setText(addZeroPrefix(date) + "." + addZeroPrefix(month) + "." + addZeroPrefix(year) + ".");
+    }
+
+    static String addZeroPrefix(int timeValue) {
+        String timeValueString = "0" + timeValue;
+        timeValueString = timeValueString.substring(timeValueString.length() - 2);
+        return timeValueString;
     }
 }

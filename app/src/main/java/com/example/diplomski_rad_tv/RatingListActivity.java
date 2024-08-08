@@ -53,7 +53,10 @@ public class RatingListActivity extends Activity {
         this.format = this.sharedPreferencesService.getClockFormat();
 
         this.firestore = FirebaseFirestore.getInstance();
-        Query query = firestore.collection("ratings").whereEqualTo("estateId", estateId);
+        Query query = firestore.collection("ratings")
+                .whereEqualTo("estateId", estateId)
+                .orderBy("created", Query.Direction.DESCENDING)
+                .limit(10);
 
         query.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -192,6 +195,10 @@ public class RatingListActivity extends Activity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (focusedLayout.equals("rating")) {
+                        findViewById(layoutFocusedView.getId()).performClick();
+                        return;
+                    }
                     focusedLayout = "rating";
 
                     FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
@@ -355,90 +362,100 @@ public class RatingListActivity extends Activity {
             Button centerLine = findViewById(R.id.centerLine1);
             RatingBar ratingBar = findViewById(R.id.ratingBar1);
             TextView ratingComment =  findViewById(R.id.ratingComment1);
+            TextView ratingTimestamp =  findViewById(R.id.ratingTimestamp1);
 
-            if (this.ratings.length > 0) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, this.ratings[0], this.language, this.theme);
-            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, null, this.language, this.theme);
+            if (this.ratings.length > 0) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, this.ratings[0], this.language, this.theme);
+            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, null, this.language, this.theme);
         } else if (row == 5) {
             Button ratingButton = findViewById(R.id.ratingButton2);
             TextView ratingUsername = findViewById(R.id.ratingUsername2);
             Button centerLine = findViewById(R.id.centerLine2);
             RatingBar ratingBar = findViewById(R.id.ratingBar2);
             TextView ratingComment =  findViewById(R.id.ratingComment2);
+            TextView ratingTimestamp =  findViewById(R.id.ratingTimestamp2);
 
-            if (this.ratings.length > 1) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, this.ratings[1], this.language, this.theme);
-            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, null, this.language, this.theme);
+            if (this.ratings.length > 1) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, this.ratings[1], this.language, this.theme);
+            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, null, this.language, this.theme);
         } else if (row == 6) {
             Button ratingButton = findViewById(R.id.ratingButton3);
             TextView ratingUsername = findViewById(R.id.ratingUsername3);
             Button centerLine = findViewById(R.id.centerLine3);
             RatingBar ratingBar = findViewById(R.id.ratingBar3);
             TextView ratingComment =  findViewById(R.id.ratingComment3);
+            TextView ratingTimestamp =  findViewById(R.id.ratingTimestamp3);
 
-            if (this.ratings.length > 2) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, this.ratings[2], this.language, this.theme);
-            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, null, this.language, this.theme);
+            if (this.ratings.length > 2) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, this.ratings[2], this.language, this.theme);
+            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, null, this.language, this.theme);
         } else if (row == 7) {
             Button ratingButton = findViewById(R.id.ratingButton4);
             TextView ratingUsername = findViewById(R.id.ratingUsername4);
             Button centerLine = findViewById(R.id.centerLine4);
             RatingBar ratingBar = findViewById(R.id.ratingBar4);
             TextView ratingComment =  findViewById(R.id.ratingComment4);
+            TextView ratingTimestamp =  findViewById(R.id.ratingTimestamp4);
 
-            if (this.ratings.length > 3) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, this.ratings[3], this.language, this.theme);
-            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, null, this.language, this.theme);
+            if (this.ratings.length > 3) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, this.ratings[3], this.language, this.theme);
+            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, null, this.language, this.theme);
         } else if (row == 8) {
             Button ratingButton = findViewById(R.id.ratingButton5);
             TextView ratingUsername = findViewById(R.id.ratingUsername5);
             Button centerLine = findViewById(R.id.centerLine5);
             RatingBar ratingBar = findViewById(R.id.ratingBar5);
             TextView ratingComment =  findViewById(R.id.ratingComment5);
+            TextView ratingTimestamp =  findViewById(R.id.ratingTimestamp5);
 
-            if (this.ratings.length > 4) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, this.ratings[4], this.language, this.theme);
-            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, null, this.language, this.theme);
+            if (this.ratings.length > 4) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, this.ratings[4], this.language, this.theme);
+            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, null, this.language, this.theme);
         } else if (row == 9) {
             Button ratingButton = findViewById(R.id.ratingButton6);
             TextView ratingUsername = findViewById(R.id.ratingUsername6);
             Button centerLine = findViewById(R.id.centerLine6);
             RatingBar ratingBar = findViewById(R.id.ratingBar6);
             TextView ratingComment =  findViewById(R.id.ratingComment6);
+            TextView ratingTimestamp =  findViewById(R.id.ratingTimestamp6);
 
-            if (this.ratings.length > 5) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, this.ratings[5], this.language, this.theme);
-            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, null, this.language, this.theme);
+            if (this.ratings.length > 5) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, this.ratings[5], this.language, this.theme);
+            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, null, this.language, this.theme);
         } else if (row == 10) {
             Button ratingButton = findViewById(R.id.ratingButton7);
             TextView ratingUsername = findViewById(R.id.ratingUsername7);
             Button centerLine = findViewById(R.id.centerLine7);
             RatingBar ratingBar = findViewById(R.id.ratingBar7);
             TextView ratingComment =  findViewById(R.id.ratingComment7);
+            TextView ratingTimestamp =  findViewById(R.id.ratingTimestamp7);
 
-            if (this.ratings.length > 6) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, this.ratings[6], this.language, this.theme);
-            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, null, this.language, this.theme);
+            if (this.ratings.length > 6) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, this.ratings[6], this.language, this.theme);
+            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, null, this.language, this.theme);
         } else if (row == 11) {
             Button ratingButton = findViewById(R.id.ratingButton8);
             TextView ratingUsername = findViewById(R.id.ratingUsername8);
             Button centerLine = findViewById(R.id.centerLine8);
             RatingBar ratingBar = findViewById(R.id.ratingBar8);
             TextView ratingComment =  findViewById(R.id.ratingComment8);
+            TextView ratingTimestamp =  findViewById(R.id.ratingTimestamp8);
 
-            if (this.ratings.length > 7) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, this.ratings[7], this.language, this.theme);
-            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, null, this.language, this.theme);
+            if (this.ratings.length > 7) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, this.ratings[7], this.language, this.theme);
+            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, null, this.language, this.theme);
         } else if (row == 12) {
             Button ratingButton = findViewById(R.id.ratingButton9);
             TextView ratingUsername = findViewById(R.id.ratingUsername9);
             Button centerLine = findViewById(R.id.centerLine9);
             RatingBar ratingBar = findViewById(R.id.ratingBar9);
             TextView ratingComment =  findViewById(R.id.ratingComment9);
+            TextView ratingTimestamp =  findViewById(R.id.ratingTimestamp9);
 
-            if (this.ratings.length > 8) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, this.ratings[8], this.language, this.theme);
-            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, null, this.language, this.theme);
+            if (this.ratings.length > 8) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, this.ratings[8], this.language, this.theme);
+            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, null, this.language, this.theme);
         } else if (row == 13) {
             Button ratingButton = findViewById(R.id.ratingButton10);
             TextView ratingUsername = findViewById(R.id.ratingUsername10);
             Button centerLine = findViewById(R.id.centerLine10);
             RatingBar ratingBar = findViewById(R.id.ratingBar10);
             TextView ratingComment =  findViewById(R.id.ratingComment10);
+            TextView ratingTimestamp =  findViewById(R.id.ratingTimestamp10);
 
-            if (this.ratings.length > 9) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, this.ratings[9], this.language, this.theme);
-            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, null, this.language, this.theme);
+            if (this.ratings.length > 9) RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, this.ratings[9], this.language, this.theme);
+            else RatingCard.setupRatingCard(getApplicationContext(), ratingButton, ratingUsername, ratingBar, centerLine, ratingComment, ratingTimestamp, null, this.language, this.theme);
         }
     }
 

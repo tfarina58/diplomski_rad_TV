@@ -84,6 +84,10 @@ public class DescriptionActivity extends Activity {
             ratingButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (focusedLayout.equals("rating")) {
+                        findViewById(layoutFocusedView.getId()).performClick();
+                        return;
+                    }
                     focusedLayout = "rating";
 
                     FrameLayout chooseRatingLayout = findViewById(R.id.chooseRatingLayout);
@@ -539,7 +543,7 @@ public class DescriptionActivity extends Activity {
     }
 
     void setupImages() {
-        int imagesLength = this.element.images.size();
+        int imagesLength = (this.element.images != null) ? this.element.images.size() : 0;
         ImageView image;
 
         image = findViewById(R.id.descriptionImage1);
@@ -674,7 +678,7 @@ public class DescriptionActivity extends Activity {
     }
 
     void setupLinks() {
-        int linksLength = this.element.links.size();
+        int linksLength = (this.element.links != null) ? this.element.links.size() : 0;
         Button button;
 
         button = findViewById(R.id.descriptionLink1);
@@ -974,7 +978,7 @@ public class DescriptionActivity extends Activity {
             else if (row == 4) {
                 ViewPager2 viewPager = findViewById(R.id.viewPager);
 
-                this.setupViewPager(getApplicationContext(), viewPager, this.element.images, this.focusedView, this.theme);
+                this.setupViewPager(getApplicationContext(), viewPager, this.element.images.size(), this.focusedView, this.theme);
             }
             else if (row == 5) {
                 Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
@@ -1104,16 +1108,22 @@ public class DescriptionActivity extends Activity {
         this.focusedView = viewPager;
         this.focusedView.requestFocus();
 
+        if (this.element.images == null) this.element.images = new ArrayList<>();
         Adapter adapter = new Adapter(this.element.images);
         viewPager = findViewById(R.id.viewPager);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(0);
 
-        this.setupViewPager(getApplicationContext(), viewPager, element.images, focusedView, theme);
+        this.setupViewPager(getApplicationContext(), viewPager, element.images.size(), focusedView, theme);
     }
 
-    void setupViewPager(Context ctx, ViewPager2 viewPager, ArrayList<String> images, View focusedView, Theme theme) {
+    void setupViewPager(Context ctx, ViewPager2 viewPager, int imagesLength, View focusedView, Theme theme) {
         if (viewPager == null) return;
+
+        if (imagesLength == 0) {
+            viewPager.setVisibility(View.GONE);
+        }
+        viewPager.setVisibility(View.VISIBLE);
 
         if (focusedView.getId() == R.id.viewPager) {
             if (theme == Theme.light) viewPager.setBackground(ContextCompat.getDrawable(ctx, R.drawable.highlighted_image_button_light));

@@ -46,7 +46,7 @@ public class LoginActivity extends Activity {
 
         this.sharedPreferencesService = new SharedPreferencesService(getSharedPreferences("MyPreferences", MODE_PRIVATE));
 
-        // this.sharedPreferencesService.clearUserAndEstateInfo();
+        this.sharedPreferencesService.clearAllInfo();
 
         String userId = sharedPreferencesService.getUserId();
         String estateId = sharedPreferencesService.getEstateId();
