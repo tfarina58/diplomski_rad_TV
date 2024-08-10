@@ -30,10 +30,14 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
+
+
+import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -59,6 +63,10 @@ public class CategoryListActivity extends Activity {
     String focusedLayout = ""; // "rating", "password" or ""
     View layoutFocusedView;
     String userName = "";
+    String temperatureUnit = "";
+    boolean daytime = false;
+    int weatherCode = 0;
+    double temperature = -999;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,11 +79,15 @@ public class CategoryListActivity extends Activity {
         this.theme = this.sharedPreferencesService.getTheme();
         this.grid = this.sharedPreferencesService.getGrid();
         this.format = this.sharedPreferencesService.getClockFormat();
+        GeoPoint coordinates = this.sharedPreferencesService.getEstateCoordinates();
+        this.temperatureUnit = this.sharedPreferencesService.getTemperatureUnit();
         this.categoriesToShow = new ArrayList<>();
 
         this.firestore = FirebaseFirestore.getInstance();
 
         this.getActiveGuestId(this.estateId);
+
+        if (coordinates != null) getWeatherAndTemperature(coordinates);
 
         Query query = firestore.collection("categories").whereEqualTo("estateId", estateId);
 
@@ -112,7 +124,6 @@ public class CategoryListActivity extends Activity {
                         setNewContentView();
                     }
                 });
-
 
         this.categories = new Category[0];
         setupCategoriesToShow();
@@ -218,12 +229,12 @@ public class CategoryListActivity extends Activity {
         if (keyCode >= 19 && keyCode <= 22) {
             if (specialCaseNavigation(oldFocusedViewId, keyCode - 19)) return true;
 
-            int newFocusedViewId = GridNavigation.navigateOverActivity(false, this.grid, oldFocusedViewId, keyCode - 19);
+            int newFocusedViewId = GridNavigation.navigateOverActivity(false, weatherCode != 0, this.grid, oldFocusedViewId, keyCode - 19);
 
             // If navigating up or down
             if (keyCode == 19 || keyCode == 20)
                 while (!checkViewExistence(newFocusedViewId) && newFocusedViewId != 0)
-                    newFocusedViewId = GridNavigation.navigateOverActivity(false, this.grid, newFocusedViewId, keyCode - 19);
+                    newFocusedViewId = GridNavigation.navigateOverActivity(false, weatherCode != 0, this.grid, newFocusedViewId, keyCode - 19);
 
             if (newFocusedViewId == 0 || !checkViewExistence(newFocusedViewId)) return false;
 
@@ -231,12 +242,12 @@ public class CategoryListActivity extends Activity {
             this.focusedView.requestFocus();
 
             // Remove focus from old View
-            int row = GridNavigation.getNormalRowWithId(oldFocusedViewId);
-            updateView(row);
+            int row = GridNavigation.getNormalRowWithId(weatherCode != 0, oldFocusedViewId);
+            updateView(weatherCode != 0, row);
 
             // Add focus to new View
-            row = GridNavigation.getNormalRowWithId(newFocusedViewId);
-            updateView(row);
+            row = GridNavigation.getNormalRowWithId(weatherCode != 0, newFocusedViewId);
+            updateView(weatherCode != 0, row);
 
             if (newFocusedViewId == R.id.searchView || newFocusedViewId == R.id.pagination) {
                 this.focusedView.callOnClick();
@@ -378,11 +389,12 @@ public class CategoryListActivity extends Activity {
                     TextView totalPagesNumber = findViewById(R.id.totalPagesNumber);
                     PaginationButton.setupPaginationButton(getApplicationContext(), pagination, pageNumber, paginationSlash, totalPagesNumber, focusedView, theme, categoriesToShow.size(), currentPage, totalPages);
 
-                    updateView(0);
-                    updateView(1);
-                    updateView(2);
-                    updateView(3);
-                    updateView(5);
+                    boolean showsWeatherButton = weatherCode != 0;
+                    updateView(showsWeatherButton, 0);
+                    updateView(showsWeatherButton, 1);
+                    updateView(showsWeatherButton, 2);
+                    updateView(showsWeatherButton, 3);
+                    updateView(showsWeatherButton, 5 + (showsWeatherButton ? 1 : 0));
                 }
             });
 
@@ -419,7 +431,7 @@ public class CategoryListActivity extends Activity {
                     TextView centerText = findViewById(R.id.centerText);
                     CenterText.setupCenterText(getApplicationContext(), centerText, language, theme, loadingInProgress, categoriesToShow.size(), "categories");
 
-                    if (grid == GridNavigation.one) updateView(7);
+                    if (grid == GridNavigation.one) updateView(weatherCode != 0, 7 + (!(weatherCode == 0 && (int)(temperature + 0.00001) == -999) ? 1 : 0));
                     else if (grid == GridNavigation.three) {
                         {
                             ImageButton background = findViewById(R.id.backgroundGrid3);
@@ -543,6 +555,25 @@ public class CategoryListActivity extends Activity {
                     backgroundAlreadySet = false;
 
                     setNewContentView();
+                }
+            });
+
+            // Weather button
+            button = findViewById(R.id.weatherButton);
+            icon = findViewById(R.id.weatherIcon);
+
+            WeatherHeaderButton.setupWeatherButton(getApplicationContext(), button, icon, focusedView, daytime, weatherCode, temperature, temperatureUnit, theme);
+
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (temperatureUnit.equals("C")) temperatureUnit = "F";
+                    else temperatureUnit = "C";
+
+                    Button weatherButton = findViewById(R.id.weatherButton);;
+                    ImageView weatherIcon = findViewById(R.id.weatherIcon);;
+
+                    WeatherHeaderButton.setupWeatherButton(getApplicationContext(), weatherButton, weatherIcon, focusedView, daytime, weatherCode, temperature, temperatureUnit, theme);
                 }
             });
         }
@@ -829,111 +860,224 @@ public class CategoryListActivity extends Activity {
         else background.setBackground(ContextCompat.getDrawable(ctx, R.color.dark_theme));
     }
 
-    void updateView(int row) {
-        if (row == 0) {
-            Button ratingButton = findViewById(R.id.ratingButton);
-            ImageView ratingIcon = findViewById(R.id.ratingIcon);
+    void updateView(boolean showsWeatherButton, int row) {
+        if (!showsWeatherButton) {
+            if (row == 0) {
+                Button ratingButton = findViewById(R.id.ratingButton);
+                ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-            RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
-        } else if (row == 1) {
-            Button languageButton = findViewById(R.id.languageButton);
-            ImageView languageIcon = findViewById(R.id.languageIcon);
+                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+            } else if (row == 1) {
+                Button languageButton = findViewById(R.id.languageButton);
+                ImageView languageIcon = findViewById(R.id.languageIcon);
 
-            LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
-        } else if (row == 2) {
-            Button themeButton = findViewById(R.id.themeButton);
-            ImageView themeIcon = findViewById(R.id.themeIcon);
+                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+            } else if (row == 2) {
+                Button themeButton = findViewById(R.id.themeButton);
+                ImageView themeIcon = findViewById(R.id.themeIcon);
 
-            ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
-        } else if (row == 3) {
-            Button gridButton = findViewById(R.id.gridButton);
-            ImageView gridIcon = findViewById(R.id.gridIcon);
+                ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+            } else if (row == 3) {
+                Button gridButton = findViewById(R.id.gridButton);
+                ImageView gridIcon = findViewById(R.id.gridIcon);
 
-            GridHeaderButton.setupGridButton(getApplicationContext(), gridButton, gridIcon, this.focusedView, this.language, this.theme);
-        } else if (row == 4) {
-            TextClock textClock = findViewById(R.id.textClock);
+                GridHeaderButton.setupGridButton(getApplicationContext(), gridButton, gridIcon, this.focusedView, this.language, this.theme);
+            } else if (row == 4) {
+                TextClock textClock = findViewById(R.id.textClock);
 
-            ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
-        } else if (row == 5) {
-            SearchView searchbarButton = findViewById(R.id.searchView);
+                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+            } else if (row == 5) {
+                SearchView searchbarButton = findViewById(R.id.searchView);
 
-            SearchbarButton.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.focusedView, this.language, this.theme);
-        } else if (row == 6) {
-            Button paginationButton = findViewById(R.id.pagination);
-            EditText paginationCurrentPage = findViewById(R.id.pageNumber);
-            TextView paginationSlash = findViewById(R.id.paginationSlash);
-            TextView paginationTotalPages = findViewById(R.id.totalPagesNumber);
+                SearchbarButton.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.focusedView, this.language, this.theme);
+            } else if (row == 6) {
+                Button paginationButton = findViewById(R.id.pagination);
+                EditText paginationCurrentPage = findViewById(R.id.pageNumber);
+                TextView paginationSlash = findViewById(R.id.paginationSlash);
+                TextView paginationTotalPages = findViewById(R.id.totalPagesNumber);
 
-            PaginationButton.setupPaginationButton(getApplicationContext(), paginationButton, paginationCurrentPage, paginationSlash, paginationTotalPages, this.focusedView, this.theme, this.categoriesToShow.size(), this.currentPage, this.totalPages);
-        } else if (row == 7 && this.grid == GridNavigation.one) {
-            ImageButton main = findViewById(R.id.backgroundGrid1);
-            TextView title = findViewById(R.id.gridTitle1);
+                PaginationButton.setupPaginationButton(getApplicationContext(), paginationButton, paginationCurrentPage, paginationSlash, paginationTotalPages, this.focusedView, this.theme, this.categoriesToShow.size(), this.currentPage, this.totalPages);
+            } else if (row == 7 && this.grid == GridNavigation.one) {
+                ImageButton main = findViewById(R.id.backgroundGrid1);
+                TextView title = findViewById(R.id.gridTitle1);
 
-            if (this.currentPage < this.categoriesToShow.size()) {
-                this.setupMainBackground(getApplicationContext(), main, this.focusedView, this.categories[this.categoriesToShow.get(this.currentPage)].image, this.theme);
-                this.setMainTitle(getApplicationContext(), title, this.categories[this.categoriesToShow.get(this.currentPage)].title, this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
-            } else {
-                this.setupMainBackground(getApplicationContext(), main, this.focusedView, "", this.theme);
-                this.setMainTitle(getApplicationContext(), title, null, this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
+                if (this.currentPage < this.categoriesToShow.size()) {
+                    this.setupMainBackground(getApplicationContext(), main, this.focusedView, this.categories[this.categoriesToShow.get(this.currentPage)].image, this.theme);
+                    this.setMainTitle(getApplicationContext(), title, this.categories[this.categoriesToShow.get(this.currentPage)].title, this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
+                } else {
+                    this.setupMainBackground(getApplicationContext(), main, this.focusedView, "", this.theme);
+                    this.setMainTitle(getApplicationContext(), title, null, this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
+                }
+            } else if (row == 7 && (this.grid == GridNavigation.three || this.grid == GridNavigation.six)) {
+                ImageButton imageButton = findViewById(R.id.gridButton1);
+                Button imageBackground = findViewById(R.id.gridButtonBackground1);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle1);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage;
+
+                if (viewIndex < this.categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            } else if (row == 8) {
+                ImageButton imageButton = findViewById(R.id.gridButton2);
+                Button imageBackground = findViewById(R.id.gridButtonBackground2);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle2);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 1;
+
+                if (viewIndex < this.categoriesToShow.size())
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            } else if (row == 9) {
+                ImageButton imageButton = findViewById(R.id.gridButton3);
+                Button imageBackground = findViewById(R.id.gridButtonBackground3);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle3);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 2;
+
+                if (viewIndex < this.categoriesToShow.size())
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            } else if (row == 10) {
+                ImageButton imageButton = findViewById(R.id.gridButton4);
+                Button imageBackground = findViewById(R.id.gridButtonBackground4);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle4);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 3;
+
+                if (viewIndex < this.categoriesToShow.size())
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            } else if (row == 11) {
+                ImageButton imageButton = findViewById(R.id.gridButton5);
+                Button imageBackground = findViewById(R.id.gridButtonBackground5);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle5);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 4;
+
+                if (viewIndex < this.categoriesToShow.size())
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            } else if (row == 12) {
+                ImageButton imageButton = findViewById(R.id.gridButton6);
+                Button imageBackground = findViewById(R.id.gridButtonBackground6);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle6);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 5;
+
+                if (viewIndex < this.categoriesToShow.size())
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
             }
-        } else if (row == 7 && (this.grid == GridNavigation.three || this.grid == GridNavigation.six)) {
-            ImageButton imageButton = findViewById(R.id.gridButton1);
-            Button imageBackground = findViewById(R.id.gridButtonBackground1);
-            TextView imageTitle = findViewById(R.id.gridButtonTitle1);
-            int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage;
+        } else {
+            if (row == 0) {
+                Button ratingButton = findViewById(R.id.ratingButton);
+                ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-            if (viewIndex < this.categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
-            else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
-        } else if (row == 8) {
-            ImageButton imageButton = findViewById(R.id.gridButton2);
-            Button imageBackground = findViewById(R.id.gridButtonBackground2);
-            TextView imageTitle = findViewById(R.id.gridButtonTitle2);
-            int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 1;
+                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+            } else if (row == 1) {
+                Button languageButton = findViewById(R.id.languageButton);
+                ImageView languageIcon = findViewById(R.id.languageIcon);
 
-            if (viewIndex < this.categoriesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
-        } else if (row == 9) {
-            ImageButton imageButton = findViewById(R.id.gridButton3);
-            Button imageBackground = findViewById(R.id.gridButtonBackground3);
-            TextView imageTitle = findViewById(R.id.gridButtonTitle3);
-            int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 2;
+                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+            } else if (row == 2) {
+                Button themeButton = findViewById(R.id.themeButton);
+                ImageView themeIcon = findViewById(R.id.themeIcon);
 
-            if (viewIndex < this.categoriesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
-        } else if (row == 10) {
-            ImageButton imageButton = findViewById(R.id.gridButton4);
-            Button imageBackground = findViewById(R.id.gridButtonBackground4);
-            TextView imageTitle = findViewById(R.id.gridButtonTitle4);
-            int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 3;
+                ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+            } else if (row == 3) {
+                Button gridButton = findViewById(R.id.gridButton);
+                ImageView gridIcon = findViewById(R.id.gridIcon);
 
-            if (viewIndex < this.categoriesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
-        } else if (row == 11) {
-            ImageButton imageButton = findViewById(R.id.gridButton5);
-            Button imageBackground = findViewById(R.id.gridButtonBackground5);
-            TextView imageTitle = findViewById(R.id.gridButtonTitle5);
-            int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 4;
+                GridHeaderButton.setupGridButton(getApplicationContext(), gridButton, gridIcon, this.focusedView, this.language, this.theme);
+            } else if (row == 4) {
+                TextClock textClock = findViewById(R.id.textClock);
 
-            if (viewIndex < this.categoriesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
-        } else if (row == 12) {
-            ImageButton imageButton = findViewById(R.id.gridButton6);
-            Button imageBackground = findViewById(R.id.gridButtonBackground6);
-            TextView imageTitle = findViewById(R.id.gridButtonTitle6);
-            int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 5;
+                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+            } else if (row == 5) {
+                Button weatherButton = findViewById(R.id.weatherButton);
+                ImageView weatherIcon = findViewById(R.id.weatherIcon);
 
-            if (viewIndex < this.categoriesToShow.size())
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
-            else
-                GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+                WeatherHeaderButton.setupWeatherButton(getApplicationContext(), weatherButton, weatherIcon, this.focusedView, this.daytime, this.weatherCode, this.temperature, this.temperatureUnit, this.theme);
+            } else if (row == 6) {
+                SearchView searchbarButton = findViewById(R.id.searchView);
+
+                SearchbarButton.setupSearchBarButton(getApplicationContext(), searchbarButton, this.searchbarText, this.focusedView, this.language, this.theme);
+            } else if (row == 7) {
+                Button paginationButton = findViewById(R.id.pagination);
+                EditText paginationCurrentPage = findViewById(R.id.pageNumber);
+                TextView paginationSlash = findViewById(R.id.paginationSlash);
+                TextView paginationTotalPages = findViewById(R.id.totalPagesNumber);
+
+                PaginationButton.setupPaginationButton(getApplicationContext(), paginationButton, paginationCurrentPage, paginationSlash, paginationTotalPages, this.focusedView, this.theme, this.categoriesToShow.size(), this.currentPage, this.totalPages);
+            } else if (row == 8 && this.grid == GridNavigation.one) {
+                ImageButton main = findViewById(R.id.backgroundGrid1);
+                TextView title = findViewById(R.id.gridTitle1);
+
+                if (this.currentPage < this.categoriesToShow.size()) {
+                    this.setupMainBackground(getApplicationContext(), main, this.focusedView, this.categories[this.categoriesToShow.get(this.currentPage)].image, this.theme);
+                    this.setMainTitle(getApplicationContext(), title, this.categories[this.categoriesToShow.get(this.currentPage)].title, this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
+                } else {
+                    this.setupMainBackground(getApplicationContext(), main, this.focusedView, "", this.theme);
+                    this.setMainTitle(getApplicationContext(), title, null, this.language, this.theme, this.loadingInProgress, this.categoriesToShow.size(), this.currentPage);
+                }
+            } else if (row == 8 && (this.grid == GridNavigation.three || this.grid == GridNavigation.six)) {
+                ImageButton imageButton = findViewById(R.id.gridButton1);
+                Button imageBackground = findViewById(R.id.gridButtonBackground1);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle1);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage;
+
+                if (viewIndex < this.categoriesToShow.size()) GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            } else if (row == 9) {
+                ImageButton imageButton = findViewById(R.id.gridButton2);
+                Button imageBackground = findViewById(R.id.gridButtonBackground2);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle2);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 1;
+
+                if (viewIndex < this.categoriesToShow.size())
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            } else if (row == 10) {
+                ImageButton imageButton = findViewById(R.id.gridButton3);
+                Button imageBackground = findViewById(R.id.gridButtonBackground3);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle3);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 2;
+
+                if (viewIndex < this.categoriesToShow.size())
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            } else if (row == 11) {
+                ImageButton imageButton = findViewById(R.id.gridButton4);
+                Button imageBackground = findViewById(R.id.gridButtonBackground4);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle4);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 3;
+
+                if (viewIndex < this.categoriesToShow.size())
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            } else if (row == 12) {
+                ImageButton imageButton = findViewById(R.id.gridButton5);
+                Button imageBackground = findViewById(R.id.gridButtonBackground5);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle5);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 4;
+
+                if (viewIndex < this.categoriesToShow.size())
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            } else if (row == 13) {
+                ImageButton imageButton = findViewById(R.id.gridButton6);
+                Button imageBackground = findViewById(R.id.gridButtonBackground6);
+                TextView imageTitle = findViewById(R.id.gridButtonTitle6);
+                int viewIndex = GridNavigation.getGridTypeAsInt(grid) * currentPage + 5;
+
+                if (viewIndex < this.categoriesToShow.size())
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, this.categories[this.categoriesToShow.get(viewIndex)]);
+                else
+                    GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, this.focusedView, this.language, this.theme, (Category) null);
+            }
         }
     }
 
@@ -977,6 +1121,7 @@ public class CategoryListActivity extends Activity {
                 if (focusedViewId == R.id.themeButton) return true;
                 if (focusedViewId == R.id.gridButton) return true;
                 if (focusedViewId == R.id.textClock) return true;
+                if (focusedViewId == R.id.weatherButton) return weatherCode != 0;
                 if (focusedViewId == R.id.searchView) return true;
                 if (focusedViewId == R.id.pagination) return true;
                 if (focusedViewId == R.id.gridButton1) {
@@ -998,6 +1143,7 @@ public class CategoryListActivity extends Activity {
                 if (focusedViewId == R.id.themeButton) return true;
                 if (focusedViewId == R.id.gridButton) return true;
                 if (focusedViewId == R.id.textClock) return true;
+                if (focusedViewId == R.id.weatherButton) return weatherCode != 0;
                 if (focusedViewId == R.id.searchView) return true;
                 if (focusedViewId == R.id.pagination) return true;
                 if (focusedViewId == R.id.gridButton1) {
@@ -1031,6 +1177,7 @@ public class CategoryListActivity extends Activity {
                 if (focusedViewId == R.id.themeButton) return true;
                 if (focusedViewId == R.id.gridButton) return true;
                 if (focusedViewId == R.id.textClock) return true;
+                if (focusedViewId == R.id.weatherButton) return weatherCode != 0;
                 if (focusedViewId == R.id.searchView) return true;
                 if (focusedViewId == R.id.pagination) return true;
                 if (focusedViewId == R.id.backgroundGrid1) {
@@ -1458,6 +1605,11 @@ public class CategoryListActivity extends Activity {
         TextClock textClock = findViewById(R.id.textClock);
 
         ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+
+        Button weatherButton = findViewById(R.id.weatherButton);
+        ImageView weatherIcon = findViewById(R.id.weatherIcon);
+
+        WeatherHeaderButton.setupWeatherButton(getApplicationContext(), weatherButton, weatherIcon, this.focusedView, this.daytime, this.weatherCode, this.temperature, this.temperatureUnit, this.theme);
     }
 
     void getActiveGuestId(String estateId) {
@@ -1465,33 +1617,58 @@ public class CategoryListActivity extends Activity {
         DocumentReference query = this.firestore.collection("estates").document(estateId);
 
         query.get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
-                        ArrayList<HashMap<String, Object>> guests = (ArrayList<HashMap<String, Object>>)queryDocumentSnapshots.get("guests"); // ArrayList<HashMap<String, Object>>
-                        if (guests == null || guests.size() == 0) return;
+            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot queryDocumentSnapshots) {
+                    ArrayList<HashMap<String, Object>> guests = (ArrayList<HashMap<String, Object>>)queryDocumentSnapshots.get("guests"); // ArrayList<HashMap<String, Object>>
+                    if (guests == null || guests.size() == 0) return;
 
-                        int guestsLength = guests.size();
-                        for (int i = 0; i < guestsLength; ++i) {
-                            Timestamp fromStamp = (Timestamp)(guests.get(i).getOrDefault("from", null));
-                            Timestamp toStamp = (Timestamp)(guests.get(i).getOrDefault("to", null));
-                            if (fromStamp == null || toStamp == null) continue;
+                    int guestsLength = guests.size();
+                    for (int i = 0; i < guestsLength; ++i) {
+                        Timestamp fromStamp = (Timestamp)(guests.get(i).getOrDefault("from", null));
+                        Timestamp toStamp = (Timestamp)(guests.get(i).getOrDefault("to", null));
+                        if (fromStamp == null || toStamp == null) continue;
 
-                            long epochFrom = fromStamp.getSeconds();
-                            long epochNow = System.currentTimeMillis() / 1000;
-                            long epochTo = toStamp.getSeconds();
+                        long epochFrom = fromStamp.getSeconds();
+                        long epochNow = System.currentTimeMillis() / 1000;
+                        long epochTo = toStamp.getSeconds();
 
-                            if (epochNow - epochFrom >= 0 && epochTo - epochNow > 0) {
-                                userName = (String)(guests.get(i).getOrDefault("name", ""));
-                                String newGuestId = (String)(guests.get(i).getOrDefault("id", ""));
-                                if (!oldGuestId.equals(newGuestId)) {
-                                    sharedPreferencesService.setGuestId(newGuestId);
-                                    sharedPreferencesService.setRatingId("");
-                                }
-                                break;
+                        if (epochNow - epochFrom >= 0 && epochTo - epochNow > 0) {
+                            userName = (String)(guests.get(i).getOrDefault("name", ""));
+                            String newGuestId = (String)(guests.get(i).getOrDefault("id", ""));
+                            if (!oldGuestId.equals(newGuestId)) {
+                                sharedPreferencesService.setGuestId(newGuestId);
+                                sharedPreferencesService.setRatingId("");
                             }
+                            break;
                         }
                     }
-                });
+                }
+            });
+    }
+
+    void getWeatherAndTemperature(GeoPoint coordinates) {
+        OpenWeatherMap.sendPostRequest("https://api.openweathermap.org/data/2.5/weather?lat=" + coordinates.getLatitude() + "&lon=" + coordinates.getLongitude() + "&appid=60a327a5990e24e4c309de648bd01fbe", new OpenWeatherMap.WeatherCallback() {
+            @Override
+            public void onWeatherDataReceived(JSONObject weatherData) {
+                try {
+                    daytime = weatherData.getJSONObject("sys").getLong("sunrise") < weatherData.getLong("dt") && weatherData.getLong("dt") < weatherData.getJSONObject("sys").getLong("sunset");
+                    weatherCode = weatherData.getJSONArray("weather").getJSONObject(0).getInt("id");
+                    temperature = weatherData.getJSONObject("main").getDouble("temp");
+
+                    Button button = findViewById(R.id.weatherButton);
+                    ImageView icon = findViewById(R.id.weatherIcon);
+
+                    WeatherHeaderButton.setupWeatherButton(getApplicationContext(), button, icon, focusedView, daytime, weatherCode, temperature, temperatureUnit, theme);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                System.out.println(errorMessage);
+            }
+        });
     }
 }

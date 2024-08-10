@@ -13,24 +13,50 @@ public class MyRatingNavigation {
             {0,                   R.id.ratingContent, 0,                   R.id.languageButton},     // ratingButton
             {0,                   R.id.ratingContent, R.id.ratingButton,   R.id.themeButton},        // languageButton
             {0,                   R.id.ratingContent, R.id.languageButton, R.id.textClock},          // themeButton
+            {0,                   R.id.ratingContent, R.id.themeButton,    R.id.weatherButton},      // textClock
+            {0,                   R.id.ratingContent, R.id.textClock,      0},                       // weatherButton
+            {R.id.languageButton, R.id.ratingBar,     0,                   0},                       // ratingContent
+            {R.id.ratingContent,  R.id.cancelButton,  0,                   0},                       // ratingBar
+            {R.id.ratingBar,      0,                  0,                   R.id.ratingSubmitButton}, // cancelButton
+            {R.id.ratingBar,      0,                  R.id.cancelButton,   0},                       // ratingSubmitButton
+    };
+
+    private static final int[][] navigationRatingWithoutWeather = {
+            {0,                   R.id.ratingContent, 0,                   R.id.languageButton},     // ratingButton
+            {0,                   R.id.ratingContent, R.id.ratingButton,   R.id.themeButton},        // languageButton
+            {0,                   R.id.ratingContent, R.id.languageButton, R.id.textClock},          // themeButton
             {0,                   R.id.ratingContent, R.id.themeButton,    0},                       // textClock
             {R.id.languageButton, R.id.ratingBar,     0,                   0},                       // ratingContent
             {R.id.ratingContent,  R.id.cancelButton,  0,                   0},                       // ratingBar
             {R.id.ratingBar,      0,                  0,                   R.id.ratingSubmitButton}, // cancelButton
             {R.id.ratingBar,      0,                  R.id.cancelButton,   0},                       // ratingSubmitButton
     };
-    public static int navigateOverActivity(int currentViewId, int direction) {
-        return navigationRating[getRowWithId(currentViewId)][direction];
+    public static int navigateOverActivity(boolean hasWeatherButton, int currentViewId, int direction) {
+        if (!hasWeatherButton) return navigationRatingWithoutWeather[getRowWithId(false, currentViewId)][direction];
+        else return navigationRating[getRowWithId(true, currentViewId)][direction];
     }
-    public static int getRowWithId(int currentViewId) {
-        if (currentViewId == R.id.ratingButton) return 0;
-        if (currentViewId == R.id.languageButton) return 1;
-        if (currentViewId == R.id.themeButton) return 2;
-        if (currentViewId == R.id.textClock) return 3;
-        if (currentViewId == R.id.ratingContent) return 4;
-        if (currentViewId == R.id.ratingBar) return 5;
-        if (currentViewId == R.id.cancelButton) return 6;
-        if (currentViewId == R.id.ratingSubmitButton) return 7;
+    public static int getRowWithId(boolean hasWeatherButton, int currentViewId) {
+        if (!hasWeatherButton) {
+            if (currentViewId == R.id.ratingButton) return 0;
+            if (currentViewId == R.id.languageButton) return 1;
+            if (currentViewId == R.id.themeButton) return 2;
+            if (currentViewId == R.id.textClock) return 3;
+            if (currentViewId == R.id.ratingContent) return 4;
+            if (currentViewId == R.id.ratingBar) return 5;
+            if (currentViewId == R.id.cancelButton) return 6;
+            if (currentViewId == R.id.ratingSubmitButton) return 7;
+        } else {
+            if (currentViewId == R.id.ratingButton) return 0;
+            if (currentViewId == R.id.languageButton) return 1;
+            if (currentViewId == R.id.themeButton) return 2;
+            if (currentViewId == R.id.textClock) return 3;
+            if (currentViewId == R.id.weatherButton) return 4;
+            if (currentViewId == R.id.ratingContent) return 5;
+            if (currentViewId == R.id.ratingBar) return 6;
+            if (currentViewId == R.id.cancelButton) return 7;
+            if (currentViewId == R.id.ratingSubmitButton) return 8;
+        }
+
         return -1;
     }
 
