@@ -85,8 +85,7 @@ public class EstateListActivity extends Activity {
                             HashMap<String, String> name = (HashMap<String, String>) document.get("name");
                             String image = document.getString("image");
                             GeoPoint coordinates = document.getGeoPoint("coordinates");
-                            HashMap<String, Object> variables = (HashMap<String, Object>) document.get("variables");
-                            estates[i] = new Estate(estateId, ownerId, image, coordinates != null ? coordinates.getLatitude() : 0, coordinates != null ? coordinates.getLongitude() : 0, name, variables);
+                            estates[i] = new Estate(estateId, ownerId, image, coordinates, name);
                             i++;
                         }
                         loadingInProgress = false;
@@ -124,12 +123,12 @@ public class EstateListActivity extends Activity {
         if (keyCode >= 19 && keyCode <= 22) {
             if (specialCaseNavigation(oldFocusedViewId, keyCode - 19)) return true;
 
-            int newFocusedViewId = GridNavigation.navigateOverActivity(true, this.grid, oldFocusedViewId, keyCode - 19);
+            int newFocusedViewId = GridNavigation.navigateOverActivity(true, false, this.grid, oldFocusedViewId, keyCode - 19);
 
             // If navigating up or down
             if (keyCode == 19 || keyCode == 20)
                 while (!checkViewExistence(newFocusedViewId) && newFocusedViewId != 0)
-                    newFocusedViewId = GridNavigation.navigateOverActivity(true, this.grid, newFocusedViewId, keyCode - 19);
+                    newFocusedViewId = GridNavigation.navigateOverActivity(true, false, this.grid, newFocusedViewId, keyCode - 19);
 
             if (newFocusedViewId == 0 || !checkViewExistence(newFocusedViewId)) return false;
 
@@ -590,7 +589,7 @@ public class EstateListActivity extends Activity {
         main.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                navigateToCategoryListActivity(estates[estatesToShow.get(currentPage)].id);
+                navigateToCategoryListActivity(estates[estatesToShow.get(currentPage)].id, estates[estatesToShow.get(currentPage)].coordinates);
             }
         });
     }
@@ -825,8 +824,11 @@ public class EstateListActivity extends Activity {
             }
     }
 
-    void navigateToCategoryListActivity(String estateId) {
+    void navigateToCategoryListActivity(String estateId, GeoPoint coordinates) {
         this.sharedPreferencesService.setEstateId(estateId);
+        if (coordinates != null)
+            this.sharedPreferencesService.setEstateCoordinates(coordinates.getLatitude(), coordinates.getLongitude());
+
         startActivity(new Intent(getApplicationContext(), CategoryListActivity.class));
     }
 
@@ -975,7 +977,7 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     int gridType = GridNavigation.getGridTypeAsInt(grid);
-                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType)].id);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType)].id, estates[estatesToShow.get(currentPage * gridType)].coordinates);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -992,7 +994,7 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     int gridType = GridNavigation.getGridTypeAsInt(grid);
-                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 1)].id);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 1)].id, estates[estatesToShow.get(currentPage * gridType + 1)].coordinates);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1009,7 +1011,7 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     int gridType = GridNavigation.getGridTypeAsInt(grid);
-                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 2)].id);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 2)].id, estates[estatesToShow.get(currentPage * gridType + 2)].coordinates);
                 }
             });
         } else GridImageButton.setupImageButton(ctx, imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1026,7 +1028,7 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     int gridType = GridNavigation.getGridTypeAsInt(grid);
-                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 3)].id);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 3)].id, estates[estatesToShow.get(currentPage * gridType + 3)].coordinates);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1043,7 +1045,7 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     int gridType = GridNavigation.getGridTypeAsInt(grid);
-                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 4)].id);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 4)].id, estates[estatesToShow.get(currentPage * gridType + 4)].coordinates);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);
@@ -1060,7 +1062,7 @@ public class EstateListActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     int gridType = GridNavigation.getGridTypeAsInt(grid);
-                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 5)].id);
+                    navigateToCategoryListActivity(estates[estatesToShow.get(currentPage * gridType + 5)].id, estates[estatesToShow.get(currentPage * gridType + 5)].coordinates);
                 }
             });
         } else GridImageButton.setupImageButton(getApplicationContext(), imageButton, imageBackground, imageTitle, focusedView, language, theme, (Estate) null);

@@ -2,6 +2,8 @@ package com.example.diplomski_rad_tv;
 
 import android.content.SharedPreferences;
 
+import com.google.firebase.firestore.GeoPoint;
+
 public class SharedPreferencesService {
     SharedPreferences sharedPreferences;
     public SharedPreferencesService(SharedPreferences sharedPreferences) {
@@ -159,10 +161,36 @@ public class SharedPreferencesService {
 
     public void setGuestId(String ratingId) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-
         if (ratingId == null) return;
 
         editor.putString("guestId", ratingId);
+        editor.apply();
+    }
+
+    public GeoPoint getEstateCoordinates() {
+        double latitude = Double.valueOf(sharedPreferences.getString("latitude", ""));
+        double longitude = Double.valueOf(sharedPreferences.getString("longitude", ""));
+
+        return new GeoPoint(latitude, longitude);
+    }
+
+    public void setEstateCoordinates(double latitude, double longitude) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString("latitude", Double.toString(latitude));
+        editor.putString("longitude", Double.toString(longitude));
+        editor.apply();
+    }
+
+    public String getTemperatureUnit() {
+        return sharedPreferences.getString("unit", "C");
+    }
+
+    public void setTemperatureUnit(String unit) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (unit == null) return;
+
+        editor.putString("unit", unit);
         editor.apply();
     }
 

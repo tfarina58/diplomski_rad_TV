@@ -11,7 +11,8 @@ public enum GridNavigation {
         {0,                    R.id.backgroundGrid1, R.id.ratingButton,    R.id.themeButton},    // languageButton
         {0,                    R.id.backgroundGrid1, R.id.languageButton,  R.id.gridButton},     // themeButton
         {0,                    R.id.backgroundGrid1, R.id.themeButton,     R.id.textClock},      // gridButton
-        {0,                    R.id.backgroundGrid1, R.id.gridButton,      0},                   // textClock
+        {0,                    R.id.backgroundGrid1, R.id.gridButton,      R.id.weatherButton},  // textClock
+        {0,                    R.id.backgroundGrid1, R.id.textClock,       0},                   // weatherButton
         {R.id.backgroundGrid1, 0,                    0,                    R.id.pagination},     // searchView
         {R.id.backgroundGrid1, 0,                    R.id.searchView,      0},                   // pagination
         {R.id.languageButton,  R.id.searchView,      R.id.backgroundGrid1, R.id.backgroundGrid1} // backgroundGrid1
@@ -21,7 +22,8 @@ public enum GridNavigation {
         {0,                   R.id.gridButton1, R.id.ratingButton,   R.id.themeButton},    // languageButton
         {0,                   R.id.gridButton1, R.id.languageButton, R.id.gridButton},     // themeButton
         {0,                   R.id.gridButton1, R.id.themeButton,    R.id.textClock},      // gridButton
-        {0,                   R.id.gridButton1, R.id.gridButton,     0},                   // textClock
+        {0,                   R.id.gridButton1, R.id.gridButton,     R.id.weatherButton},  // textClock
+        {0,                   R.id.gridButton1, R.id.textClock,      0},                   // weatherButton
         {R.id.gridButton1,    0,                0,                   R.id.pagination},     // searchView
         {R.id.gridButton1,    0,                R.id.searchView,     0},                   // pagination
         {R.id.languageButton, R.id.searchView,  R.id.gridButton3,    R.id.gridButton2},    // gridButton1
@@ -33,7 +35,8 @@ public enum GridNavigation {
         {0,                   R.id.gridButton1, R.id.ratingButton,   R.id.themeButton},    // languageButton
         {0,                   R.id.gridButton1, R.id.languageButton, R.id.gridButton},     // themeButton
         {0,                   R.id.gridButton1, R.id.themeButton,    R.id.textClock},      // gridButton
-        {0,                   R.id.gridButton1, R.id.gridButton,     0},                   // textClock
+        {0,                   R.id.gridButton1, R.id.gridButton,     R.id.weatherButton},  // textClock
+        {0,                   R.id.gridButton1, R.id.textClock,      0},                   // weatherButton
         {R.id.gridButton1,    0,                0,                   R.id.pagination},     // searchView
         {R.id.gridButton1,    0,                R.id.searchView,     0},                   // pagination
         {R.id.languageButton, R.id.gridButton4, R.id.gridButton3,    R.id.gridButton2},    // gridButton1
@@ -42,6 +45,44 @@ public enum GridNavigation {
         {R.id.gridButton1,    R.id.searchView,  R.id.gridButton6,    R.id.gridButton5},    // gridButton4
         {R.id.gridButton2,    R.id.searchView,  R.id.gridButton4,    R.id.gridButton6},    // gridButton5
         {R.id.gridButton3,    R.id.searchView,  R.id.gridButton5,    R.id.gridButton4}     // gridButton6
+    };
+
+    private static final int[][] normalNavigationGrid1WithoutWeather = {
+            {0,                    R.id.backgroundGrid1, 0,                    R.id.languageButton}, // ratingButton
+            {0,                    R.id.backgroundGrid1, R.id.ratingButton,    R.id.themeButton},    // languageButton
+            {0,                    R.id.backgroundGrid1, R.id.languageButton,  R.id.gridButton},     // themeButton
+            {0,                    R.id.backgroundGrid1, R.id.themeButton,     R.id.textClock},      // gridButton
+            {0,                    R.id.backgroundGrid1, R.id.gridButton,      0},                   // textClock
+            {R.id.backgroundGrid1, 0,                    0,                    R.id.pagination},     // searchView
+            {R.id.backgroundGrid1, 0,                    R.id.searchView,      0},                   // pagination
+            {R.id.languageButton,  R.id.searchView,      R.id.backgroundGrid1, R.id.backgroundGrid1} // backgroundGrid1
+    };
+    private static final int[][] normalNavigationGrid3WithoutWeather = {
+            {0,                   R.id.gridButton1, 0,                   R.id.languageButton}, // ratingButton
+            {0,                   R.id.gridButton1, R.id.ratingButton,   R.id.themeButton},    // languageButton
+            {0,                   R.id.gridButton1, R.id.languageButton, R.id.gridButton},     // themeButton
+            {0,                   R.id.gridButton1, R.id.themeButton,    R.id.textClock},      // gridButton
+            {0,                   R.id.gridButton1, R.id.gridButton,     0},                   // textClock
+            {R.id.gridButton1,    0,                0,                   R.id.pagination},     // searchView
+            {R.id.gridButton1,    0,                R.id.searchView,     0},                   // pagination
+            {R.id.languageButton, R.id.searchView,  R.id.gridButton3,    R.id.gridButton2},    // gridButton1
+            {R.id.languageButton, R.id.searchView,  R.id.gridButton1,    R.id.gridButton3},    // gridButton2
+            {R.id.languageButton, R.id.searchView,  R.id.gridButton2,    R.id.gridButton1}     // gridButton3
+    };
+    private static final int[][] normalNavigationGrid6WithoutWeather = {
+            {0,                   R.id.gridButton1, 0,                   R.id.languageButton}, // ratingButton
+            {0,                   R.id.gridButton1, R.id.ratingButton,   R.id.themeButton},    // languageButton
+            {0,                   R.id.gridButton1, R.id.languageButton, R.id.gridButton},     // themeButton
+            {0,                   R.id.gridButton1, R.id.themeButton,    R.id.textClock},      // gridButton
+            {0,                   R.id.gridButton1, R.id.gridButton,     0},                   // textClock
+            {R.id.gridButton1,    0,                0,                   R.id.pagination},     // searchView
+            {R.id.gridButton1,    0,                R.id.searchView,     0},                   // pagination
+            {R.id.languageButton, R.id.gridButton4, R.id.gridButton3,    R.id.gridButton2},    // gridButton1
+            {R.id.languageButton, R.id.gridButton5, R.id.gridButton1,    R.id.gridButton3},    // gridButton2
+            {R.id.languageButton, R.id.gridButton6, R.id.gridButton2,    R.id.gridButton1},    // gridButton3
+            {R.id.gridButton1,    R.id.searchView,  R.id.gridButton6,    R.id.gridButton5},    // gridButton4
+            {R.id.gridButton2,    R.id.searchView,  R.id.gridButton4,    R.id.gridButton6},    // gridButton5
+            {R.id.gridButton3,    R.id.searchView,  R.id.gridButton5,    R.id.gridButton4}     // gridButton6
     };
 
     private static final int[][] estateNavigationGrid1 = {
@@ -78,16 +119,28 @@ public enum GridNavigation {
             {R.id.gridButton2,    R.id.searchView,  R.id.gridButton4,    R.id.gridButton6},    // gridButton5
             {R.id.gridButton3,    R.id.searchView,  R.id.gridButton5,    R.id.gridButton4}     // gridButton6
     };
-    public static int navigateOverActivity(boolean isEstateActivity, GridNavigation currentGrid, int currentViewId, int direction) {
+    public static int navigateOverActivity(boolean isEstateActivity, boolean hasWeatherButton, GridNavigation currentGrid, int currentViewId, int direction) {
         if (!isEstateActivity) {
-            switch (currentGrid) {
-                case one:
-                    return normalNavigationGrid1[getNormalRowWithId(currentViewId)][direction];
-                case three:
-                    return normalNavigationGrid3[getNormalRowWithId(currentViewId)][direction];
-                case six:
-                    return normalNavigationGrid6[getNormalRowWithId(currentViewId)][direction];
+            if (!hasWeatherButton) {
+                switch (currentGrid) {
+                    case one:
+                        return normalNavigationGrid1WithoutWeather[getNormalRowWithId(false, currentViewId)][direction];
+                    case three:
+                        return normalNavigationGrid3WithoutWeather[getNormalRowWithId(false, currentViewId)][direction];
+                    case six:
+                        return normalNavigationGrid6WithoutWeather[getNormalRowWithId(false, currentViewId)][direction];
+                }
+            } else {
+                switch (currentGrid) {
+                    case one:
+                        return normalNavigationGrid1[getNormalRowWithId(true, currentViewId)][direction];
+                    case three:
+                        return normalNavigationGrid3[getNormalRowWithId(true, currentViewId)][direction];
+                    case six:
+                        return normalNavigationGrid6[getNormalRowWithId(true, currentViewId)][direction];
+                }
             }
+
         } else {
             switch (currentGrid) {
                 case one:
@@ -100,20 +153,38 @@ public enum GridNavigation {
         }
         return 0;
     }
-    public static int getNormalRowWithId(int currentViewId) {
-        if (currentViewId == R.id.ratingButton) return 0;
-        if (currentViewId == R.id.languageButton) return 1;
-        if (currentViewId == R.id.themeButton) return 2;
-        if (currentViewId == R.id.gridButton) return 3;
-        if (currentViewId == R.id.textClock) return 4;
-        if (currentViewId == R.id.searchView) return 5;
-        if (currentViewId == R.id.pagination) return 6;
-        if (currentViewId == R.id.backgroundGrid1 || currentViewId == R.id.gridButton1) return 7;
-        if (currentViewId == R.id.gridButton2) return 8;
-        if (currentViewId == R.id.gridButton3) return 9;
-        if (currentViewId == R.id.gridButton4) return 10;
-        if (currentViewId == R.id.gridButton5) return 11;
-        if (currentViewId == R.id.gridButton6) return 12;
+    public static int getNormalRowWithId(boolean hasWeatherButton, int currentViewId) {
+        if (!hasWeatherButton) {
+            if (currentViewId == R.id.ratingButton) return 0;
+            if (currentViewId == R.id.languageButton) return 1;
+            if (currentViewId == R.id.themeButton) return 2;
+            if (currentViewId == R.id.gridButton) return 3;
+            if (currentViewId == R.id.textClock) return 4;
+            if (currentViewId == R.id.searchView) return 5;
+            if (currentViewId == R.id.pagination) return 6;
+            if (currentViewId == R.id.backgroundGrid1 || currentViewId == R.id.gridButton1) return 7;
+            if (currentViewId == R.id.gridButton2) return 8;
+            if (currentViewId == R.id.gridButton3) return 9;
+            if (currentViewId == R.id.gridButton4) return 10;
+            if (currentViewId == R.id.gridButton5) return 11;
+            if (currentViewId == R.id.gridButton6) return 12;
+        } else {
+            if (currentViewId == R.id.ratingButton) return 0;
+            if (currentViewId == R.id.languageButton) return 1;
+            if (currentViewId == R.id.themeButton) return 2;
+            if (currentViewId == R.id.gridButton) return 3;
+            if (currentViewId == R.id.textClock) return 4;
+            if (currentViewId == R.id.weatherButton) return 5;
+            if (currentViewId == R.id.searchView) return 6;
+            if (currentViewId == R.id.pagination) return 7;
+            if (currentViewId == R.id.backgroundGrid1 || currentViewId == R.id.gridButton1) return 8;
+            if (currentViewId == R.id.gridButton2) return 9;
+            if (currentViewId == R.id.gridButton3) return 10;
+            if (currentViewId == R.id.gridButton4) return 11;
+            if (currentViewId == R.id.gridButton5) return 12;
+            if (currentViewId == R.id.gridButton6) return 13;
+        }
+
         return -1;
     }
 
@@ -134,7 +205,7 @@ public enum GridNavigation {
     }
 
     public static boolean isUpperButtons(int viewId) {
-        return viewId == R.id.ratingButton || viewId == R.id.languageButton || viewId == R.id.themeButton || viewId == R.id.gridButton || viewId == R.id.textClock;
+        return viewId == R.id.ratingButton || viewId == R.id.languageButton || viewId == R.id.themeButton || viewId == R.id.gridButton || viewId == R.id.textClock || viewId == R.id.weatherButton;
     }
 
     public static boolean isLowerButtons(int viewId) {

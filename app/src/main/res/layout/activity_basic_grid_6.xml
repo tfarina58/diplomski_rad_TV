@@ -23,7 +23,7 @@
 
     <TextView
         android:id="@+id/gridTitle6"
-        android:layout_width="265dp"
+        android:layout_width="215dp"
         android:layout_height="35dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="14dp"
@@ -70,7 +70,7 @@
 
     <Button
         android:id="@+id/languageButton"
-        android:layout_width="118dp"
+        android:layout_width="108dp"
         android:layout_height="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -102,7 +102,7 @@
 
     <Button
         android:id="@+id/themeButton"
-        android:layout_width="118dp"
+        android:layout_width="108dp"
         android:layout_height="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -132,7 +132,7 @@
 
     <Button
         android:id="@+id/gridButton"
-        android:layout_width="138dp"
+        android:layout_width="128dp"
         android:layout_height="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -156,13 +156,13 @@
         android:translationZ="20dp"
         app:layout_constraintBottom_toBottomOf="@+id/gridButton"
         app:layout_constraintEnd_toEndOf="@+id/gridButton"
-        app:layout_constraintHorizontal_bias="0.17"
+        app:layout_constraintHorizontal_bias="0.12"
         app:layout_constraintStart_toStartOf="@+id/gridButton"
         app:layout_constraintTop_toTopOf="@+id/gridButton" />
 
     <TextClock
         android:id="@+id/textClock"
-        android:layout_width="128dp"
+        android:layout_width="108dp"
         android:layout_height="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -172,8 +172,38 @@
         android:background="@drawable/purple_background"
         android:textAlignment="center"
         android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/weatherButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/weatherButton"
+        android:layout_width="92dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/purple_background"
+        android:gravity="center"
+        android:scaleType="fitCenter"
+        android:text="@string/temperature_display"
+        android:paddingLeft="26dp"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/weatherIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:srcCompat="@drawable/clouds"
+        android:translationZ="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/weatherButton"
+        app:layout_constraintEnd_toEndOf="@+id/weatherButton"
+        app:layout_constraintHorizontal_bias="0.17"
+        app:layout_constraintStart_toStartOf="@+id/weatherButton"
+        app:layout_constraintTop_toTopOf="@+id/weatherButton" />
 
     <android.widget.SearchView
         android:id="@+id/searchView"

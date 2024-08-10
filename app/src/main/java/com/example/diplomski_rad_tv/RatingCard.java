@@ -9,9 +9,6 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.Timestamp;
-import com.google.type.DateTime;
-
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class RatingCard {
@@ -66,13 +63,8 @@ public class RatingCard {
         ratingBar.setRating((float)rating.rating);
         ratingComment.setText(rating.comment);
 
-        Timestamp created = rating.created;
-        Date createdDate = created.toDate();
-        int date = createdDate.getDate();
-        int month = createdDate.getMonth();
-        int year = createdDate.getYear();
-
-        ratingTimestamp.setText(addZeroPrefix(date) + "." + addZeroPrefix(month) + "." + addZeroPrefix(year) + ".");
+        Date createdDate = rating.created.toDate();
+        ratingTimestamp.setText(addZeroPrefix(createdDate.getDate()) + "." + addZeroPrefix(createdDate.getMonth()) + "." + (2000 + createdDate.getYear() % 100) + ".");
     }
 
     static String addZeroPrefix(int timeValue) {

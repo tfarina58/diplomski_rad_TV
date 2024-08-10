@@ -14,6 +14,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.TextView;
+
+import com.google.firebase.firestore.GeoPoint;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.squareup.picasso.Picasso;
@@ -24,6 +26,8 @@ import android.widget.Toast;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +42,10 @@ public class DescriptionActivity extends Activity {
     boolean fullscreenMode = false;
     String focusedLayout = ""; // "rating", "bigWorkingHours" or ""
     View layoutFocusedView;
+    String temperatureUnit = "";
+    boolean daytime = false;
+    int weatherCode = 0;
+    double temperature = -999;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +56,9 @@ public class DescriptionActivity extends Activity {
         this.language = this.sharedPreferencesService.getLanguage();
         this.theme = this.sharedPreferencesService.getTheme();
         this.format = this.sharedPreferencesService.getClockFormat();
+        GeoPoint coordinates = this.sharedPreferencesService.getEstateCoordinates();
+        this.temperatureUnit = this.sharedPreferencesService.getTemperatureUnit();
+
 
         Bundle bundle = getIntent().getExtras();
         String jsonElement = bundle.getString("element");
@@ -59,6 +70,8 @@ public class DescriptionActivity extends Activity {
         if (this.element.template == 1) setContentView(R.layout.activity_description_1);
         else if (this.element.template == 2) setContentView(R.layout.activity_description_2);
         else setContentView(R.layout.activity_description_3);
+
+        if (coordinates != null) getWeatherAndTemperature(coordinates);
 
         {
             TextView title = findViewById(R.id.descriptionTitle);
@@ -118,9 +131,10 @@ public class DescriptionActivity extends Activity {
                     language = language.next();
                     sharedPreferencesService.setLanguage(language);
 
-                    updateView(element.template, 0);
-                    updateView(element.template, 1);
-                    updateView(element.template, 2);
+                    boolean hasWeatherButton = weatherCode != 0;
+                    updateView(element.template, hasWeatherButton, 0);
+                    updateView(element.template, hasWeatherButton, 1);
+                    updateView(element.template, hasWeatherButton, 2);
 
                     TextView title = findViewById(R.id.descriptionTitle);
                     setupTitle(getApplicationContext(), title, element.title, language, theme);
@@ -189,6 +203,28 @@ public class DescriptionActivity extends Activity {
                             ((TextClock)focusedView).setFormat12Hour("hh:mm:ss a");
                             break;
                     }
+                }
+            });
+        }
+
+        {
+
+            // Weather button
+            Button button = findViewById(R.id.weatherButton);
+            ImageView icon = findViewById(R.id.weatherIcon);
+
+            WeatherHeaderButton.setupWeatherButton(getApplicationContext(), button, icon, focusedView, daytime, weatherCode, temperature, temperatureUnit, theme);
+
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (temperatureUnit.equals("C")) temperatureUnit = "F";
+                    else temperatureUnit = "C";
+
+                    Button weatherButton = findViewById(R.id.weatherButton);;
+                    ImageView weatherIcon = findViewById(R.id.weatherIcon);;
+
+                    WeatherHeaderButton.setupWeatherButton(getApplicationContext(), weatherButton, weatherIcon, focusedView, daytime, weatherCode, temperature, temperatureUnit, theme);
                 }
             });
         }
@@ -389,9 +425,9 @@ public class DescriptionActivity extends Activity {
         if (keyCode >= 19 && keyCode <= 22) {
             if (specialCaseNavigation(oldFocusedViewId, keyCode - 19)) return true;
 
-            int newFocusedViewId = DescriptionNavigation.navigateOverActivity(this.element.template, oldFocusedViewId, keyCode - 19);
+            int newFocusedViewId = DescriptionNavigation.navigateOverActivity(this.element.template, weatherCode != 0, oldFocusedViewId, keyCode - 19);
             while (!checkViewExistence(newFocusedViewId) && newFocusedViewId != 0)
-                newFocusedViewId = DescriptionNavigation.navigateOverActivity(this.element.template, newFocusedViewId, keyCode - 19);
+                newFocusedViewId = DescriptionNavigation.navigateOverActivity(this.element.template, weatherCode != 0, newFocusedViewId, keyCode - 19);
 
             // If == 0, focusedView will stay the same
             if (newFocusedViewId == 0) return true;
@@ -401,12 +437,12 @@ public class DescriptionActivity extends Activity {
             this.focusedView.requestFocus();
 
             // Remove focus from old View
-            int row = DescriptionNavigation.getRowWithId(this.element.template, oldFocusedViewId);
-            updateView(this.element.template, row);
+            int row = DescriptionNavigation.getRowWithId(this.element.template, weatherCode != 0, oldFocusedViewId);
+            updateView(this.element.template, weatherCode != 0, row);
 
             // Add focus to new View
-            row = DescriptionNavigation.getRowWithId(this.element.template, newFocusedViewId);
-            updateView(this.element.template, row);
+            row = DescriptionNavigation.getRowWithId(this.element.template, weatherCode != 0, newFocusedViewId);
+            updateView(this.element.template, weatherCode != 0, row);
 
             CustomScrollView scrollView = findViewById(R.id.scrollView);
             this.scrollToCenterView(scrollView, this.focusedView);
@@ -425,6 +461,7 @@ public class DescriptionActivity extends Activity {
         if (focusedViewId == R.id.languageButton) return true;
         if (focusedViewId == R.id.themeButton) return true;
         if (focusedViewId == R.id.textClock) return true;
+        if (focusedViewId == R.id.weatherButton) return weatherCode != 0;
         if (focusedViewId == R.id.descriptionContent) return this.element.description != null && !this.element.description.isEmpty();
         if (focusedViewId == R.id.descriptionImage1) return this.element.images.size() > 0 && !this.element.images.get(0).isEmpty();
         if (focusedViewId == R.id.descriptionImage2) return this.element.images.size() > 1 && !this.element.images.get(1).isEmpty();
@@ -553,7 +590,6 @@ public class DescriptionActivity extends Activity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "0", Toast.LENGTH_LONG).show();
                 showViewPager(0);
             }
         });
@@ -565,7 +601,6 @@ public class DescriptionActivity extends Activity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "1", Toast.LENGTH_LONG).show();
                 showViewPager(1);
             }
         });
@@ -577,7 +612,6 @@ public class DescriptionActivity extends Activity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "2", Toast.LENGTH_LONG).show();
                 showViewPager(2);
             }
         });
@@ -589,7 +623,6 @@ public class DescriptionActivity extends Activity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "3", Toast.LENGTH_LONG).show();
                 showViewPager(3);
             }
         });
@@ -601,7 +634,6 @@ public class DescriptionActivity extends Activity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "4", Toast.LENGTH_LONG).show();
                 showViewPager(4);
             }
         });
@@ -613,7 +645,6 @@ public class DescriptionActivity extends Activity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "5", Toast.LENGTH_LONG).show();
                 showViewPager(5);
             }
         });
@@ -625,7 +656,6 @@ public class DescriptionActivity extends Activity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "6", Toast.LENGTH_LONG).show();
                 showViewPager(6);
             }
         });
@@ -637,7 +667,6 @@ public class DescriptionActivity extends Activity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "7", Toast.LENGTH_LONG).show();
                 showViewPager(7);
             }
         });
@@ -649,7 +678,6 @@ public class DescriptionActivity extends Activity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "8", Toast.LENGTH_LONG).show();
                 showViewPager(8);
             }
         });
@@ -780,231 +808,482 @@ public class DescriptionActivity extends Activity {
         else button.setTextColor(ContextCompat.getColor(ctx, R.color.text_color_dark_mode));
     }
 
-    void updateView(long template, int row) {
-        if (template == 1) {
-            if (row == 0) {
-                Button ratingButton = findViewById(R.id.ratingButton);
-                ImageView ratingIcon = findViewById(R.id.ratingIcon);
+    void updateView(long template, boolean hasWeatherButton, int row) {
+        if (!hasWeatherButton) {
+            if (template == 1) {
+                if (row == 0) {
+                    Button ratingButton = findViewById(R.id.ratingButton);
+                    ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 1) {
-                Button languageButton = findViewById(R.id.languageButton);
-                ImageView languageIcon = findViewById(R.id.languageIcon);
+                    RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+                } else if (row == 1) {
+                    Button languageButton = findViewById(R.id.languageButton);
+                    ImageView languageIcon = findViewById(R.id.languageIcon);
 
-                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 2) {
-                Button themeButton = findViewById(R.id.themeButton);
-                ImageView themeIcon = findViewById(R.id.themeIcon);
+                    LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+                } else if (row == 2) {
+                    Button themeButton = findViewById(R.id.themeButton);
+                    ImageView themeIcon = findViewById(R.id.themeIcon);
 
-                ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 3) {
-                TextClock textClock = findViewById(R.id.textClock);
+                    ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+                } else if (row == 3) {
+                    TextClock textClock = findViewById(R.id.textClock);
 
-                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
-            }
-            else if (row == 4) {
-                TextView description = findViewById(R.id.descriptionContent);
+                    ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+                } else if (row == 4) {
+                    TextView description = findViewById(R.id.descriptionContent);
 
-                this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 5) {
-                ImageView image = findViewById(R.id.descriptionImage1);
+                    this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
+                } else if (row == 5) {
+                    ImageView image = findViewById(R.id.descriptionImage1);
 
-                if (0 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
-                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-            }
-            else if (row == 6) {
-                ImageView image = findViewById(R.id.descriptionImage2);
+                    if (0 < this.element.images.size())
+                        this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
+                    else
+                        this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                } else if (row == 6) {
+                    ImageView image = findViewById(R.id.descriptionImage2);
 
-                if (1 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(1), this.focusedView, this.theme);
-                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-            }
-            else if (row == 7) {
-                ImageView image = findViewById(R.id.descriptionImage3);
+                    if (1 < this.element.images.size())
+                        this.setupImage(getApplicationContext(), image, this.element.images.get(1), this.focusedView, this.theme);
+                    else
+                        this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                } else if (row == 7) {
+                    ImageView image = findViewById(R.id.descriptionImage3);
 
-                if (2 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(2), this.focusedView, this.theme);
-                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-            }
-            else if (row == 8) {
-                ImageView image = findViewById(R.id.descriptionImage4);
+                    if (2 < this.element.images.size())
+                        this.setupImage(getApplicationContext(), image, this.element.images.get(2), this.focusedView, this.theme);
+                    else
+                        this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                } else if (row == 8) {
+                    ImageView image = findViewById(R.id.descriptionImage4);
 
-                if (3 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(3), this.focusedView, this.theme);
-                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-            }
-            else if (row == 9) {
-                ImageView image = findViewById(R.id.descriptionImage5);
+                    if (3 < this.element.images.size())
+                        this.setupImage(getApplicationContext(), image, this.element.images.get(3), this.focusedView, this.theme);
+                    else
+                        this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                } else if (row == 9) {
+                    ImageView image = findViewById(R.id.descriptionImage5);
 
-                if (4 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(4), this.focusedView, this.theme);
-                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-            }
-            else if (row == 10) {
-                ImageView image = findViewById(R.id.descriptionImage6);
+                    if (4 < this.element.images.size())
+                        this.setupImage(getApplicationContext(), image, this.element.images.get(4), this.focusedView, this.theme);
+                    else
+                        this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                } else if (row == 10) {
+                    ImageView image = findViewById(R.id.descriptionImage6);
 
-                if (5 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(5), this.focusedView, this.theme);
-                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-            }
-            else if (row == 11) {
-                ImageView image = findViewById(R.id.descriptionImage7);
+                    if (5 < this.element.images.size())
+                        this.setupImage(getApplicationContext(), image, this.element.images.get(5), this.focusedView, this.theme);
+                    else
+                        this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                } else if (row == 11) {
+                    ImageView image = findViewById(R.id.descriptionImage7);
 
-                if (6 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(6), this.focusedView, this.theme);
-                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-            }
-            else if (row == 12) {
-                ImageView image = findViewById(R.id.descriptionImage8);
+                    if (6 < this.element.images.size())
+                        this.setupImage(getApplicationContext(), image, this.element.images.get(6), this.focusedView, this.theme);
+                    else
+                        this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                } else if (row == 12) {
+                    ImageView image = findViewById(R.id.descriptionImage8);
 
-                if (7 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(7), this.focusedView, this.theme);
-                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-            }
-            else if (row == 13) {
-                ImageView image = findViewById(R.id.descriptionImage9);
+                    if (7 < this.element.images.size())
+                        this.setupImage(getApplicationContext(), image, this.element.images.get(7), this.focusedView, this.theme);
+                    else
+                        this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                } else if (row == 13) {
+                    ImageView image = findViewById(R.id.descriptionImage9);
 
-                if (8 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(8), this.focusedView, this.theme);
-                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-            }
-            else if (row == 14) {
-                Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
-                TextView workingHours = findViewById(R.id.workingHours);
-                TextView entryFee = findViewById(R.id.entryFee);
-                TextView minimalAge = findViewById(R.id.minimalAge);
+                    if (8 < this.element.images.size())
+                        this.setupImage(getApplicationContext(), image, this.element.images.get(8), this.focusedView, this.theme);
+                    else
+                        this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                } else if (row == 14) {
+                    Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+                    TextView workingHours = findViewById(R.id.workingHours);
+                    TextView entryFee = findViewById(R.id.entryFee);
+                    TextView minimalAge = findViewById(R.id.minimalAge);
 
-                SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 15) {
-                Button button = findViewById(R.id.descriptionLink1);
+                    SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
+                } else if (row == 15) {
+                    Button button = findViewById(R.id.descriptionLink1);
 
-                if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
-                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
-            }
-            else if (row == 16) {
-                Button button = findViewById(R.id.descriptionLink2);
+                    if (0 < this.element.links.size())
+                        this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+                    else
+                        this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                } else if (row == 16) {
+                    Button button = findViewById(R.id.descriptionLink2);
 
-                if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
-                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
-            }
-            else if (row == 17) {
-                Button button = findViewById(R.id.descriptionLink3);
+                    if (1 < this.element.links.size())
+                        this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+                    else
+                        this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                } else if (row == 17) {
+                    Button button = findViewById(R.id.descriptionLink3);
 
-                if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
-                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
-            }
-        } else if (template == 2) {
-            if (row == 0) {
-                Button ratingButton = findViewById(R.id.ratingButton);
-                ImageView ratingIcon = findViewById(R.id.ratingIcon);
+                    if (2 < this.element.links.size())
+                        this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+                    else
+                        this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
+            } else if (template == 2) {
+                if (row == 0) {
+                    Button ratingButton = findViewById(R.id.ratingButton);
+                    ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 1) {
-                Button languageButton = findViewById(R.id.languageButton);
-                ImageView languageIcon = findViewById(R.id.languageIcon);
+                    RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+                } else if (row == 1) {
+                    Button languageButton = findViewById(R.id.languageButton);
+                    ImageView languageIcon = findViewById(R.id.languageIcon);
 
-                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 2) {
-                Button themeButton = findViewById(R.id.themeButton);
-                ImageView themeIcon = findViewById(R.id.themeIcon);
+                    LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+                } else if (row == 2) {
+                    Button themeButton = findViewById(R.id.themeButton);
+                    ImageView themeIcon = findViewById(R.id.themeIcon);
 
-                ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 3) {
-                TextClock textClock = findViewById(R.id.textClock);
+                    ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+                } else if (row == 3) {
+                    TextClock textClock = findViewById(R.id.textClock);
 
-                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
-            }
-            else if (row == 4) {
-                TextView description = findViewById(R.id.descriptionContent);
+                    ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+                } else if (row == 4) {
+                    TextView description = findViewById(R.id.descriptionContent);
 
-                this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 5) {
-                ImageView image = findViewById(R.id.descriptionImage1);
+                    this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
+                } else if (row == 5) {
+                    ImageView image = findViewById(R.id.descriptionImage1);
 
-                if (0 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
-                else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
-            }
-            else if (row == 6) {
-                Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
-                TextView workingHours = findViewById(R.id.workingHours);
-                TextView entryFee = findViewById(R.id.entryFee);
-                TextView minimalAge = findViewById(R.id.minimalAge);
+                    if (0 < this.element.images.size())
+                        this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
+                    else
+                        this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                } else if (row == 6) {
+                    Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+                    TextView workingHours = findViewById(R.id.workingHours);
+                    TextView entryFee = findViewById(R.id.entryFee);
+                    TextView minimalAge = findViewById(R.id.minimalAge);
 
-                SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 7) {
-                Button button = findViewById(R.id.descriptionLink1);
+                    SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
+                } else if (row == 7) {
+                    Button button = findViewById(R.id.descriptionLink1);
 
-                if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
-                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
-            }
-            else if (row == 8) {
-                Button button = findViewById(R.id.descriptionLink2);
+                    if (0 < this.element.links.size())
+                        this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+                    else
+                        this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                } else if (row == 8) {
+                    Button button = findViewById(R.id.descriptionLink2);
 
-                if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
-                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
-            }
-            else if (row == 9) {
-                Button button = findViewById(R.id.descriptionLink3);
+                    if (1 < this.element.links.size())
+                        this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+                    else
+                        this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                } else if (row == 9) {
+                    Button button = findViewById(R.id.descriptionLink3);
 
-                if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
-                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                    if (2 < this.element.links.size())
+                        this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+                    else
+                        this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
+            } else {
+                if (row == 0) {
+                    Button ratingButton = findViewById(R.id.ratingButton);
+                    ImageView ratingIcon = findViewById(R.id.ratingIcon);
+
+                    RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+                } else if (row == 1) {
+                    Button languageButton = findViewById(R.id.languageButton);
+                    ImageView languageIcon = findViewById(R.id.languageIcon);
+
+                    LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+                } else if (row == 2) {
+                    Button themeButton = findViewById(R.id.themeButton);
+                    ImageView themeIcon = findViewById(R.id.themeIcon);
+
+                    ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+                } else if (row == 3) {
+                    TextClock textClock = findViewById(R.id.textClock);
+
+                    ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+                } else if (row == 4) {
+                    ViewPager2 viewPager = findViewById(R.id.viewPager);
+
+                    this.setupViewPager(getApplicationContext(), viewPager, this.element.images.size(), this.focusedView, this.theme);
+                } else if (row == 5) {
+                    Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+                    TextView workingHours = findViewById(R.id.workingHours);
+                    TextView entryFee = findViewById(R.id.entryFee);
+                    TextView minimalAge = findViewById(R.id.minimalAge);
+
+                    SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
+                } else if (row == 6) {
+                    Button button = findViewById(R.id.descriptionLink1);
+
+                    if (0 < this.element.links.size())
+                        this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+                    else
+                        this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                } else if (row == 7) {
+                    Button button = findViewById(R.id.descriptionLink2);
+
+                    if (1 < this.element.links.size())
+                        this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+                    else
+                        this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                } else if (row == 8) {
+                    Button button = findViewById(R.id.descriptionLink3);
+
+                    if (2 < this.element.links.size())
+                        this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+                    else
+                        this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
             }
         } else {
-            if (row == 0) {
-                Button ratingButton = findViewById(R.id.ratingButton);
-                ImageView ratingIcon = findViewById(R.id.ratingIcon);
+            if (template == 1) {
+                if (row == 0) {
+                    Button ratingButton = findViewById(R.id.ratingButton);
+                    ImageView ratingIcon = findViewById(R.id.ratingIcon);
 
-                RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 1) {
-                Button languageButton = findViewById(R.id.languageButton);
-                ImageView languageIcon = findViewById(R.id.languageIcon);
+                    RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 1) {
+                    Button languageButton = findViewById(R.id.languageButton);
+                    ImageView languageIcon = findViewById(R.id.languageIcon);
 
-                LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 2) {
-                Button themeButton = findViewById(R.id.themeButton);
-                ImageView themeIcon = findViewById(R.id.themeIcon);
+                    LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 2) {
+                    Button themeButton = findViewById(R.id.themeButton);
+                    ImageView themeIcon = findViewById(R.id.themeIcon);
 
-                ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 3) {
-                TextClock textClock = findViewById(R.id.textClock);
+                    ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 3) {
+                    TextClock textClock = findViewById(R.id.textClock);
 
-                ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
-            }
-            else if (row == 4) {
-                ViewPager2 viewPager = findViewById(R.id.viewPager);
+                    ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+                }
+                else if (row == 4) {
+                    Button weatherButton = findViewById(R.id.weatherButton);
+                    ImageView weatherIcon = findViewById(R.id.weatherIcon);
 
-                this.setupViewPager(getApplicationContext(), viewPager, this.element.images.size(), this.focusedView, this.theme);
-            }
-            else if (row == 5) {
-                Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
-                TextView workingHours = findViewById(R.id.workingHours);
-                TextView entryFee = findViewById(R.id.entryFee);
-                TextView minimalAge = findViewById(R.id.minimalAge);
+                    WeatherHeaderButton.setupWeatherButton(getApplicationContext(), weatherButton, weatherIcon, this.focusedView, this.daytime, this.weatherCode, this.temperature, this.temperatureUnit, this.theme);
+                }
+                else if (row == 5) {
+                    TextView description = findViewById(R.id.descriptionContent);
 
-                SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
-            }
-            else if (row == 6) {
-                Button button = findViewById(R.id.descriptionLink1);
+                    this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 6) {
+                    ImageView image = findViewById(R.id.descriptionImage1);
 
-                if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
-                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
-            }
-            else if (row == 7) {
-                Button button = findViewById(R.id.descriptionLink2);
+                    if (0 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
+                    else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                }
+                else if (row == 7) {
+                    ImageView image = findViewById(R.id.descriptionImage2);
 
-                if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
-                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
-            }
-            else if (row == 8) {
-                Button button = findViewById(R.id.descriptionLink3);
+                    if (1 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(1), this.focusedView, this.theme);
+                    else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                }
+                else if (row == 8) {
+                    ImageView image = findViewById(R.id.descriptionImage3);
 
-                if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
-                else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                    if (2 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(2), this.focusedView, this.theme);
+                    else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                }
+                else if (row == 9) {
+                    ImageView image = findViewById(R.id.descriptionImage4);
+
+                    if (3 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(3), this.focusedView, this.theme);
+                    else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                }
+                else if (row == 10) {
+                    ImageView image = findViewById(R.id.descriptionImage5);
+
+                    if (4 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(4), this.focusedView, this.theme);
+                    else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                }
+                else if (row == 11) {
+                    ImageView image = findViewById(R.id.descriptionImage6);
+
+                    if (5 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(5), this.focusedView, this.theme);
+                    else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                }
+                else if (row == 12) {
+                    ImageView image = findViewById(R.id.descriptionImage7);
+
+                    if (6 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(6), this.focusedView, this.theme);
+                    else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                }
+                else if (row == 13) {
+                    ImageView image = findViewById(R.id.descriptionImage8);
+
+                    if (7 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(7), this.focusedView, this.theme);
+                    else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                }
+                else if (row == 14) {
+                    ImageView image = findViewById(R.id.descriptionImage9);
+
+                    if (8 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(8), this.focusedView, this.theme);
+                    else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                }
+                else if (row == 15) {
+                    Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+                    TextView workingHours = findViewById(R.id.workingHours);
+                    TextView entryFee = findViewById(R.id.entryFee);
+                    TextView minimalAge = findViewById(R.id.minimalAge);
+
+                    SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 16) {
+                    Button button = findViewById(R.id.descriptionLink1);
+
+                    if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+                    else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
+                else if (row == 17) {
+                    Button button = findViewById(R.id.descriptionLink2);
+
+                    if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+                    else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
+                else if (row == 18) {
+                    Button button = findViewById(R.id.descriptionLink3);
+
+                    if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+                    else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
+            } else if (template == 2) {
+                if (row == 0) {
+                    Button ratingButton = findViewById(R.id.ratingButton);
+                    ImageView ratingIcon = findViewById(R.id.ratingIcon);
+
+                    RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 1) {
+                    Button languageButton = findViewById(R.id.languageButton);
+                    ImageView languageIcon = findViewById(R.id.languageIcon);
+
+                    LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 2) {
+                    Button themeButton = findViewById(R.id.themeButton);
+                    ImageView themeIcon = findViewById(R.id.themeIcon);
+
+                    ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 3) {
+                    TextClock textClock = findViewById(R.id.textClock);
+
+                    ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+                }
+                else if (row == 4) {
+                    Button weatherButton = findViewById(R.id.weatherButton);
+                    ImageView weatherIcon = findViewById(R.id.weatherIcon);
+
+                    WeatherHeaderButton.setupWeatherButton(getApplicationContext(), weatherButton, weatherIcon, this.focusedView, this.daytime, this.weatherCode, this.temperature, this.temperatureUnit, this.theme);
+                }
+                else if (row == 5) {
+                    TextView description = findViewById(R.id.descriptionContent);
+
+                    this.setupDescription(getApplicationContext(), description, this.element.description, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 6) {
+                    ImageView image = findViewById(R.id.descriptionImage1);
+
+                    if (0 < this.element.images.size()) this.setupImage(getApplicationContext(), image, this.element.images.get(0), this.focusedView, this.theme);
+                    else this.setupImage(getApplicationContext(), image, "", this.focusedView, this.theme);
+                }
+                else if (row == 7) {
+                    Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+                    TextView workingHours = findViewById(R.id.workingHours);
+                    TextView entryFee = findViewById(R.id.entryFee);
+                    TextView minimalAge = findViewById(R.id.minimalAge);
+
+                    SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 8) {
+                    Button button = findViewById(R.id.descriptionLink1);
+
+                    if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+                    else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
+                else if (row == 9) {
+                    Button button = findViewById(R.id.descriptionLink2);
+
+                    if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+                    else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
+                else if (row == 10) {
+                    Button button = findViewById(R.id.descriptionLink3);
+
+                    if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+                    else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
+            } else {
+                if (row == 0) {
+                    Button ratingButton = findViewById(R.id.ratingButton);
+                    ImageView ratingIcon = findViewById(R.id.ratingIcon);
+
+                    RatingHeaderButton.setupRatingButton(getApplicationContext(), ratingButton, ratingIcon, true, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 1) {
+                    Button languageButton = findViewById(R.id.languageButton);
+                    ImageView languageIcon = findViewById(R.id.languageIcon);
+
+                    LanguageHeaderButton.setupLanguageButton(getApplicationContext(), languageButton, languageIcon, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 2) {
+                    Button themeButton = findViewById(R.id.themeButton);
+                    ImageView themeIcon = findViewById(R.id.themeIcon);
+
+                    ThemeHeaderButton.setupThemeButton(getApplicationContext(), themeButton, themeIcon, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 3) {
+                    TextClock textClock = findViewById(R.id.textClock);
+
+                    ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+                }
+                else if (row == 4) {
+                    Button weatherButton = findViewById(R.id.weatherButton);
+                    ImageView weatherIcon = findViewById(R.id.weatherIcon);
+
+                    WeatherHeaderButton.setupWeatherButton(getApplicationContext(), weatherButton, weatherIcon, this.focusedView, this.daytime, this.weatherCode, this.temperature, this.temperatureUnit, this.theme);
+                }
+                else if (row == 5) {
+                    ViewPager2 viewPager = findViewById(R.id.viewPager);
+
+                    this.setupViewPager(getApplicationContext(), viewPager, this.element.images.size(), this.focusedView, this.theme);
+                }
+                else if (row == 6) {
+                    Button smallWorkingHours = findViewById(R.id.smallWorkingHours);
+                    TextView workingHours = findViewById(R.id.workingHours);
+                    TextView entryFee = findViewById(R.id.entryFee);
+                    TextView minimalAge = findViewById(R.id.minimalAge);
+
+                    SmallWorkingHours.setupSmallWorkingHours(getApplicationContext(), smallWorkingHours, workingHours, entryFee, minimalAge, this.element, this.focusedView, this.language, this.theme);
+                }
+                else if (row == 7) {
+                    Button button = findViewById(R.id.descriptionLink1);
+
+                    if (0 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(0).get("title"), (String) this.element.links.get(0).get("url"), this.focusedView, this.language, this.theme);
+                    else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
+                else if (row == 8) {
+                    Button button = findViewById(R.id.descriptionLink2);
+
+                    if (1 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(1).get("title"), (String) this.element.links.get(1).get("url"), this.focusedView, this.language, this.theme);
+                    else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
+                else if (row == 9) {
+                    Button button = findViewById(R.id.descriptionLink3);
+
+                    if (2 < this.element.links.size()) this.setupLink(getApplicationContext(), button, (LinkedTreeMap<String, String>) this.element.links.get(2).get("title"), (String) this.element.links.get(2).get("url"), this.focusedView, this.language, this.theme);
+                    else this.setupLink(getApplicationContext(), button, null, "", this.focusedView, this.language, this.theme);
+                }
             }
         }
     }
@@ -1097,7 +1376,6 @@ public class DescriptionActivity extends Activity {
         descriptionImage1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "0", Toast.LENGTH_LONG).show();
                 showViewPager(0);
             }
         });
@@ -1243,5 +1521,35 @@ public class DescriptionActivity extends Activity {
         TextClock textClock = findViewById(R.id.textClock);
 
         ClockHeaderButton.setupClockButton(getApplicationContext(), textClock, this.focusedView, this.format, this.theme);
+
+        Button weatherButton = findViewById(R.id.weatherButton);
+        ImageView weatherIcon = findViewById(R.id.weatherIcon);
+
+        WeatherHeaderButton.setupWeatherButton(getApplicationContext(), weatherButton, weatherIcon, this.focusedView, this.daytime, this.weatherCode, this.temperature, this.temperatureUnit, this.theme);
+    }
+
+    void getWeatherAndTemperature(GeoPoint coordinates) {
+        OpenWeatherMap.sendPostRequest("https://api.openweathermap.org/data/2.5/weather?lat=" + coordinates.getLatitude() + "&lon=" + coordinates.getLongitude() + "&appid=60a327a5990e24e4c309de648bd01fbe", new OpenWeatherMap.WeatherCallback() {
+            @Override
+            public void onWeatherDataReceived(JSONObject weatherData) {
+                try {
+                    daytime = weatherData.getJSONObject("sys").getLong("sunrise") < weatherData.getLong("dt") && weatherData.getLong("dt") < weatherData.getJSONObject("sys").getLong("sunset");
+                    weatherCode = weatherData.getJSONArray("weather").getJSONObject(0).getInt("id");
+                    temperature = weatherData.getJSONObject("main").getDouble("temp");
+
+                    Button button = findViewById(R.id.weatherButton);
+                    ImageView icon = findViewById(R.id.weatherIcon);
+
+                    WeatherHeaderButton.setupWeatherButton(getApplicationContext(), button, icon, focusedView, daytime, weatherCode, temperature, temperatureUnit, theme);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                System.out.println(errorMessage);
+            }
+        });
     }
 }

@@ -44,6 +44,10 @@ public class MyRatingActivity extends Activity {
     String ratingId = "";
     String focusedLayout = ""; // "rating" or ""
     View layoutFocusedView;
+    String temperatureUnit = "";
+    boolean daytime = false;
+    int weatherCode = 0;
+    double temperature = -999;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
