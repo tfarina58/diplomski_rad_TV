@@ -415,6 +415,11 @@ public class EstateListActivity extends Activity {
                     setNewContentView();
                 }
             });
+
+            button = findViewById(R.id.weatherButton);
+            icon = findViewById(R.id.weatherIcon);
+
+            WeatherHeaderButton.setupWeatherButton(getApplicationContext(), button, icon, focusedView, true, 0, -999, "C", theme);
         }
 
         {
