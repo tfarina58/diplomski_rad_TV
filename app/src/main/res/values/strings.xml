@@ -27,11 +27,11 @@
 
     <string name="no_categories_en">There are no categories to display!</string>
     <string name="no_categories_de">Es sind keine Kategorien zum Anzeigen vorhanden!</string>
-    <string name="no_categories_hr">Nema kategorija za prikaz!</string>
+    <string name="no_categories_hr">Nema stavci za prikaz!</string>
 
-    <string name="no_elements_en">There are no elements to display!</string>
+    <string name="no_elements_en">There are no items to display!</string>
     <string name="no_elements_de">Es sind keine Elemente zum Anzeigen vorhanden!</string>
-    <string name="no_elements_hr">Nema elemenata za prikaz!</string>
+    <string name="no_elements_hr">Nema stavka za prikaz!</string>
 
     <string name="real_estate_name_en">Real estate name</string>
     <string name="real_estate_name_de">Immobilienname</string>
@@ -39,11 +39,11 @@
 
     <string name="category_name_en">Category name</string>
     <string name="category_name_de">Kategoriename</string>
-    <string name="category_name_hr">Ime kategorije</string>
+    <string name="category_name_hr">Ime stavke</string>
 
-    <string name="element_name_en">Element name</string>
+    <string name="element_name_en">Item name</string>
     <string name="element_name_de">Elementname</string>
-    <string name="element_name_hr">Naziv elementa</string>
+    <string name="element_name_hr">Naziv stavke</string>
 
     <string name="invalid_page_number_en">Invalid input. Please enter a number between 1 and</string>
     <string name="invalid_page_number_de">Ungültige Eingabe. Bitte geben Sie eine Zahl zwischen 1 und</string>
@@ -81,11 +81,11 @@
 
     <string name="welcome_en">Welcome</string>
     <string name="welcome_de">Willkommen</string>
-    <string name="welcome_hr">Dobrodošli</string>
+    <string name="welcome_hr">Dobro došli</string>
 
-    <string name="send_rating_en">Send rating</string>
-    <string name="send_rating_de">Bewertung senden</string>
-    <string name="send_rating_hr">Pošalji ocjenu</string>
+    <string name="send_rating_en">Send review</string>
+    <string name="send_rating_de">Rezension senden</string>
+    <string name="send_rating_hr">Pošalji recenziju</string>
 
     <string name="rating_content_en">Please write down any praise and remarks</string>
     <string name="rating_content_de">Bitte schreiben Sie Lob und Bemerkungen auf</string>
@@ -99,17 +99,17 @@
     <string name="cancel_de">Kündigen</string>
     <string name="cancel_hr">Otkaži</string>
 
-    <string name="rating_en">Rating</string>
-    <string name="rating_de">Bewertungen</string>
-    <string name="rating_hr">Ocjenivanje</string>
+    <string name="rating_en">Review</string>
+    <string name="rating_de">Rezension</string>
+    <string name="rating_hr">Recenzija</string>
 
-    <string name="cannot_uploading_rating_en">There was an error while uploading your rating.</string>
-    <string name="cannot_uploading_rating_de">Beim Hochladen Ihrer Bewertung ist ein Fehler aufgetreten.</string>
-    <string name="cannot_uploading_rating_hr">Došlo je do pogreške prilikom slanja vaše ocjene.</string>
+    <string name="cannot_uploading_rating_en">There was an error while uploading your review.</string>
+    <string name="cannot_uploading_rating_de">Beim Hochladen Ihrer Rezension ist ein Fehler aufgetreten.</string>
+    <string name="cannot_uploading_rating_hr">Došlo je do pogreške prilikom slanja vaše recenzije.</string>
 
-    <string name="cannot_download_rating_en">There was an error while downloading previous rating.</string>
-    <string name="cannot_download_rating_de">Beim Herunterladen der vorherigen Bewertung ist ein Fehler aufgetreten.</string>
-    <string name="cannot_download_rating_hr">Došlo je do pogreške prilikom preuzimanja prethodnih ocjene.</string>
+    <string name="cannot_download_rating_en">There was an error while downloading previous review.</string>
+    <string name="cannot_download_rating_de">Beim Herunterladen der vorherigen Rezension ist ein Fehler aufgetreten.</string>
+    <string name="cannot_download_rating_hr">Došlo je do pogreške prilikom preuzimanja prethodnih recenzija.</string>
 
     <string name="search_en">Search...</string>
     <string name="search_de">Suchen...</string>
@@ -135,45 +135,45 @@
     <string name="choose_rating_page_de">Nächste Seite auswählen</string>
     <string name="choose_rating_page_hr">Odaberite sljedeću stranicu</string>
 
-    <string name="my_rating_en">My rating</string>
-    <string name="my_rating_de">Meine Bewertung</string>
-    <string name="my_rating_hr">Moja ocjena</string>
+    <string name="my_rating_en">My review</string>
+    <string name="my_rating_de">Meine Rezension</string>
+    <string name="my_rating_hr">Moja recenzija</string>
 
-    <string name="show_ratings_en">Show ratings</string>
-    <string name="show_ratings_de">Bewertungen anzeigen</string>
-    <string name="show_ratings_hr">Prikaži ocjene</string>
+    <string name="show_ratings_en">Show reviews</string>
+    <string name="show_ratings_de">Rezensione anzeigen</string>
+    <string name="show_ratings_hr">Prikaži recenzije</string>
 
-    <string name="no_ratings_en">There are no ratings to display!</string>
-    <string name="no_ratings_de">Es sind keine Bewertungen vorhanden!</string>
-    <string name="no_ratings_hr">Nema ocjena za prikaz!</string>
+    <string name="no_ratings_en">There are no reviews to display!</string>
+    <string name="no_ratings_de">Es sind keine Rezensione vorhanden!</string>
+    <string name="no_ratings_hr">Nema recenzija za prikaz!</string>
 
     <string name="incorrect_password_en">The password is incorrect.</string>
     <string name="incorrect_password_de">Das Passwort ist inkorrekt.</string>
     <string name="incorrect_password_hr">Lozinka je netočna.</string>
 
-    <string name="send_rating_anonymously_en">Send rating anonymously</string>
-    <string name="send_rating_anonymously_de">Bewertung anonym absenden</string>
-    <string name="send_rating_anonymously_hr">Pošaljite ocjenu anonimno</string>
+    <string name="send_rating_anonymously_en">Send review anonymously</string>
+    <string name="send_rating_anonymously_de">Rezension anonym absenden</string>
+    <string name="send_rating_anonymously_hr">Pošaljite recenziju anonimno</string>
 
-    <string name="successfully_updated_rating_en">Your rating has been successfully updated.</string>
-    <string name="successfully_updated_rating_de">Ihre Bewertung wurde erfolgreich aktualisiert.</string>
-    <string name="successfully_updated_rating_hr">Vaša ocjena je uspješno ažurirana.</string>
+    <string name="successfully_updated_rating_en">Your review has been successfully updated.</string>
+    <string name="successfully_updated_rating_de">Ihre Rezension wurde erfolgreich aktualisiert.</string>
+    <string name="successfully_updated_rating_hr">Vaša recenzija je uspješno ažurirana.</string>
 
-    <string name="error_while_updating_rating_en">There was an error while updating your rating.</string>
-    <string name="error_while_updating_rating_de">Beim Aktualisieren Ihrer Bewertung ist ein Fehler aufgetreten.</string>
-    <string name="error_while_updating_rating_hr">Došlo je do pogreške prilikom ažuriranja vaše ocjene.</string>
+    <string name="error_while_updating_rating_en">There was an error while updating your review.</string>
+    <string name="error_while_updating_rating_de">Beim Aktualisieren Ihrer Rezension ist ein Fehler aufgetreten.</string>
+    <string name="error_while_updating_rating_hr">Došlo je do pogreške prilikom ažuriranja vaše recenzije.</string>
 
-    <string name="successfully_created_rating_en">Your rating has been successfully saved.</string>
-    <string name="successfully_created_rating_de">Ihre Bewertung wurde erfolgreich gespeichert.</string>
-    <string name="successfully_created_rating_hr">Vaša ocjena je uspješno spremljena.</string>
+    <string name="successfully_created_rating_en">Your review has been successfully saved.</string>
+    <string name="successfully_created_rating_de">Ihre Rezension wurde erfolgreich gespeichert.</string>
+    <string name="successfully_created_rating_hr">Vaša recenzija je uspješno spremljena.</string>
 
-    <string name="ratings_en">Ratings</string>
-    <string name="ratings_de">Bewertungen</string>
-    <string name="ratings_hr">Ocjene</string>
+    <string name="ratings_en">Reviews</string>
+    <string name="ratings_de">Rezensione</string>
+    <string name="ratings_hr">Recenzije</string>
 
-    <string name="your_rating_en">Your rating</string>
-    <string name="your_rating_de">Deine Bewertung</string>
-    <string name="your_rating_hr">Vaša ocjena</string>
+    <string name="your_rating_en">Your review</string>
+    <string name="your_rating_de">Deine Rezension</string>
+    <string name="your_rating_hr">Vaša recenzija</string>
 
     <string name="working_hours_en">Working hours</string>
     <string name="working_hours_de">Arbeitszeit</string>

@@ -19,13 +19,13 @@ public class RatingHeaderButton {
 
         switch (language) {
             case german:
-                ratingButton.setText(R.string.rating_de);
+                ratingButton.setText(R.string.ratings_de);
                 break;
             case croatian:
-                ratingButton.setText(R.string.rating_hr);
+                ratingButton.setText(R.string.ratings_hr);
                 break;
             default:
-                ratingButton.setText(R.string.rating_en);
+                ratingButton.setText(R.string.ratings_en);
         }
 
         ratingIcon.setImageDrawable(ContextCompat.getDrawable(ctx, R.drawable.rating));

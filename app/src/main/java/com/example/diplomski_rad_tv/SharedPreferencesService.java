@@ -209,6 +209,8 @@ public class SharedPreferencesService {
         setGrid(GridNavigation.six);
         setClockFormat(Clock.h24);
         setGuestId("");
+        setEstateCoordinates(0, 0);
         setRatingId("");
+        setTemperatureUnit("C");
     }
 }

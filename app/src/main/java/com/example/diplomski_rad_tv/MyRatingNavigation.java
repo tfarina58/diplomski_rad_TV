@@ -117,7 +117,7 @@ public class MyRatingNavigation {
         }
 
         ratingBar.setNumStars(5);
-        ratingBar.setStepSize(1);
+        ratingBar.setStepSize(1.0f);
         ratingBar.setRating(rating);
     }
 

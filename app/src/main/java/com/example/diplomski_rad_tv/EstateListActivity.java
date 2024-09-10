@@ -71,8 +71,21 @@ public class EstateListActivity extends Activity {
         this.estatesToShow = new ArrayList<>();
 
         this.firestore = FirebaseFirestore.getInstance();
-        Query query = firestore.collection("estates").whereEqualTo("ownerId", userId);
 
+        String orderBy = "name";
+        switch(this.language) {
+            case german:
+                orderBy += ".de";
+                break;
+            case croatian:
+                orderBy += ".hr";
+                break;
+            default:
+                orderBy += ".en";
+                break;
+        }
+
+        Query query = firestore.collection("estates").whereEqualTo("ownerId", userId).orderBy(orderBy, Query.Direction.ASCENDING);
         query.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override

@@ -135,11 +135,6 @@ public class MyRatingActivity extends Activity {
 
         // Up, down, left, right navigation button
         if (keyCode == 4) {
-            /*if (!id.isEmpty()) {
-                startActivity(new Intent(getApplicationContext(), DescriptionActivity.class));
-                return true;
-            }*/
-
             String id = this.sharedPreferencesService.getCategoryId();
             if (!id.isEmpty()) {
                 startActivity(new Intent(getApplicationContext(), ElementListActivity.class));
@@ -303,6 +298,18 @@ public class MyRatingActivity extends Activity {
                 case 5:
                     RatingBar ratingBar = findViewById(R.id.ratingBar);
                     MyRatingNavigation.setupRatingBarField(getApplicationContext(), ratingBar, this.focusedView, this.theme, ratingBar.getRating());
+
+                    ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                        @Override
+                        public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                            if (rating < 1) {
+                                ratingBar.setRating(1);
+                            } else if (rating > 5) {
+                                ratingBar.setRating(5);
+                            }
+                        }
+                    });
+
                 case 6:
                     Button cancelButton = findViewById(R.id.cancelButton);
                     MyRatingNavigation.setupCancelButton(getApplicationContext(), cancelButton, this.focusedView, this.language, this.theme);
@@ -448,6 +455,8 @@ public class MyRatingActivity extends Activity {
                         public void onClick(View v) {
                             if (temperatureUnit.equals("C")) temperatureUnit = "F";
                             else temperatureUnit = "C";
+
+                            sharedPreferencesService.setTemperatureUnit(temperatureUnit);
 
                             Button weatherButton = findViewById(R.id.weatherButton);;
                             ImageView weatherIcon = findViewById(R.id.weatherIcon);;

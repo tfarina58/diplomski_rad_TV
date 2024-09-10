@@ -221,6 +221,8 @@ public class DescriptionActivity extends Activity {
                     if (temperatureUnit.equals("C")) temperatureUnit = "F";
                     else temperatureUnit = "C";
 
+                    sharedPreferencesService.setTemperatureUnit(temperatureUnit);
+
                     Button weatherButton = findViewById(R.id.weatherButton);;
                     ImageView weatherIcon = findViewById(R.id.weatherIcon);;
 

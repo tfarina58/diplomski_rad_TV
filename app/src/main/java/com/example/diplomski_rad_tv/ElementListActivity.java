@@ -86,9 +86,22 @@ public class ElementListActivity extends Activity {
 
         getCurrentUserName();
 
-        if (coordinates != null) getWeatherAndTemperature(coordinates);
+        // if (coordinates != null) getWeatherAndTemperature(coordinates);
 
-        Query query = firestore.collection("elements").whereEqualTo("categoryId", categoryId);
+        String orderBy = "title";
+        switch(this.language) {
+            case german:
+                orderBy += ".de";
+                break;
+            case croatian:
+                orderBy += ".hr";
+                break;
+            default:
+                orderBy += ".en";
+                break;
+        }
+
+        Query query = firestore.collection("elements").whereEqualTo("categoryId", categoryId).orderBy(orderBy, Query.Direction.ASCENDING);
 
         query.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -517,6 +530,8 @@ public class ElementListActivity extends Activity {
                 public void onClick(View v) {
                     if (temperatureUnit.equals("C")) temperatureUnit = "F";
                     else temperatureUnit = "C";
+
+                    sharedPreferencesService.setTemperatureUnit(temperatureUnit);
 
                     Button weatherButton = findViewById(R.id.weatherButton);;
                     ImageView weatherIcon = findViewById(R.id.weatherIcon);;
